@@ -6,12 +6,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 npm run -s build
-PACKAGES="@marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway create-marg-app"
+PACKAGES="@marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway marg create-marg-app"
 fail=0
 for w in $PACKAGES; do
   case "$w" in
     @marg-adk/widget) want="widget.js" ;;
     @marg-adk/gateway) want="dist/server.js bin/marg-gateway.js public/demo.html" ;;
+    marg) want="bin/marg.js lib/cli.js payload/templates/domain.json.template" ;;
     create-marg-app) want="bin/create-marg-app.js payload/templates/domain.json.template payload/examples/support-intake/domain.json payload/shared-skills/conversation-behaviour/SKILL.md payload/scripts/new-domain.ts payload/env.example project/tsconfig.json" ;;
     @marg-adk/core) want="dist/index.js dist/index.d.ts dist/log-worker.mjs" ;;
     *) want="dist/index.js dist/index.d.ts" ;;

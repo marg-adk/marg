@@ -15,7 +15,7 @@ cleanup() {
 trap cleanup EXIT
 npm run -s build
 mkdir -p "$TMP/packs"
-for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway; do
+for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway marg; do
   npm pack -s -w "$w" --pack-destination "$TMP/packs" > /dev/null
 done
 ls "$TMP/packs"
@@ -39,4 +39,8 @@ bytes=$(curl -fsS "http://localhost:$PORT/widget.js" | wc -c | tr -d " ")
 [[ "$bytes" -gt 10000 ]] || { echo "widget.js not served (got $bytes bytes)"; exit 1; }
 echo "demo: playground and widget served on :$PORT"
 EVAL_GATEWAY="http://localhost:$PORT" npm run -s evals
-echo "create-marg-app OK: install, typecheck, gateway, playground, example suite"
+kill "$GW" 2>/dev/null || true; GW=""
+sleep 1
+echo "▶ marg check (the project gate, its own gateway on a free port)"
+npx marg check 2>&1 | tail -4
+echo "create-marg-app OK: install, typecheck, gateway, playground, example suite, marg check"

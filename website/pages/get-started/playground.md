@@ -1,8 +1,11 @@
 # The playground
 
-The gateway's home page is a playground around the embeddable widget: the conversation in the
-centre, your past chats on the left, the live draft on the right. It is exactly what a host
-application gets from one `<script>` tag.
+The gateway's home page is a playground around the embeddable widget, and the dev UI: one
+conversation in the centre (exactly what a host application gets from one `<script>` tag), the
+**live draft** on the right (every value with where it came from), and the **trace** beside it:
+one entry per turn with who answered (the runtime or the model), every tool call with its time,
+usage, and the create. Both panes collapse; past chats are in a drawer; the empty state offers
+the domains' own example openers.
 
 A hosted copy runs at **https://marg-playground.onrender.com** on the mock model with writes
 off. It sleeps when idle, so the first load takes a moment, and keeps no disk, so a session may

@@ -15,7 +15,7 @@ model by editing one line there.
 ## Your own domain
 
 ```bash
-npm run new-domain -- bookings --entity booking     # domains/bookings from templates/
+npx marg new bookings --entity booking     # domains/bookings from templates/
 ```
 
 Build in this order: tools (`mcp/server.ts`) → probe the backend → schema registry → skill →
@@ -25,10 +25,10 @@ guide is at https://github.com/marg-adk/marg/blob/main/docs/guides/new-domain.md
 ## The gate
 
 ```bash
-npm run gateway:evals &  # a second gateway on :8788 with writes OFF
-npm run evals            # the example's scenarios; exit code = the gate
-npm run typecheck
+npx marg check           # typecheck, then every suite against its own writes-off gateway
 ```
+
+Or by hand: `npm run gateway:evals &` (a second gateway on :8788, writes off), then `npm run evals`.
 
 ## Layout
 

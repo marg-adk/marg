@@ -19,7 +19,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 /** Dependency order: each package's .d.ts resolve through the previous ones' dist. */
 const ORDER = ["types", "core", "verdict", "evals", "metering", "gateway"];
-const WITH_LICENSE = [...ORDER, "widget", "create-marg-app"];
+const WITH_LICENSE = [...ORDER, "widget", "create-marg-app", "marg"];
 
 const t0 = Date.now();
 for (const p of ORDER) {
@@ -33,4 +33,5 @@ for (const p of ORDER) {
 }
 for (const p of WITH_LICENSE) copyFileSync(join(root, "LICENSE"), join(root, "packages", p, "LICENSE"));
 execFileSync("node", [join(root, "packages", "create-marg-app", "scripts", "sync-payload.js")], { stdio: "inherit" });
+execFileSync("node", [join(root, "packages", "marg", "scripts", "sync-payload.js")], { stdio: "inherit" });
 console.log(`build: ${ORDER.length} packages compiled, payload synced (${Math.round((Date.now() - t0) / 100) / 10}s)`);

@@ -27,6 +27,7 @@ observability/openobserve/alerts/
 packages/*/dist/
 packages/*/LICENSE
 packages/create-marg-app/payload/
+packages/marg/payload/
 
 # the site: mirrored content and build output (npm run site:build)
 website/src/
