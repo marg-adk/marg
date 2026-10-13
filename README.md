@@ -138,6 +138,8 @@ Five rules hold the design together:
 
 [docs/PATTERN.md](docs/PATTERN.md) explains each rule and the failure it answers;
 [docs/LESSONS.md](docs/LESSONS.md) is the field notebook behind them.
+[The model must never read "yes"](docs/posts/the-model-must-never-read-yes.md) is the launch
+post: the one number that shaped the design, and a step in twenty lines.
 
 ## The path to your own domain
 
