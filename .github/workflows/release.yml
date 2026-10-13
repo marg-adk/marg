@@ -37,7 +37,7 @@ jobs:
         run: |
           cp .env.example .env
           npm run gateway:evals > gateway.log 2>&1 &
-          for i in $(seq 1 60); do curl -fsS http://localhost:8788/health > /dev/null 2>&1 && break; sleep 1; done
+          for i in $(seq 1 60); do curl -fsS http://localhost:8788/api/health > /dev/null 2>&1 && break; sleep 1; done
           npm run evals
       - run: npm run check:pack
       - run: npm run check:create

@@ -1,5 +1,6 @@
 # Security gate on every PR and weekly: dependency review (new vulnerable or copyleft
-# dependencies fail the PR), a verified-secrets scan over the diff, and npm audit at high.
+# dependencies fail the PR) and npm audit at high. Secrets are caught by GitHub secret scanning
+# with push protection, enabled on the repository (no action to run, nothing to license).
 name: security
 on:
   pull_request:
@@ -24,20 +25,6 @@ jobs:
           fail-on-severity: high
           deny-licenses: GPL-2.0, GPL-3.0, AGPL-3.0, LGPL-3.0, SSPL-1.0
           comment-summary-in-pr: on-failure
-  secrets:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: TruffleHog (verified secrets only)
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }}
-          head: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
-          extra_args: --only-verified
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
