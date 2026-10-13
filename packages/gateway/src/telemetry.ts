@@ -11,7 +11,7 @@
  * `agent.eval.scenario`, so eval traffic is one filter away from production traffic on every panel.
  */
 import type express from "express";
-import { MS_BUCKETS, SpanKind, SpanStatusCode, counter, extractContext, histogram, normalizePath, otelContext, registerGauge, sessionCount, startSpan, withEvalTag } from "@marg/core";
+import { MS_BUCKETS, SpanKind, SpanStatusCode, counter, extractContext, histogram, normalizePath, otelContext, registerGauge, sessionCount, startSpan, withEvalTag } from "@marg-adk/core";
 
 function sessionOf(req: express.Request): string | undefined {
   const body = req.body as { session_id?: unknown } | undefined;

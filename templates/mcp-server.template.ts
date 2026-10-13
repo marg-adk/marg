@@ -22,7 +22,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { randomUUID } from "node:crypto";
-import { AUTH_META_KEY, SESSION_META_KEY, extractContext, head, initOtel, log, runInContext, SpanKind, SpanStatusCode, summarize, withSpan } from "@marg/core";
+import { AUTH_META_KEY, SESSION_META_KEY, extractContext, head, initOtel, log, runInContext, SpanKind, SpanStatusCode, summarize, withSpan } from "@marg-adk/core";
 
 initOtel({ service: "__NAME__-mcp" });
 

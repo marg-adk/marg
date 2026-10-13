@@ -16,7 +16,7 @@
  * scheme allowlist, lone chips, caps), reply dedupe (a model re-emitting its pre-tool text after
  * the tool answered), and the summary-card rows built from a draft.
  */
-import type { CardRow, UiBlock } from "@marg/types";
+import type { CardRow, UiBlock } from "@marg-adk/types";
 import { envList } from "./env.js";
 
 const BARE_BLOCK = /^\{\s*"type"\s*:\s*"[a-z]+"/;

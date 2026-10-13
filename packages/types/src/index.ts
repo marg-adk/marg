@@ -1,5 +1,5 @@
 /**
- * @marg/types — the shapes every package agrees on.
+ * @marg-adk/types — the shapes every package agrees on.
  *
  * WHAT THIS IS: the domain manifest (what a drop-in domain folder declares), the client
  * protocol (ui blocks, stream events, the preview pane, completion), and the state the

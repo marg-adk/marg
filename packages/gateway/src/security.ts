@@ -15,7 +15,7 @@
  */
 import { createHash, randomUUID } from "node:crypto";
 import type express from "express";
-import { envList, envNum, log, userIdFromToken, type Session } from "@marg/core";
+import { envList, envNum, log, userIdFromToken, type Session } from "@marg-adk/core";
 import { verifyAgentToken } from "./auth.js";
 
 export const securityConfig = {

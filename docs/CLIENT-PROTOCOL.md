@@ -41,7 +41,7 @@ the chat: render the end-state card (`label`, `entity_url` only when present), f
 composer, keep uploads welcome.
 
 ## ui blocks
-A reply's `ui` is an array of blocks (types in `@marg/types`). Tapping an option sends its
+A reply's `ui` is an array of blocks (types in `@marg-adk/types`). Tapping an option sends its
 `value` as the user's next message; a form submit sends `"Label [key]: value; …"` plus a
 readable `display`. Block families:
 

@@ -17,7 +17,7 @@
  *
  * Pure functions.
  */
-import type { FormBlock, FormRow } from "@marg/types";
+import type { FormBlock, FormRow } from "@marg-adk/types";
 
 export type { FormBlock, FormRow };
 

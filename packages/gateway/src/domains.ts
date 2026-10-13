@@ -10,9 +10,9 @@
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
-import type { DomainManifest } from "@marg/types";
+import type { DomainManifest } from "@marg-adk/types";
 import { pathToFileURL } from "node:url";
-import { REPO_ROOT, connectDomainMcp, envList, llmChain, loadDomainSteps, log, registerCapabilities } from "@marg/core";
+import { REPO_ROOT, connectDomainMcp, envList, llmChain, loadDomainSteps, log, registerCapabilities } from "@marg-adk/core";
 
 let cache: DomainManifest[] | null = null;
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * marg-gateway — start the Marg gateway from an installed @marg/gateway.
+ * marg-gateway — start the Marg gateway from an installed @marg-adk/gateway.
  *
  * WHAT COMES IN: the environment (.env in the working directory, docs/ENVIRONMENT.md).
  * WHAT COMES OUT: the HTTP/SSE server on GATEWAY_PORT (8787), domains discovered under the

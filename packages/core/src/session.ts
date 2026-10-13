@@ -14,7 +14,7 @@
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Completion, HistoryEntry, PreviewState } from "@marg/types";
+import type { Completion, HistoryEntry, PreviewState } from "@marg-adk/types";
 import { REPO_ROOT, envNum } from "./env.js";
 import { mongoSessions } from "./stores.js";
 import { log } from "./logger.js";

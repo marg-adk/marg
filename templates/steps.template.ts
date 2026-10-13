@@ -5,7 +5,7 @@
  * required questions, confirmations — runtime steps. Free text and corrections — the model.
  * Built from the three helpers; implement StepDefinition directly for a bespoke moment.
  */
-import { stepHelpers, type StepDefinition } from "@marg/core";
+import { stepHelpers, type StepDefinition } from "@marg-adk/core";
 
 const { chipsStep, formStep } = stepHelpers;
 

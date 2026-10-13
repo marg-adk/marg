@@ -23,7 +23,7 @@
   red, `RELEASING.md`, `.nvmrc`, `.editorconfig`, and badges in the README.
 - **packages**: every package is publishable — a build per package (`tsc -p tsconfig.build.json`
   to `dist/`, ESM + `.d.ts`), `exports`, `types`, `files`, `publishConfig.access: public`;
-  `@marg/widget` is now a package (the file plus a manifest); `@marg/gateway` ships a
+  `@marg-adk/widget` is now a package (the file plus a manifest); `@marg-adk/gateway` ships a
   `marg-gateway` command that registers the tsx loader and runs the compiled server. The tsx
   development path through `tsconfig.json` paths is unchanged.
 - **create-marg-app**: `npx create-marg-app my-agent` copies the templates, the example domain,

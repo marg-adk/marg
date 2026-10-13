@@ -16,7 +16,7 @@
  * abuse (a production chat hit the limit on its 11th tap).
  */
 import type express from "express";
-import { envNum, getCounterStore, log, recordRateLimited } from "@marg/core";
+import { envNum, getCounterStore, log, recordRateLimited } from "@marg-adk/core";
 
 const WINDOW_MS = 60_000;
 

@@ -7,7 +7,7 @@
  * Both are drawn after the model's gathering is valid, read in code, written to the draft and
  * carried into every validate/preview/create call.
  */
-import { stepHelpers, type StepDefinition } from "@marg/core";
+import { stepHelpers, type StepDefinition } from "@marg-adk/core";
 
 const { chipsStep, formStep } = stepHelpers;
 

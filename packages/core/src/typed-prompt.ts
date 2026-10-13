@@ -19,7 +19,7 @@
  *
  * Domains opt in with `types` in domain.json. AGENT_TYPED_PROMPT=false restores load-everything.
  */
-import type { DomainManifest, PreviewState } from "@marg/types";
+import type { DomainManifest, PreviewState } from "@marg-adk/types";
 import { behaviour } from "./otel.js";
 import type { ToolDef } from "./llm.js";
 import { log } from "./logger.js";

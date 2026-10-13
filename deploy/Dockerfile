@@ -1,7 +1,7 @@
 # deploy/Dockerfile — the gateway image. Build from the repository root:
 #   docker build -f deploy/Dockerfile -t marg-gateway .
 # No build step: tsx runs the TypeScript sources through tsconfig.json paths, so BOTH tsconfig files
-# ship (without tsconfig.base.json the paths are lost and @marg/* resolve to a dist/ that is not
+# ship (without tsconfig.base.json the paths are lost and @marg-adk/* resolve to a dist/ that is not
 # there). Runs as a non-root user; health on /api/health. CI builds this image and probes it.
 FROM node:22-alpine
 WORKDIR /app

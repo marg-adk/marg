@@ -9,7 +9,7 @@
  * Timers live in this process; in a multi-node deploy they belong to the node that served the last turn.
  */
 import type express from "express";
-import { envNum, getSession, isCompleted, log, pushMessage, saveSession } from "@marg/core";
+import { envNum, getSession, isCompleted, log, pushMessage, saveSession } from "@marg-adk/core";
 
 export const nudgeConfig = {
   enabled: process.env.AGENT_NUDGE_ENABLED !== "false",

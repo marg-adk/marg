@@ -10,7 +10,7 @@
  * Audio duration is metered (bill what the vendor bills you).
  */
 import type express from "express";
-import { counter, log, withSpan } from "@marg/core";
+import { counter, log, withSpan } from "@marg-adk/core";
 
 export const sttConfig = (() => {
   const provider = (process.env.AGENT_STT_PROVIDER ?? (process.env.DEEPGRAM_API_KEY ? "deepgram" : process.env.AGENT_STT_BASE ? "openai" : "")).toLowerCase();

@@ -1,4 +1,4 @@
-# @marg/gateway
+# @marg-adk/gateway
 
 The HTTP/SSE server of a [Marg](https://github.com/marg-adk/marg) agent — the only thing clients
 talk to: sessions with verified identity and owner checks, chat turns (JSON or streamed), the

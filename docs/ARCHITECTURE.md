@@ -31,7 +31,7 @@
 │ schema/*.json · steps/index.ts · mock/policy.ts · probe/ · evals/                │
 └─────────────────────────────────────────────────────────────────────────────────┘
       ▲                                   ▲
-      │ @marg/verdict (typed decisions)   │ model chain: anthropic | openai-compatible | mock
+      │ @marg-adk/verdict (typed decisions)   │ model chain: anthropic | openai-compatible | mock
 ```
 
 ## One turn, in order

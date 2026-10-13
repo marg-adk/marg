@@ -17,7 +17,7 @@
  */
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import type express from "express";
-import { envNum, log } from "@marg/core";
+import { envNum, log } from "@marg-adk/core";
 
 const SECRET = process.env.AGENT_TOKEN_SECRET ?? "";
 const TTL_S = envNum("AGENT_TOKEN_TTL_S", 900);

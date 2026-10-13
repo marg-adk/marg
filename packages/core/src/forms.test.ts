@@ -1,7 +1,7 @@
 /** forms.test.ts — the form wire format, validation and the echo, pinned. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { FormBlock, FormRow } from "@marg/types";
+import type { FormBlock, FormRow } from "@marg-adk/types";
 import { canonicalPick, formEcho, formReply, looksLikeFormReply, missingRows, parseFormReply, validateFormValues } from "./forms.js";
 
 const rows: FormRow[] = [

@@ -18,7 +18,7 @@
  */
 import { pathToFileURL } from "node:url";
 import { isAbsolute, join } from "node:path";
-import type { CardBlock, ChipsBlock, DomainManifest, PreviewState, StepState, UiBlock } from "@marg/types";
+import type { CardBlock, ChipsBlock, DomainManifest, PreviewState, StepState, UiBlock } from "@marg-adk/types";
 import { callDomainTool } from "../mcp-client.js";
 import { behaviour, withSpan } from "../otel.js";
 import { log } from "../logger.js";

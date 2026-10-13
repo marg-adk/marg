@@ -92,7 +92,7 @@ which option, is this safe to write. The runtime asks these as typed questions �
 `noul` (yes/no → P(true)), `score` — and a cascade answers them: deterministic rules first
 (free, certain), a decision model second (Laya, open-weight, ~30 ms, over the System One
 protocol), a generative model with logprobs last. Confidence is a property of the distribution;
-calibrate it on your own labelled data before a threshold means anything (`@marg/verdict`
+calibrate it on your own labelled data before a threshold means anything (`@marg-adk/verdict`
 ships the maths and a report).
 
 ## 5. The write gate, three times

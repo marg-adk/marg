@@ -22,7 +22,7 @@ Innovations (github.com/NandhaKishorM/laya): ModernBERT-large / mmBERT-base enco
 answer in a single forward pass (~30 ms per question on a GPU, 100+ languages in the
 multilingual checkpoint, a `laya-typed-decisions` checkpoint fine-tuned for agent workflows).
 
-## What @marg/verdict gives you
+## What @marg-adk/verdict gives you
 
 - **Backends behind one interface**: `rulesBackend` (regex / predicates — free, certain, first),
   `systemOneBackend` (Laya via Ollama or `laya-serve`, or any compatible server), `llmBackend`

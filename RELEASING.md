@@ -31,8 +31,8 @@ git tag -a v<version> -m "Marg <version>" && git push origin v<version>
 ```
 
 `.github/workflows/release.yml` runs the full gate again, then `npm publish --provenance` for
-`@marg/types`, `@marg/core`, `@marg/verdict`, `@marg/evals`, `@marg/metering`, `@marg/widget`,
-`@marg/gateway` and `create-marg-app`, in that order. It needs one repository secret,
+`@marg-adk/types`, `@marg-adk/core`, `@marg-adk/verdict`, `@marg-adk/evals`, `@marg-adk/metering`, `@marg-adk/widget`,
+`@marg-adk/gateway` and `create-marg-app`, in that order. It needs one repository secret,
 `NPM_TOKEN`: an npm **automation** token (granular, publish rights on the `@marg` scope and
 `create-marg-app`, no 2FA prompt). Provenance ties each package to the commit and the workflow run.
 
@@ -46,6 +46,6 @@ After the run is green:
 
 - A failed publish mid-list: fix, bump the patch version, tag again. npm never re-publishes a
   version, so a half-published release is finished by the next one, not retried.
-- A bad release: `npm deprecate @marg/<pkg>@<version> "<reason, link>"` on every published
+- A bad release: `npm deprecate @marg-adk/<pkg>@<version> "<reason, link>"` on every published
   package, then release the fix. Do not unpublish.
 - A security fix: follow `SECURITY.md`; publish the advisory with the release.

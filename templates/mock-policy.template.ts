@@ -6,7 +6,7 @@
  * real model's job (resolve records, ask one thing, validate after every change, create only
  * after the runtime's summary). Replace with a real chain and nothing else changes.
  */
-import { registerMockModel, type ChatMessage, type ToolCall } from "@marg/core";
+import { registerMockModel, type ChatMessage, type ToolCall } from "@marg-adk/core";
 
 let seq = 0;
 const call = (name: string, args: Record<string, unknown>): ToolCall => ({ id: `mock_${++seq}`, type: "function", function: { name, arguments: JSON.stringify(args) } });
