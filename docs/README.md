@@ -21,4 +21,5 @@ Start with the pattern, then the playbook. Everything else is reference.
 | [../ROADMAP.md](../ROADMAP.md) | What is here, what is next |
 | [guides/](guides/) | New domain · new step · readers · evals |
 | [posts/](posts/) | The launch post: the number that shaped the design |
+| [reviews/](reviews/) | Studies of other frameworks and what Marg takes from them |
 | [adr/](adr/) | Architecture decision records 0001–0006 + the template |

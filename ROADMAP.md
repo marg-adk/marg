@@ -101,6 +101,64 @@ output and a classification of every red, `RELEASING.md` (tag, changelog, publis
 Discussions on, a reply to every issue within a day, a release every two to three weeks, and
 `good first issue` labels on the sub-tasks of items 4 to 6.
 
+## 0.3 — the surface
+
+0.2 makes Marg installable. 0.3 makes it findable and legible: the site, the dev UI, one command,
+and a method a coding agent can follow. The reasoning is in
+[docs/reviews/adk-dev-2026-10.md](docs/reviews/adk-dev-2026-10.md); the items are in order of
+leverage, and the first ships before 0.2's items 4–6 because it multiplies everything after it.
+
+### 1. The site
+
+VitePress on GitHub Pages at `marg-adk.github.io/marg`: a landing page (one sentence, one button,
+the GIF, the quickstart in tabs, four feature sections, the field numbers, an FAQ), the docs
+reorganised into Get started · Build · Components · Run · Deploy · Reference · Community, search,
+a "since" line per page, and a comparison page that states the wedge next to the number. Built
+and deployed by CI on every merge to `main`.
+
+Accept: the site is live, every page in `docs/` is reachable from the nav, search finds
+"readYesNo", and the README's first links point at it.
+
+### 2. The playground as the dev UI
+
+One centred conversation; the draft and a new trace pane as side panels that collapse; suggested
+openers on the empty state; a plain header; usable on a phone. The trace shows the route decision
+and its confidence, each step's state, every tool call with arguments and result, the model's
+turns and timings, from the gateway's per-turn data plus one endpoint where needed.
+
+Accept: the six-turn journey in the GIF is re-recorded on the new UI; the trace pane shows the
+create gate refusing a premature yes; `npm test` (the widget under the fake DOM) and the example
+suite stay green.
+
+### 3. The `marg` CLI
+
+`marg web | new | evals | verdict | check` in one published package, wrapping the scripts;
+`create-marg-app` wires it into a new project's scripts.
+
+Accept: `npx marg web` in a created project opens the playground; `check:create` uses it.
+
+### 4. A skill for coding agents
+
+`skills/build-a-domain/SKILL.md`, installable into Claude Code and Codex: the worksheet, the
+build order, the gate, the classification rule, with the example domain as the reference.
+
+Accept: a coding agent given the skill and "a bookings domain" produces a domain that passes
+`check:scaffold`'s shape and its own suite.
+
+### 5. Provider and integration pages
+
+A page per model provider with its env lines; a page per store, observability backend and voice
+provider; "use Marg tools from another framework" and "a Marg domain behind an A2A card".
+
+Accept: every env family in `docs/ENVIRONMENT.md` has a page that shows it working.
+
+### 6. Evals: user simulation
+
+A scripted or model-played user for scenarios that need free text beyond the mock policy, with
+the same deterministic checks and the same classification.
+
+Accept: one example scenario runs with a simulated user in CI on the mock model.
+
 ## Later
 
 - A calibration workbench for Verdict: label, fit, plot reliability, choose the abstention threshold.
