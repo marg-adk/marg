@@ -1,0 +1,29 @@
+name: Feature request
+description: A capability the runtime, the gateway, the widget, Verdict or the evals should have.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What goes wrong, or costs something, without this. Marg adds mechanisms because their absence cost something; say what it cost you.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+      description: What the runtime or the model should do instead. If it changes the pattern (who owns a moment, how a decision is made, how writes are gated), say so — that goes through an ADR (docs/adr/TEMPLATE.md).
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This is domain-agnostic (nothing product-, brand- or backend-specific lands in packages/)
+        - label: I would be willing to open a pull request for it

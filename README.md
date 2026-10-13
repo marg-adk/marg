@@ -9,7 +9,9 @@ decision engine, the eval harness and the production spine. It was extracted fro
 is live with real users, not designed on a whiteboard: every mechanism in it is here because its
 absence cost something.
 
-<!-- badges once the repository is public: CI · npm · licence -->
+[![ci](https://github.com/marg-adk/marg/actions/workflows/ci.yml/badge.svg)](https://github.com/marg-adk/marg/actions/workflows/ci.yml) [![codeql](https://github.com/marg-adk/marg/actions/workflows/codeql.yml/badge.svg)](https://github.com/marg-adk/marg/actions/workflows/codeql.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/marg-adk/marg/badge)](https://scorecard.dev/viewer/?uri=github.com/marg-adk/marg) [![licence](https://img.shields.io/badge/licence-Apache--2.0-blue.svg)](LICENSE) [![node](https://img.shields.io/badge/node-%E2%89%A522-brightgreen.svg)](.nvmrc)
+
+<!-- npm badge once published: [![npm](https://img.shields.io/npm/v/@marg/core.svg)](https://www.npmjs.com/package/@marg/core) -->
 
 ## Is Marg for you?
 

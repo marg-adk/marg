@@ -21,7 +21,7 @@ import type { FormBlock, FormRow } from "@marg/types";
 
 export type { FormBlock, FormRow };
 
-const PAIR_RE = /^\s*([^:\[\]]+?)\s*(?:\[([a-z0-9_]+)\])?\s*:\s*(.*?)\s*$/is;
+const PAIR_RE = /^\s*([^:[\]]+?)\s*(?:\[([a-z0-9_]+)\])?\s*:\s*(.*?)\s*$/is;
 
 /** The message a client sends for the filled rows. */
 export function formReply(rows: FormRow[], values: Record<string, string>): string {
