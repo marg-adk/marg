@@ -1,9 +1,46 @@
 {
   "name": "@marg/types",
   "version": "0.1.0",
-  "private": true,
+  "license": "Apache-2.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marg-adk/marg.git",
+    "directory": "packages/types"
+  },
+  "homepage": "https://github.com/marg-adk/marg#readme",
+  "bugs": {
+    "url": "https://github.com/marg-adk/marg/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Cross-package types for Marg: the domain manifest, the client protocol (ui blocks, stream events, preview, completion), step state.",
-  "main": "src/index.ts",
-  "types": "src/index.ts"
+  "keywords": [
+    "agents",
+    "agent-framework",
+    "llm",
+    "mcp",
+    "typescript"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  }
 }

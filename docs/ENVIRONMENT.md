@@ -69,6 +69,9 @@ literal string `"true"`; stores fall back with a warning rather than failing boo
 `GATEWAY_PORT` (8787), `AGENT_BRAND` (Marg), `AGENT_SERVICE_NAMESPACE` (marg), `AGENT_METRIC_PREFIX` (agent),
 `AGENT_ENV` (local), `AGENT_DOMAIN_DIRS` (domains,examples), `AGENT_DOMAINS` (all), `AGENT_PUBLIC_DIR`,
 `AGENT_WIDGET_FILE`, `AGENT_SHARED_SKILLS_DIR`, `AGENT_REPO_ROOT`, `AGENT_SHUTDOWN_GRACE_MS` (10000).
+`AGENT_REPO_ROOT` defaults to the repository root when running from a checkout and to the
+working directory's project (the nearest `package.json` or `.git`) when the packages are
+installed from npm; `.env`, `domains/`, `examples/` and `shared-skills/` are read from there.
 
 ## Evals
 `EVAL_GATEWAY` (http://localhost:8788), `SCENARIO`, `EVAL_SHARD` (`i/n`), `EVAL_RERUNS`, `EVAL_FLAKES`, `EVAL_VERBOSE`, `EVAL_BEARER`.

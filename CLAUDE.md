@@ -36,6 +36,10 @@ Classify every red before fixing it: check brittleness, model flake, pre-existin
 - Decisions: `packages/verdict/src`. Gateway: `packages/gateway/src`. Client: `packages/widget`.
 - The example domain: `examples/support-intake`. Scaffolding: `templates/`, `scripts/new-domain.ts`.
 - Checks: `scripts/check-*.{ts,sh}`. Observability as code: `observability/openobserve/`.
+- Publishing: `scripts/build.ts` (dist per package, in dependency order), `packages/create-marg-app`
+  (its `payload/` is synced from templates, the example, shared skills at build), `check:pack`,
+  `check:create`, `.github/workflows/release.yml` (tag `v*` → npm, needs `NPM_TOKEN`). Development
+  never needs the build: tsx runs the sources through `tsconfig.json` paths.
 
 ## Current focus
 `ROADMAP.md` → "0.2 — the adoption push", items 1 to 7, in that order; start with item 1

@@ -20,6 +20,7 @@
  */
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import {
@@ -83,8 +84,18 @@ primeMetrics();
 registerGatewayGauges();
 
 const PORT = envNum("GATEWAY_PORT", 8787);
-const PUBLIC_DIR = process.env.AGENT_PUBLIC_DIR ?? join(REPO_ROOT, "packages", "gateway", "public");
-const WIDGET_FILE = process.env.AGENT_WIDGET_FILE ?? join(REPO_ROOT, "packages", "widget", "widget.js");
+// The playground page ships inside this package (public/ beside src/ and dist/); the widget is
+// the @marg/widget package (a workspace link here, a dependency when installed from npm).
+const PUBLIC_DIR = process.env.AGENT_PUBLIC_DIR ?? fileURLToPath(new URL("../public/", import.meta.url));
+const WIDGET_FILE = process.env.AGENT_WIDGET_FILE ?? locateWidget();
+const SHARED_SKILLS_DIR = process.env.AGENT_SHARED_SKILLS_DIR ?? join(REPO_ROOT, "shared-skills");
+function locateWidget(): string {
+  try {
+    return fileURLToPath(import.meta.resolve("@marg/widget/widget.js"));
+  } catch {
+    return join(REPO_ROOT, "packages", "widget", "widget.js");
+  }
+}
 
 const app = express();
 if (process.env.AGENT_TRUST_PROXY === "true") app.set("trust proxy", true);
@@ -252,7 +263,7 @@ app.get("/api/skills", (req, res) => {
   const out: { name: string; scope: string; chars: number; body: string }[] = [];
   for (const d of discoverDomains()) {
     for (const shared of d.shared_skills ?? []) {
-      const body = readSkillBody(join(REPO_ROOT, "shared-skills", shared));
+      const body = readSkillBody(join(SHARED_SKILLS_DIR, shared));
       if (body && !out.some((s) => s.name === shared)) out.push({ name: shared, scope: "shared", chars: body.length, body });
     }
     for (const skill of d.skills) {

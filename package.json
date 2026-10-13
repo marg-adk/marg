@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Marg \u2014 an open-source Agent Development Kit for conversational agents that complete a job, step by step: runtime-owned steps, typed decisions, evals as the ratchet, and a production ops spine.",
+  "description": "Marg — an open-source Agent Development Kit for conversational agents that complete a job, step by step: runtime-owned steps, typed decisions, evals as the ratchet, and a production ops spine.",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=22"
@@ -30,7 +30,11 @@
     "db:down": "redis-cli shutdown nosave 2>/dev/null; mongod --dbpath .data/mongo --shutdown 2>/dev/null; true",
     "check:scaffold": "bash scripts/check-scaffold.sh",
     "o2:dashboards": "tsx scripts/make-dashboards.ts",
-    "check:e2e": "bash scripts/check-e2e.sh"
+    "check:e2e": "bash scripts/check-e2e.sh",
+    "build": "tsx scripts/build.ts",
+    "clean": "rm -rf packages/*/dist packages/*/LICENSE packages/create-marg-app/payload",
+    "check:pack": "bash scripts/check-pack.sh",
+    "check:create": "bash scripts/check-create.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

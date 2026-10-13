@@ -38,6 +38,14 @@ absence cost something.
 ## Two minutes to a running agent
 
 ```bash
+npx create-marg-app my-agent && cd my-agent
+npm install
+npm run gateway             # http://localhost:8787 — .env holds LLM_CHAIN=mock: a scripted offline model, no key
+```
+
+Or work in the repository itself (the same gate CI runs, every check, the docs):
+
+```bash
 git clone https://github.com/marg-adk/marg.git && cd marg
 npm install
 cp .env.example .env        # LLM_CHAIN=mock — a scripted offline model, no key needed
@@ -59,6 +67,8 @@ npm test                    # unit tests, including the widget driven under a fa
 npm run check:otel          # spans, metrics and trace-carrying log lines, against in-memory exporters
 npm run check:scaffold      # the templates still produce a domain that compiles and passes its own suite
 npm run check:e2e           # the real write path with writes ON, end to end
+npm run check:pack          # every package builds and packs clean for npm
+npm run check:create        # create-marg-app from local tarballs: install, boot, the example suite
 ```
 
 ## What you get
@@ -159,6 +169,11 @@ part; copy from it freely.
   ([docs/guides/readers.md](docs/guides/readers.md)).
 - **The eval runner alone.** It drives any gateway that speaks the client protocol.
 - **The widget alone.** Implement [docs/CLIENT-PROTOCOL.md](docs/CLIENT-PROTOCOL.md) behind it.
+
+On npm: `@marg/core`, `@marg/types`, `@marg/verdict`, `@marg/evals`, `@marg/metering`,
+`@marg/gateway` (with the `marg-gateway` command), `@marg/widget`, and `create-marg-app`.
+The repository builds them with `npm run build`; development runs the TypeScript sources
+directly through `tsx`, no build needed.
 
 ## Going to production
 

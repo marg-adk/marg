@@ -1,12 +1,63 @@
 {
   "name": "@marg/core",
   "version": "0.1.0",
-  "private": true,
+  "license": "Apache-2.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marg-adk/marg.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/marg-adk/marg#readme",
+  "bugs": {
+    "url": "https://github.com/marg-adk/marg/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Marg core runtime — the domain-agnostic agent loop: prompt assembly, the model chain, MCP tools, sessions, durable stores, runtime-owned steps, readers, guards, observability.",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "keywords": [
+    "agents",
+    "agent-framework",
+    "llm",
+    "mcp",
+    "typescript"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && cp src/log-worker.mjs dist/"
+  },
   "dependencies": {
-    "@marg/types": "0.1.0"
+    "@marg/types": "0.1.0",
+    "@anthropic-ai/sdk": "^0.115.0",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/context-async-hooks": "^2.11.0",
+    "@opentelemetry/core": "^2.11.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "^0.222.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.222.0",
+    "@opentelemetry/instrumentation": "^0.222.0",
+    "@opentelemetry/instrumentation-undici": "^0.32.0",
+    "@opentelemetry/resources": "^2.11.0",
+    "@opentelemetry/sdk-metrics": "^2.11.0",
+    "@opentelemetry/sdk-trace-base": "^2.11.0",
+    "mongodb": "^7.5.0",
+    "redis": "^6.2.0"
   }
 }

@@ -1,0 +1,49 @@
+# Release: a tag v<version> runs the gate, builds, and publishes every package to npm with
+# provenance. Needs one secret, NPM_TOKEN (an npm automation token with publish rights to the
+# @marg scope and create-marg-app). RELEASING.md (roadmap item 7) will describe the full flow.
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci --no-audit --no-fund
+      - name: The tag must match the package version
+        run: |
+          v=$(node -p "require('./package.json').version")
+          [[ "${GITHUB_REF_NAME}" == "v$v" ]] || { echo "tag ${GITHUB_REF_NAME} != package version v$v"; exit 1; }
+          for p in packages/*/package.json; do
+            pv=$(node -p "require('./$p').version"); [[ "$pv" == "$v" ]] || { echo "$p is $pv, expected $v"; exit 1; }
+          done
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run check:otel
+      - run: npm run check:scaffold
+      - run: npm run check:e2e
+      - name: Example suite on the mock model (writes off)
+        run: |
+          cp .env.example .env
+          npm run gateway:evals > gateway.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://localhost:8788/health > /dev/null 2>&1 && break; sleep 1; done
+          npm run evals
+      - run: npm run check:pack
+      - run: npm run check:create
+      - name: Publish (dependency order)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for w in @marg/types @marg/core @marg/verdict @marg/evals @marg/metering @marg/widget @marg/gateway create-marg-app; do
+            npm publish --provenance --access public -w "$w"
+          done

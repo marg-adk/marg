@@ -1,0 +1,42 @@
+{
+  "name": "@marg/widget",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marg-adk/marg.git",
+    "directory": "packages/widget"
+  },
+  "homepage": "https://github.com/marg-adk/marg#readme",
+  "bugs": {
+    "url": "https://github.com/marg-adk/marg/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "The Marg chat widget — one <script> tag, Shadow DOM, zero dependencies: streaming replies, chips, forms, cards, tables, media, resume, nudges, voice. Served by @marg/gateway at /widget.js.",
+  "keywords": [
+    "agents",
+    "agent-framework",
+    "llm",
+    "mcp",
+    "typescript",
+    "widget",
+    "chat-ui"
+  ],
+  "main": "./widget.js",
+  "exports": {
+    ".": "./widget.js",
+    "./widget.js": "./widget.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "widget.js",
+    "README.md",
+    "LICENSE"
+  ]
+}
