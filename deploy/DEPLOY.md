@@ -16,6 +16,13 @@ Profiles: `stores` (Redis + Mongo — sessions, ledgers, shared counters), `obse
 with automatic TLS for `AGENT_DOMAIN`). Without `stores` the gateway keeps sessions in memory
 with a file fallback under the `gateway-data` volume — fine for one replica, not for two.
 
+## The hosted playground
+
+`render.yaml` at the repository root is a Render Blueprint for the public playground: the same
+image on the free tier with `LLM_CHAIN=mock`, writes off, no login and the rate limits on. New →
+Blueprint on Render, point it at the repository, done. It sleeps when idle and keeps no disk, so
+sessions may be lost; it is a demo, not a deployment.
+
 ## Without Docker
 ```bash
 npm ci && cp .env.production.example .env           # the gateway reads .env

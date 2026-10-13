@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **playground**: `render.yaml`, a Render Blueprint for the hosted playground (mock model,
+  writes off, no login, rate limits on).
 - **core**: the form-reply pair parser scans instead of matching a regex that backtracked
   polynomially on long runs of spaces in user text (CodeQL, high). The Docker healthcheck and
   the CI gate poll `/api/health`, the path the gateway serves.
