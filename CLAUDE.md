@@ -37,6 +37,13 @@ Classify every red before fixing it: check brittleness, model flake, pre-existin
 - The example domain: `examples/support-intake`. Scaffolding: `templates/`, `scripts/new-domain.ts`.
 - Checks: `scripts/check-*.{ts,sh}`. Observability as code: `observability/openobserve/`.
 
+## Current focus
+`ROADMAP.md` → "0.2 — the adoption push", items 1 to 7, in that order; start with item 1
+(publishable packages and `create-marg-app`). Each item names its acceptance test; run the gate
+before and after. Nothing lands that breaks `check:scaffold` or the example suite. This repository
+was built in one long session and handed over through its files: everything a session needs is in
+`CLAUDE.md`, `ROADMAP.md` and `docs/`, not in anyone's memory.
+
 ## Environment
 `npm install`, `cp .env.example .env` (the mock model; no key), `npm run gateway` → :8787.
 Optional: `docker compose -f observability/docker-compose.yml up -d` for OpenObserve.
