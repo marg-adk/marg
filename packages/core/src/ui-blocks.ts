@@ -36,15 +36,11 @@ export function splitUi(text: string, final: boolean): { prose: string; blocks: 
     const close = text.indexOf("```", bodyStart);
     if (close === -1) {
       if (final) blocks.push(text.slice(bodyStart).replace(/`+\s*$/, ""));
-      i = text.length;
       break;
     }
     blocks.push(text.slice(bodyStart, close));
     const eol = text.indexOf("\n", close + 3);
-    if (eol === -1) {
-      i = text.length;
-      break;
-    }
+    if (eol === -1) break;
     i = eol;
   }
   const lines = prose.split("\n");

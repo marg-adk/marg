@@ -73,8 +73,8 @@ export function wordsOf(text: string): string[] {
   const s = text
     .toLowerCase()
     .replace(/[’‘`´]/g, "'")
-    .replace(/[\u{1F3FB}-\u{1F3FF}️]/gu, "")
-    .replace(/[:;=]['-]?[(\/|\\]|-_-|>_<|\bt_t\b|[✗✘✕]/gi, " emoji ")
+    .replace(/[\u{1F3FB}-\u{1F3FF}]|\uFE0F/gu, "") // skin-tone modifiers and the emoji variation selector
+    .replace(/[:;=]['-]?[(/|\\]|-_-|>_<|\bt_t\b|[✗✘✕]/gi, " emoji ")
     .replace(/\b(i|we|you|they|it|that)'ll\b/g, "$1 will")
     .replace(/\b(we|you|they)'re\b/g, "$1 are")
     .replace(/\b(?:i|we)'d\s+like\b|\b(?:i|we)\s+would\s+like\b|\bid\s+like\b/g, " i want ")

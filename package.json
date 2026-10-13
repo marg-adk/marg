@@ -17,6 +17,7 @@
     "gateway:evals": "AGENT_ALLOW_WRITES=false AGENT_REQUIRE_LOGIN=false AGENT_RATE_DISABLED=true GATEWAY_PORT=8788 tsx packages/gateway/src/server.ts",
     "evals": "tsx examples/support-intake/evals/run-evals.ts",
     "typecheck": "tsc -p . --noEmit",
+    "lint": "eslint .",
     "test": "node --import tsx --test \"packages/*/src/**/*.test.ts\" \"packages/*/test/**/*.test.ts\" \"examples/*/test/**/*.test.ts\"",
     "test:core": "node --import tsx --test \"packages/core/src/**/*.test.ts\"",
     "test:verdict": "node --import tsx --test \"packages/verdict/src/**/*.test.ts\"",
@@ -56,10 +57,14 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^22.0.0",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.71.2"
   }
 }

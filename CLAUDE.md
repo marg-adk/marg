@@ -13,7 +13,7 @@ The model owns the conversation; the runtime owns the moments that must be right
 
 ## The gate (run before and after any change that touches a reader, a guard, a step, a skill or the widget)
 ```bash
-npm run typecheck && npm test && npm run check:otel && npm run check:scaffold && npm run check:e2e
+npm run lint && npm run typecheck && npm test && npm run check:otel && npm run check:scaffold && npm run check:e2e
 npm run gateway:evals &   # writes OFF on :8788
 npm run evals             # the example suite must stay green
 ```

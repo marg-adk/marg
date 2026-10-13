@@ -109,7 +109,7 @@ const TRANSPORT_FAILURE = /not connected|connection closed|EPIPE|ECONNRESET|writ
  * the string goes back to the model, which can read it and recover conversationally.
  */
 export async function callDomainTool(domain: string, name: string, args: Record<string, unknown>, authToken?: string, sessionId?: string): Promise<string> {
-  let conn = connections.get(domain);
+  const conn = connections.get(domain);
   if (!conn) throw new Error(`MCP not connected for domain "${domain}"`);
   return withSpan(`mcp.call ${name}`, { kind: SpanKind.CLIENT, attrs: { "rpc.system": "mcp", "rpc.service": `${domain}`, "rpc.method": name, ...(sessionId ? { "session.id": sessionId } : {}) } }, async (span) => {
     const once = async (c: DomainMcp) => {

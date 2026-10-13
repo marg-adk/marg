@@ -1,0 +1,32 @@
+name: Domain request
+description: An example domain or a template you would like to see (a booking, an application, a listing, an order...).
+labels: [domain]
+body:
+  - type: input
+    id: job
+    attributes:
+      label: The job the agent completes
+      description: One sentence, the way the router would describe it.
+      placeholder: "Book a table at a venue: which venue, when, for how many, confirm, create."
+    validations:
+      required: true
+  - type: textarea
+    id: moments
+    attributes:
+      label: The moments the runtime should own
+      description: Which values must never be guessed (pickers, forms, chips), what confirms the write, what "done" looks like.
+    validations:
+      required: true
+  - type: textarea
+    id: backend
+    attributes:
+      label: The backend
+      description: What the tools talk to (a REST API, a file, a mock) and what it validates. Public or mockable backends make the best examples because CI can run them with no key.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Can you help?
+      options:
+        - label: I can write the MCP tools
+        - label: I can write the skill and the steps
+        - label: I can write the eval scenarios

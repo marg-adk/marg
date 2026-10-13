@@ -1,0 +1,43 @@
+name: Bug report
+description: Something behaves differently from what the docs or the pattern promise.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you saw. A transcript of the turn (the user text and the reply or ui block) is the most useful thing you can paste.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: Steps, ideally against the example domain on the mock model (`LLM_CHAIN=mock`) so anyone can replay it with no key. A failing eval scenario is perfect.
+      placeholder: |
+        1. npm run gateway
+        2. type "ticket for Northwind: login fails on mobile"
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Marg version or commit, Node version, OS, and the model chain (`LLM_CHAIN`).
+      placeholder: "0.1.0 · Node 22.12 · macOS 15 · LLM_CHAIN=mock"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [core runtime, steps or readers, gateway, widget, verdict, evals, templates or scaffolder, create-marg-app, docs, other]
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Gateway log lines around the failure (`npm run gateway` output), with any user text or tokens removed.
+      render: text

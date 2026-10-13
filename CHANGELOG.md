@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **repository**: the gate runs on Node 22 and 24 with `npm run lint` (ESLint, correctness
+  rules only) first; CodeQL, a security workflow (dependency review, verified-secrets scan,
+  `npm audit`) and the OpenSSF Scorecard run on every PR or weekly; Dependabot keeps npm and
+  Actions current in grouped weekly PRs; CODEOWNERS, issue templates (bug, feature, domain
+  request), a pull-request template that asks for the gate output and a classification of every
+  red, `RELEASING.md`, `.nvmrc`, `.editorconfig`, and badges in the README.
 - **packages**: every package is publishable — a build per package (`tsc -p tsconfig.build.json`
   to `dist/`, ESM + `.d.ts`), `exports`, `types`, `files`, `publishConfig.access: public`;
   `@marg/widget` is now a package (the file plus a manifest); `@marg/gateway` ships a
