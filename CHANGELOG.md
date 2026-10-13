@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **docs**: a review of adk.dev and what Marg takes from it (`docs/reviews/`), and ROADMAP
+  "0.3 — the surface": the site, the playground as the dev UI, a `marg` CLI, a skill for coding
+  agents, provider pages, user simulation.
 - **deploy**: the image ships `tsconfig.base.json` (without it tsx lost the path mappings and
   the gateway crashed at boot — the first Render deploy failed on this); CI now builds the image
   and probes its health, playground and widget (`image` job, required).
