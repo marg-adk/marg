@@ -1,0 +1,21 @@
+{
+  "//": "Domain manifest — the ONLY registration mechanism. Drop this folder under domains/ and the gateway discovers it at boot. `dir` is injected at discovery, never authored. Typed as DomainManifest in packages/types.",
+  "name": "__NAME__",
+  "title": "__TITLE__",
+  "description": "<One sentence. This IS the router's domain card and the capability statement — say what the domain DOES and its scope boundary.>",
+  "route_hints": {
+    "examples": ["<verbatim thing a user would type>", "<another, different register>", "<one per variant>"],
+    "keywords": ["<verb>", "<noun>", "<vernacular term>"]
+  },
+  "mcp": { "command": "npx", "args": ["tsx", "domains/__NAME__/mcp/server.ts"] },
+  "skills": ["skills/__NAME__"],
+  "shared_skills": ["conversation-behaviour", "visual-presentation"],
+  "steps": "steps/index.ts",
+  "step_order": ["details", "priority"],
+  "mock": "mock/policy.ts",
+  "evals": "evals",
+  "entity": { "singular": "__ENTITY__", "plural": "__ENTITY__s", "id_key": "entity_id" },
+  "slot_labels": { "title": "Title", "record_name": "Record", "kind": "Kind", "notes": "Notes", "priority": "Priority" },
+  "hidden_slots": ["record_id"],
+  "attested_lists": []
+}

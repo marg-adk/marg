@@ -29,6 +29,10 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: No generated files are tracked
+        run: |
+          bad=$(git ls-files | grep -E '^(website/src|website/\.vitepress/(dist|cache)|packages/[^/]+/(dist|payload)|packages/[^/]+/LICENSE)(/|$)' || true)
+          if [ -n "$bad" ]; then echo "generated files are tracked — remove them from the index:"; echo "$bad" | head -20; exit 1; fi
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
