@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **repository**: CI fails when a generated path (the site's mirrored docs or build, a package's
+  `dist/` or payload) is tracked; Dependabot ignores major bumps of `@types/node` (the engine is
+  Node 22).
 - **site**: https://marg-adk.github.io/marg — VitePress on GitHub Pages, built from the
   repository's docs on every merge (`website/`, `npm run site:build`): a landing page, Get
   started · Build · Components · Run · Reference · Community, search, a comparison page, an FAQ.
