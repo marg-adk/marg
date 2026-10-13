@@ -26,7 +26,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { AsyncLocalStorage } from "node:async_hooks";
-import { AUTH_META_KEY, SESSION_META_KEY, extractContext, head, initOtel, log, runInContext, SpanKind, SpanStatusCode, summarize, withSpan } from "@marg/core";
+import { AUTH_META_KEY, SESSION_META_KEY, extractContext, head, initOtel, log, runInContext, SpanKind, SpanStatusCode, summarize, withSpan } from "@marg-adk/core";
 
 initOtel({ service: "marg-support-intake-mcp" });
 

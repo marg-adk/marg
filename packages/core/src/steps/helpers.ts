@@ -3,7 +3,7 @@
  * multi-pick step. Most domains compose their steps from these three; a bespoke step implements
  * StepDefinition directly (see docs/guides/new-step.md).
  */
-import type { ChipsBlock, FormBlock, FormRow, MultichipsBlock, UiOption } from "@marg/types";
+import type { ChipsBlock, FormBlock, FormRow, MultichipsBlock, UiOption } from "@marg-adk/types";
 import { formEcho, looksLikeFormReply, missingRows, parseFormReply, validateFormValues, canonicalPick } from "../forms.js";
 import { readChoice } from "../readers.js";
 import { CONFIRM_WORDS, NEUTRAL, wordsOf } from "../reply-words.js";

@@ -1,5 +1,5 @@
 /**
- * @marg/metering — the client a product embeds to report usage to a metering service.
+ * @marg-adk/metering — the client a product embeds to report usage to a metering service.
  *
  * RULES FOR EMITTERS (docs/METERING.md):
  *  - No PII, no content in events — opaque ids only. Events are retained for years.

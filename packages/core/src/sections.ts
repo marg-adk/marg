@@ -1,4 +1,4 @@
-import type { ChipsBlock } from "@marg/types";
+import type { ChipsBlock } from "@marg-adk/types";
 
 /**
  * sections.ts — the review's "Change something" as a section picker (pure).

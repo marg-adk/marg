@@ -29,7 +29,7 @@ the user.
 - **Caps**: Redis fixed windows (5h / day / week) + a calendar month per subject (the verified
   user id hashed, else the session) — `usage-caps.ts`.
 - **A metering service** (optional): `AGENT_METERING_URL` makes the gateway POST batched
-  events through `@marg/metering` — buffered, idempotent (`event_id = session:turn:kind`),
+  events through `@marg-adk/metering` — buffered, idempotent (`event_id = session:turn:kind`),
   fail-open; `check(account)` on the hot path bounded to 300 ms. The service rates events
   against a catalogue, keeps a durable ledger, and feeds a billing engine (plans, wallets,
   invoices) — e.g. Lago (AGPL, self-hosted) — never the agent.

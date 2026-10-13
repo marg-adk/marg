@@ -16,7 +16,7 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { DomainManifest } from "@marg/types";
+import type { DomainManifest } from "@marg-adk/types";
 import { REPO_ROOT } from "./env.js";
 import { BRAND } from "./config.js";
 import { typedEnabled, typeTitle, typeToolName } from "./typed-prompt.js";

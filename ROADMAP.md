@@ -24,8 +24,8 @@ monorepo. Frameworks are adopted through npm.
 - A build per package: `tsc -p tsconfig.build.json` to `dist/` (ESM + `.d.ts`), `exports`,
   `types`, `files`; drop `private`; `publishConfig.access: public`. The tsx dev path through
   `tsconfig.json` paths keeps working.
-- Publish `@marg/types`, `@marg/core`, `@marg/verdict`, `@marg/evals`, `@marg/metering`,
-  `@marg/gateway` (with a `marg-gateway` bin) and `@marg/widget` (the file plus a manifest).
+- Publish `@marg-adk/types`, `@marg-adk/core`, `@marg-adk/verdict`, `@marg-adk/evals`, `@marg-adk/metering`,
+  `@marg-adk/gateway` (with a `marg-gateway` bin) and `@marg-adk/widget` (the file plus a manifest).
 - `packages/create-marg-app`: `npx create-marg-app my-agent` copies `templates/` and the example
   into a fresh project whose `package.json` depends on the published versions, then prints the
   next steps.

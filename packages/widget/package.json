@@ -1,5 +1,5 @@
 {
-  "name": "@marg/widget",
+  "name": "@marg-adk/widget",
   "version": "0.1.0",
   "license": "Apache-2.0",
   "type": "module",
@@ -18,7 +18,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "The Marg chat widget — one <script> tag, Shadow DOM, zero dependencies: streaming replies, chips, forms, cards, tables, media, resume, nudges, voice. Served by @marg/gateway at /widget.js.",
+  "description": "The Marg chat widget — one <script> tag, Shadow DOM, zero dependencies: streaming replies, chips, forms, cards, tables, media, resume, nudges, voice. Served by @marg-adk/gateway at /widget.js.",
   "keywords": [
     "agents",
     "agent-framework",

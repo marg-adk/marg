@@ -15,8 +15,8 @@
  */
 import { createHash } from "node:crypto";
 import type express from "express";
-import type { CapStanding, TurnUsage } from "@marg/types";
-import { envNum0, getCounterStore, log, planTokens, recordCapped, recordUsageEvent, sessionPlanTokens, sessionTotalTokens, type Session } from "@marg/core";
+import type { CapStanding, TurnUsage } from "@marg-adk/types";
+import { envNum0, getCounterStore, log, planTokens, recordCapped, recordUsageEvent, sessionPlanTokens, sessionTotalTokens, type Session } from "@marg-adk/core";
 import { meteringSink } from "./metering-sink.js";
 
 export const capConfig = {

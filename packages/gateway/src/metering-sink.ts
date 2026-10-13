@@ -9,11 +9,11 @@
  *
  * The sink is fail-open and non-blocking: a metering outage drops events after a bounded
  * buffer and logs, it never fails a turn. Configure AGENT_METERING_URL (+ _API_KEY) to POST
- * batches to an HTTP collector (the @marg/metering client shape); unset ⇒ the JSONL ledger
- * written by @marg/core is the record.
+ * batches to an HTTP collector (the @marg-adk/metering client shape); unset ⇒ the JSONL ledger
+ * written by @marg-adk/core is the record.
  */
-import { MeteringClient, type MeteringEvent } from "@marg/metering";
-import { log } from "@marg/core";
+import { MeteringClient, type MeteringEvent } from "@marg-adk/metering";
+import { log } from "@marg-adk/core";
 
 export interface TurnCost {
   account_id: string;

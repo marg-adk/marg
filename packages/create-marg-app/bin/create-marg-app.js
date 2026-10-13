@@ -13,7 +13,7 @@
  * WHO TALKS TO IT: a developer, once per project. Then `npm run gateway`, `npm run new-domain`.
  *
  * CREATE_MARG_APP_PACKS=<dir> (the repository's own check) points the dependencies at local
- * tarballs (marg-<name>-<version>.tgz) instead of the registry.
+ * tarballs (marg-adk-<name>-<version>.tgz) instead of the registry.
  */
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
@@ -27,7 +27,7 @@ const projectFiles = join(here, "..", "project");
 const args = process.argv.slice(2);
 const target = args.find((a) => !a.startsWith("-"));
 if (!target || args.includes("--help") || args.includes("-h")) {
-  console.log(`usage: npx create-marg-app <folder>\n\n  Creates a Marg project: the example domain, templates, shared skills and the scaffolder,\n  depending on @marg/* ${self.version}. Then: cd <folder> && npm install && npm run gateway`);
+  console.log(`usage: npx create-marg-app <folder>\n\n  Creates a Marg project: the example domain, templates, shared skills and the scaffolder,\n  depending on @marg-adk/* ${self.version}. Then: cd <folder> && npm install && npm run gateway`);
   process.exit(target ? 0 : 2);
 }
 const dest = resolve(process.cwd(), target);
@@ -55,7 +55,7 @@ writeFileSync(join(dest, "README.md"), readFileSync(join(projectFiles, "README.m
 
 const v = self.version;
 const packs = process.env.CREATE_MARG_APP_PACKS;
-const marg = (p) => (packs ? `file:${resolve(packs, `marg-${p}-${v}.tgz`)}` : `${v}`);
+const marg = (p) => (packs ? `file:${resolve(packs, `marg-adk-${p}-${v}.tgz`)}` : `${v}`);
 const pkg = {
   name,
   version: "0.1.0",
@@ -71,11 +71,11 @@ const pkg = {
     typecheck: "tsc -p . --noEmit",
   },
   dependencies: {
-    "@marg/core": marg("core"),
-    "@marg/evals": marg("evals"),
-    "@marg/gateway": marg("gateway"),
-    "@marg/types": marg("types"),
-    "@marg/verdict": marg("verdict"),
+    "@marg-adk/core": marg("core"),
+    "@marg-adk/evals": marg("evals"),
+    "@marg-adk/gateway": marg("gateway"),
+    "@marg-adk/types": marg("types"),
+    "@marg-adk/verdict": marg("verdict"),
     "@modelcontextprotocol/sdk": "^1.12.0",
     zod: "^3.23.8",
   },
@@ -87,7 +87,7 @@ const pkg = {
 };
 if (packs) {
   // Transitive @marg dependencies must come from the same tarballs, not the registry.
-  pkg.overrides = { "@marg/types": marg("types"), "@marg/core": marg("core"), "@marg/verdict": marg("verdict"), "@marg/metering": marg("metering"), "@marg/widget": marg("widget") };
+  pkg.overrides = { "@marg-adk/types": marg("types"), "@marg-adk/core": marg("core"), "@marg-adk/verdict": marg("verdict"), "@marg-adk/metering": marg("metering"), "@marg-adk/widget": marg("widget") };
 }
 writeFileSync(join(dest, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
 

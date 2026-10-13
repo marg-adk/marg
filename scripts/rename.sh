@@ -4,7 +4,7 @@
 #   scripts/rename.sh "Acme Agent" acme
 #
 # Replaces  Marg → "Acme Agent"  (display name, AGENT_BRAND default, titles)
-#           @marg/* → @acme/*    (package scope, tsconfig paths, imports)
+#           @marg-adk/* → @acme/*    (package scope, tsconfig paths, imports)
 #           marg → acme          (slugs: package name, storage key marg:sid:, docs)
 # in every text file except LICENSE, CHANGELOG.md, package-lock.json, node_modules, .git and
 # .data, then re-links the workspaces. Workspace FOLDERS keep their names. The Hindi word and

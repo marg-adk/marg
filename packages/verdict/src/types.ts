@@ -1,5 +1,5 @@
 /**
- * @marg/verdict — typed decisions for agents.
+ * @marg-adk/verdict — typed decisions for agents.
  *
  * A DECISION is a typed question about a state, answered with a probability distribution, not
  * prose: "which department?" (choice), "is this urgent?" (noul: a yes/no with P(true)), "how

@@ -4,7 +4,7 @@
  * An Express server that is the ONLY thing clients ever talk to. It owns the URL surface,
  * applies the cross-cutting concerns (security, rate limits, usage caps, logging, metrics,
  * tracing), and delegates the conversation to the super agent (router.ts) → a domain agent
- * (@marg/core).
+ * (@marg-adk/core).
  *
  * ONE CHAT TURN
  *  1. The client POSTs {session_id, message[, display]} to /api/chat or /api/chat/stream (or
@@ -62,9 +62,9 @@ import {
   storeState,
   WRITES_ALLOWED,
   type Session,
-} from "@marg/core";
-import { verdictEnvSnapshot } from "@marg/verdict";
-import type { StreamEvent, TurnUsage } from "@marg/types";
+} from "@marg-adk/core";
+import { verdictEnvSnapshot } from "@marg-adk/verdict";
+import type { StreamEvent, TurnUsage } from "@marg-adk/types";
 import { discoverDomains, installDomains } from "./domains.js";
 import { initRouter, routeTurn, routerSnapshot } from "./router.js";
 import { allowMediaUpload, allowSessionCreate, allowTranscribe, beginChatTurn, rateLimitSnapshot } from "./rate-limit.js";
@@ -76,7 +76,7 @@ import { adminGate, bearerFrom, corsOptions, identify, identityOf, ownsSession, 
 import { exchangeEnabled, handleExchange, handleLogout, vaultedToken, verifyAgentToken } from "./auth.js";
 import { otelHttp, registerGatewayGauges } from "./telemetry.js";
 import { meteringSink } from "./metering-sink.js";
-import { looksLikeFormReply } from "@marg/core";
+import { looksLikeFormReply } from "@marg-adk/core";
 
 initOtel({ service: process.env.OTEL_SERVICE_NAME ?? "marg-gateway" });
 primeMetrics();
@@ -84,13 +84,13 @@ registerGatewayGauges();
 
 const PORT = envNum("GATEWAY_PORT", 8787);
 // The playground page ships inside this package (public/ beside src/ and dist/); the widget is
-// the @marg/widget package (a workspace link here, a dependency when installed from npm).
+// the @marg-adk/widget package (a workspace link here, a dependency when installed from npm).
 const PUBLIC_DIR = process.env.AGENT_PUBLIC_DIR ?? fileURLToPath(new URL("../public/", import.meta.url));
 const WIDGET_FILE = process.env.AGENT_WIDGET_FILE ?? locateWidget();
 const SHARED_SKILLS_DIR = process.env.AGENT_SHARED_SKILLS_DIR ?? join(REPO_ROOT, "shared-skills");
 function locateWidget(): string {
   try {
-    return fileURLToPath(import.meta.resolve("@marg/widget/widget.js"));
+    return fileURLToPath(import.meta.resolve("@marg-adk/widget/widget.js"));
   } catch {
     return join(REPO_ROOT, "packages", "widget", "widget.js");
   }
@@ -303,7 +303,7 @@ app.post("/api/decide", async (req, res) => {
   try {
     const { classify } = await import("./router.js");
     void classify;
-    const { deciderFromEnv } = await import("@marg/verdict");
+    const { deciderFromEnv } = await import("@marg-adk/verdict");
     const { llmComplete } = await import("./router.js");
     const { decider } = deciderFromEnv({ complete: llmComplete });
     res.json(await decider.decide(state as never, questions as never));

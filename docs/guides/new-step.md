@@ -4,10 +4,10 @@ Ask first: **what does a wrong answer cost?** A guessed value published under th
 a skipped question, a write without a yes — those are steps. Free text, digressions and
 corrections in words stay the model's.
 
-## The three helpers (`stepHelpers` from `@marg/core`)
+## The three helpers (`stepHelpers` from `@marg-adk/core`)
 
 ```ts
-import { stepHelpers, type StepDefinition } from "@marg/core";
+import { stepHelpers, type StepDefinition } from "@marg-adk/core";
 const { chipsStep, multiStep, formStep } = stepHelpers;
 
 export const steps: StepDefinition[] = [

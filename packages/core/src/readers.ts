@@ -7,7 +7,7 @@
  * question again. Every reader follows the same rule as reply-words.ts: every word must be
  * accounted for, or it is content.
  */
-import type { UiOption } from "@marg/types";
+import type { UiOption } from "@marg-adk/types";
 import { CONFIRM_WORDS, NEUTRAL, isPlainNo, isPlainSkip, isPlainYes, isQuestionShaped, wordsOf } from "./reply-words.js";
 
 export type YesNoRead = "yes" | "no" | "skip" | "words";

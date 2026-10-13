@@ -3,11 +3,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@marg/types": ["packages/types/src/index.ts"],
-      "@marg/core": ["packages/core/src/index.ts"],
-      "@marg/verdict": ["packages/verdict/src/index.ts"],
-      "@marg/evals": ["packages/evals/src/index.ts"],
-      "@marg/metering": ["packages/metering/src/index.ts"]
+      "@marg-adk/types": ["packages/types/src/index.ts"],
+      "@marg-adk/core": ["packages/core/src/index.ts"],
+      "@marg-adk/verdict": ["packages/verdict/src/index.ts"],
+      "@marg-adk/evals": ["packages/evals/src/index.ts"],
+      "@marg-adk/metering": ["packages/metering/src/index.ts"]
     },
     "noEmit": true
   },

@@ -1,7 +1,7 @@
 /** preview.test.ts — the draft read off the tool calls: merge vs replace, completion, the summary fingerprint. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { PreviewState } from "@marg/types";
+import type { PreviewState } from "@marg-adk/types";
 import { detectCompletion, detectPreview, draftFingerprint } from "./preview.js";
 
 test("completion: a write tool returning created:true and a real id", () => {

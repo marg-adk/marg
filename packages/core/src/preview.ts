@@ -15,7 +15,7 @@
  * draft fingerprint the confirm gate compares against.
  */
 import { createHash } from "node:crypto";
-import type { Completion, PreviewState } from "@marg/types";
+import type { Completion, PreviewState } from "@marg-adk/types";
 
 export const SLOT_CAP = 60;
 export const SLOT_VALUE_CAP = 200;

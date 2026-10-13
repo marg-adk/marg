@@ -1,6 +1,6 @@
 # Guide: readers — reading a reply in code
 
-`@marg/core` exports the readers the runtime uses; use the same ones in your steps and your
+`@marg-adk/core` exports the readers the runtime uses; use the same ones in your steps and your
 eval checks so the rule never drifts.
 
 | Reader | Reads | Returns |

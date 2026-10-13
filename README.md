@@ -15,7 +15,7 @@ absence cost something.
 
 [![ci](https://github.com/marg-adk/marg/actions/workflows/ci.yml/badge.svg)](https://github.com/marg-adk/marg/actions/workflows/ci.yml) [![codeql](https://github.com/marg-adk/marg/actions/workflows/codeql.yml/badge.svg)](https://github.com/marg-adk/marg/actions/workflows/codeql.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/marg-adk/marg/badge)](https://scorecard.dev/viewer/?uri=github.com/marg-adk/marg) [![licence](https://img.shields.io/badge/licence-Apache--2.0-blue.svg)](LICENSE) [![node](https://img.shields.io/badge/node-%E2%89%A522-brightgreen.svg)](.nvmrc)
 
-<!-- npm badge once published: [![npm](https://img.shields.io/npm/v/@marg/core.svg)](https://www.npmjs.com/package/@marg/core) -->
+<!-- npm badge once published: [![npm](https://img.shields.io/npm/v/@marg-adk/core.svg)](https://www.npmjs.com/package/@marg-adk/core) -->
 
 ## Is Marg for you?
 
@@ -177,13 +177,13 @@ part; copy from it freely.
   `packages/verdict` exposes a System One-compatible HTTP server, so any agent stack can ask
   typed questions of rules, Laya or an LLM through one interface ([docs/DECISIONS.md](docs/DECISIONS.md)).
 - **The readers alone.** `readYesNo`, `readChoice`, `readAmount`, the form wire format and the
-  review picker's reader are pure functions in `@marg/core`, usable in any Node service
+  review picker's reader are pure functions in `@marg-adk/core`, usable in any Node service
   ([docs/guides/readers.md](docs/guides/readers.md)).
 - **The eval runner alone.** It drives any gateway that speaks the client protocol.
 - **The widget alone.** Implement [docs/CLIENT-PROTOCOL.md](docs/CLIENT-PROTOCOL.md) behind it.
 
-On npm: `@marg/core`, `@marg/types`, `@marg/verdict`, `@marg/evals`, `@marg/metering`,
-`@marg/gateway` (with the `marg-gateway` command), `@marg/widget`, and `create-marg-app`.
+On npm: `@marg-adk/core`, `@marg-adk/types`, `@marg-adk/verdict`, `@marg-adk/evals`, `@marg-adk/metering`,
+`@marg-adk/gateway` (with the `marg-gateway` command), `@marg-adk/widget`, and `create-marg-app`.
 The repository builds them with `npm run build`; development runs the TypeScript sources
 directly through `tsx`, no build needed.
 

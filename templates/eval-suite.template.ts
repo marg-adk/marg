@@ -10,7 +10,7 @@
  */
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { hasUi, neverTool, noError, noLeak, notCompleted, reloadRedraws, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, type Scenario } from "@marg/evals";
+import { hasUi, neverTool, noError, noLeak, notCompleted, reloadRedraws, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, type Scenario } from "@marg-adk/evals";
 
 const scenarios: Scenario[] = [
   {

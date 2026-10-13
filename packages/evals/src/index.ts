@@ -1,5 +1,5 @@
 /**
- * @marg/evals — evals are the ratchet.
+ * @marg-adk/evals — evals are the ratchet.
  *
  * A scenario is a scripted multi-turn conversation replayed against a gateway started with
  * WRITES OFF, with deterministic checks per turn (reply regexes, ui block types, tools called or

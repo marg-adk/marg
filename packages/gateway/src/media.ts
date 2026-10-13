@@ -22,7 +22,7 @@ import { unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type express from "express";
-import { behaviour, callDomainTool, envNum, isInternalTool, log, saveSession, withSpan, type Session } from "@marg/core";
+import { behaviour, callDomainTool, envNum, isInternalTool, log, saveSession, withSpan, type Session } from "@marg-adk/core";
 import { discoverDomains } from "./domains.js";
 
 export const mediaConfig = {

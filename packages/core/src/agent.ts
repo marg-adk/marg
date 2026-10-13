@@ -24,7 +24,7 @@
  * `execute_tool <name>` span per tool call, the runtime's step spans, and `behaviour.*` events
  * wherever the runtime corrected the model. Trace log lines carry the same trace id.
  */
-import type { AgentReply, Completion, DomainManifest, StreamEvent, UiBlock } from "@marg/types";
+import type { AgentReply, Completion, DomainManifest, StreamEvent, UiBlock } from "@marg-adk/types";
 import { chatComplete, chatCompleteStream, type ChatMessage, type ToolCall } from "./llm.js";
 import { buildDomainPrompt } from "./prompt.js";
 import { callDomainTool, getDomainToolDefs, isInternalTool } from "./mcp-client.js";

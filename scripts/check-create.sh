@@ -15,7 +15,7 @@ cleanup() {
 trap cleanup EXIT
 npm run -s build
 mkdir -p "$TMP/packs"
-for w in @marg/types @marg/core @marg/verdict @marg/evals @marg/metering @marg/widget @marg/gateway; do
+for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway; do
   npm pack -s -w "$w" --pack-destination "$TMP/packs" > /dev/null
 done
 ls "$TMP/packs"

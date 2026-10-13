@@ -9,7 +9,7 @@
  *
  * Replace it with a real chain (LLM_CHAIN=openai,anthropic …) and nothing else changes.
  */
-import { registerMockModel, type ChatMessage, type ToolCall } from "@marg/core";
+import { registerMockModel, type ChatMessage, type ToolCall } from "@marg-adk/core";
 
 const CATEGORIES = ["billing", "technical", "account", "feature request"];
 

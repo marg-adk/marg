@@ -15,7 +15,7 @@
  * A step definition is pure where it can be: `read` and `settle` take the message and the draft,
  * and return what to write. Side effects (a tool call to fetch options) go through `ctx.call`.
  */
-import type { DomainManifest, PreviewState, StepState, UiBlock } from "@marg/types";
+import type { DomainManifest, PreviewState, StepState, UiBlock } from "@marg-adk/types";
 import type { Session } from "../session.js";
 
 export type StepVia = "moment" | "late" | "edit" | "redraw";

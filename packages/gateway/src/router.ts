@@ -11,9 +11,9 @@
  * LLM with logprobs last. A low-confidence pick falls back to the active domain, then the first
  * domain — routing never throws, and a misroute degrades to a clarifying question, never a wrong write.
  */
-import type { DomainManifest } from "@marg/types";
-import { chatComplete, counter, getSession, log, recordUsage, withSpan, type ChatMessage } from "@marg/core";
-import { deciderFromEnv, regexChoice, rulesBackend, type CompleteFn, type Decider, type TokenLogprobs } from "@marg/verdict";
+import type { DomainManifest } from "@marg-adk/types";
+import { chatComplete, counter, getSession, log, recordUsage, withSpan, type ChatMessage } from "@marg-adk/core";
+import { deciderFromEnv, regexChoice, rulesBackend, type CompleteFn, type Decider, type TokenLogprobs } from "@marg-adk/verdict";
 import { discoverDomains } from "./domains.js";
 
 const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

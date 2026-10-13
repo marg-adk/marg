@@ -45,6 +45,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          for w in @marg/types @marg/core @marg/verdict @marg/evals @marg/metering @marg/widget @marg/gateway create-marg-app; do
+          for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway create-marg-app; do
             npm publish --provenance --access public -w "$w"
           done
