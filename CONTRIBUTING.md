@@ -10,6 +10,7 @@ pattern honest are the most valuable ones.
 
 ## The gate for every change
 ```bash
+npm run lint                     # ESLint, correctness rules only
 npm run typecheck
 npm test                         # unit tests (core, verdict, metering, the widget under a fake DOM)
 npm run check:otel               # the OpenTelemetry seam
@@ -41,6 +42,12 @@ copy; the suite must go red) and adds the scenario that would have caught the bu
 Model endpoints: a preset in `packages/core/src/llm.ts` (base URL, auth style, defaults) and a
 price-table entry. Decision backends: implement `DecisionBackend` in `packages/verdict`.
 Speech-to-text: a provider branch in `packages/gateway/src/transcribe.ts`.
+
+## Pull requests
+Open one from a branch (never push to `main`; it is protected). The template asks for the gate
+output and a classification of every red; CI runs the gate on Node 22 and 24, the packages job,
+CodeQL and the security checks, and a maintainer review is required. `RELEASING.md` describes
+how a merged change reaches npm.
 
 ## Reporting a vulnerability
 See `SECURITY.md`. Please do not open a public issue for a security problem.

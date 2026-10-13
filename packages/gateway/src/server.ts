@@ -35,7 +35,6 @@ import {
   envNum,
   flushLogs,
   getDomainToolDefs,
-  getSession,
   getUsageStats,
   initOtel,
   initSessions,

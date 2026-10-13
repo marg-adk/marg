@@ -27,6 +27,7 @@ jobs:
           for p in packages/*/package.json; do
             pv=$(node -p "require('./$p').version"); [[ "$pv" == "$v" ]] || { echo "$p is $pv, expected $v"; exit 1; }
           done
+      - run: npm run lint
       - run: npm run typecheck
       - run: npm test
       - run: npm run check:otel

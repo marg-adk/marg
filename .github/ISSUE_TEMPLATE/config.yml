@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/marg-adk/marg/discussions
+    about: Ask how to do something, or float a design idea, in Discussions.
+  - name: Security vulnerability
+    url: https://github.com/marg-adk/marg/security/advisories/new
+    about: Report privately. Please do not open a public issue for a security problem.
