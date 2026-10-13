@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **site**: https://marg-adk.github.io/marg — VitePress on GitHub Pages, built from the
+  repository's docs on every merge (`website/`, `npm run site:build`): a landing page, Get
+  started · Build · Components · Run · Reference · Community, search, a comparison page, an FAQ.
+  Pull requests build it, so a dead link fails the PR.
 - **docs**: a review of adk.dev and what Marg takes from it (`docs/reviews/`), and ROADMAP
   "0.3 — the surface": the site, the playground as the dev UI, a `marg` CLI, a skill for coding
   agents, provider pages, user simulation.

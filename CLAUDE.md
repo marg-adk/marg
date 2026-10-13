@@ -36,6 +36,8 @@ Classify every red before fixing it: check brittleness, model flake, pre-existin
 - Decisions: `packages/verdict/src`. Gateway: `packages/gateway/src`. Client: `packages/widget`.
 - The example domain: `examples/support-intake`. Scaffolding: `templates/`, `scripts/new-domain.ts`.
 - Checks: `scripts/check-*.{ts,sh}`. Observability as code: `observability/openobserve/`.
+- The site: `website/` (VitePress; `sync.mjs` mirrors docs/ into `website/src` with links rewritten;
+  authored pages in `website/pages`; `npm run site:build`; deployed by `.github/workflows/pages.yml`).
 - Publishing: `scripts/build.ts` (dist per package, in dependency order), `packages/create-marg-app`
   (its `payload/` is synced from templates, the example, shared skills at build), `check:pack`,
   `check:create`, `.github/workflows/release.yml` (tag `v*` → npm, needs `NPM_TOKEN`). Development
