@@ -1,7 +1,8 @@
 # The gate every change runs: lint, types, unit tests, and the example domain end to end on the
 # scripted mock model (writes off, no key, no network) — on Node 22 and 24. docs/guides/evals.md
 # explains the report. A second job proves the packages still build, pack and install into a
-# fresh create-marg-app project. Branch protection requires both.
+# fresh create-marg-app project. A third builds the deploy image and probes its health, so a
+# file missing from the image fails here and not on the host. Branch protection requires all three.
 name: ci
 on:
   push:
@@ -65,3 +66,25 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run check:pack
       - run: npm run check:create
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the gateway image
+        run: docker build -f deploy/Dockerfile -t marg-gateway:ci .
+      - name: Boot it on the mock model (writes off) and probe health and the playground
+        run: |
+          docker run -d --name gw -p 8787:8787 -e LLM_CHAIN=mock -e AGENT_ALLOW_WRITES=false -e AGENT_REQUIRE_LOGIN=false marg-gateway:ci
+          for i in $(seq 1 60); do
+            curl -fsS http://localhost:8787/api/health > /dev/null 2>&1 && break
+            sleep 1
+          done
+          curl -fsS http://localhost:8787/api/health
+          curl -fsS http://localhost:8787/ | grep -q widget.js
+          bytes=$(curl -fsS http://localhost:8787/widget.js | wc -c)
+          [ "$bytes" -gt 10000 ]
+          echo "image OK: health, playground and widget served"
+      - name: Container log (on failure)
+        if: failure()
+        run: docker logs gw 2>&1 | tail -n 100 || true

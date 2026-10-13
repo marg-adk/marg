@@ -17,6 +17,9 @@ services:
     envVars:
       - key: GATEWAY_PORT
         value: "8787"
+      # Render routes to the port named here; the gateway listens on GATEWAY_PORT.
+      - key: PORT
+        value: "8787"
       - key: LLM_CHAIN
         value: mock
       - key: AGENT_ALLOW_WRITES
