@@ -1,0 +1,39 @@
+# render.yaml — the hosted playground (ROADMAP 0.2, item 2): one web service on Render's free
+# tier running the gateway image on the scripted mock model, writes OFF, no login, the rate
+# limits on. Deploy: Render → New → Blueprint → this repository; nothing else to configure.
+# The free tier sleeps when idle and has no disk, so sessions may be lost on a redeploy or a
+# wake — the README says so next to the link. A real deployment uses deploy/DEPLOY.md instead.
+services:
+  - type: web
+    name: marg-playground
+    runtime: docker
+    dockerfilePath: ./deploy/Dockerfile
+    dockerContext: .
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: GATEWAY_PORT
+        value: "8787"
+      - key: LLM_CHAIN
+        value: mock
+      - key: AGENT_ALLOW_WRITES
+        value: "false"
+      - key: AGENT_REQUIRE_LOGIN
+        value: "false"
+      - key: AGENT_BRAND
+        value: Marg
+      - key: AGENT_ENV
+        value: playground
+      # Render terminates TLS and proxies: rate limits must key on the real client address.
+      - key: AGENT_TRUST_PROXY
+        value: "true"
+      # Defaults restated so the playground's limits are visible here (docs/ENVIRONMENT.md).
+      - key: AGENT_RATE_SESSIONS_PER_IP
+        value: "20"
+      - key: AGENT_RATE_CHAT_PER_IP
+        value: "60"
+      - key: AGENT_RATE_MAX_CONCURRENT
+        value: "8"
