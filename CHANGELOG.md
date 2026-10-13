@@ -5,6 +5,8 @@
 - **deploy**: the image ships `tsconfig.base.json` (without it tsx lost the path mappings and
   the gateway crashed at boot — the first Render deploy failed on this); CI now builds the image
   and probes its health, playground and widget (`image` job, required).
+- **docs**: the launch post, `docs/posts/the-model-must-never-read-yes.md` (the long form, the
+  Show HN comment, the r/LLMDevs post, the thread), linked from the README.
 - **docs**: the README opens with `docs/images/playground.gif`, the six-turn journey recorded from
   the playground on the mock model (0.14 MB).
 - **playground**: `render.yaml`, a Render Blueprint for the hosted playground (mock model,
