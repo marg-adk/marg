@@ -64,10 +64,11 @@ const pkg = {
   description: `${name} — a Marg agent (created by create-marg-app ${v})`,
   engines: { node: ">=22" },
   scripts: {
-    gateway: "marg-gateway",
-    "gateway:evals": "AGENT_ALLOW_WRITES=false AGENT_REQUIRE_LOGIN=false AGENT_RATE_DISABLED=true GATEWAY_PORT=8788 marg-gateway",
-    evals: "tsx examples/support-intake/evals/run-evals.ts",
-    "new-domain": "tsx scripts/new-domain.ts",
+    gateway: "marg web",
+    "gateway:evals": "AGENT_REQUIRE_LOGIN=false AGENT_RATE_DISABLED=true marg web --port 8788 --writes off",
+    evals: "marg evals",
+    check: "marg check",
+    "new-domain": "marg new",
     typecheck: "tsc -p . --noEmit",
   },
   dependencies: {
@@ -76,6 +77,7 @@ const pkg = {
     "@marg-adk/gateway": marg("gateway"),
     "@marg-adk/types": marg("types"),
     "@marg-adk/verdict": marg("verdict"),
+    marg: packs ? `file:${resolve(packs, `marg-${v}.tgz`)}` : `${v}`,
     "@modelcontextprotocol/sdk": "^1.12.0",
     zod: "^3.23.8",
   },
@@ -93,5 +95,5 @@ writeFileSync(join(dest, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
 
 const rel = target === "." ? "." : target;
 console.log(`created ${name} in ${dest}\n`);
-console.log(`next:\n  cd ${rel}\n  npm install\n  npm run gateway            # the playground on http://localhost:8787 — type "ticket for Northwind: login fails on mobile"\n`);
-console.log(`then:\n  npm run new-domain -- bookings     # your own domain from templates/\n  npm run gateway:evals & npm run evals   # the example's gate, writes off\n\n  .env holds LLM_CHAIN=mock (no key). Docs: https://github.com/marg-adk/marg#readme`);
+console.log(`next:\n  cd ${rel}\n  npm install\n  npm run gateway            # marg web — the playground on http://localhost:8787; type "ticket for Northwind: login fails on mobile"\n`);
+console.log(`then:\n  npx marg new bookings      # your own domain from templates/\n  npx marg check             # the gate: typecheck, then every suite with writes off\n\n  .env holds LLM_CHAIN=mock (no key). Docs: https://marg-adk.github.io/marg/`);

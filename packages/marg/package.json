@@ -1,0 +1,48 @@
+{
+  "name": "marg",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marg-adk/marg.git",
+    "directory": "packages/marg"
+  },
+  "homepage": "https://marg-adk.github.io/marg/",
+  "bugs": {
+    "url": "https://github.com/marg-adk/marg/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "The marg command: web (the gateway and the playground), new (a domain from the templates), evals (every suite against a writes-off gateway), verdict (a typed decision from the shell), check (the project's gate).",
+  "keywords": [
+    "agents",
+    "agent-framework",
+    "llm",
+    "mcp",
+    "typescript",
+    "cli"
+  ],
+  "bin": {
+    "marg": "./bin/marg.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "payload",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "prepack": "node scripts/sync-payload.js"
+  },
+  "dependencies": {
+    "@marg-adk/gateway": "0.1.0",
+    "@marg-adk/verdict": "0.1.0",
+    "tsx": "^4.19.0"
+  }
+}

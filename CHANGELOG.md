@@ -6,6 +6,11 @@
   repository's docs on every merge (`website/`, `npm run site:build`): a landing page, Get
   started · Build · Components · Run · Reference · Community, search, a comparison page, an FAQ.
   Pull requests build it, so a dead link fails the PR.
+- **marg**: the `marg` command on npm — `web` (the gateway and the playground), `new` (a domain
+  from the templates), `evals` (every suite against a writes-off gateway), `verdict` (a typed
+  decision from the shell), `check` (the project's gate: typecheck, then every suite with writes
+  off on its own gateway). `create-marg-app` wires it into a new project's scripts; `check:create`
+  runs `marg check` in the created project.
 - **docs**: a review of adk.dev and what Marg takes from it (`docs/reviews/`), and ROADMAP
   "0.3 — the surface": the site, the playground as the dev UI, a `marg` CLI, a skill for coding
   agents, provider pages, user simulation.

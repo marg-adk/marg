@@ -23,6 +23,7 @@
     "**/dist/**",
     "packages/create-marg-app/**",
     "website/**",
+    "packages/marg/**",
     "templates/**",
     "**/results/**"
   ]

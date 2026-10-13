@@ -68,9 +68,21 @@ the report and how to classify a red.
 
 ## Your own domain
 
-```bash
+::: code-group
+
+```bash [npm]
+npx marg new bookings --entity booking
+npx marg check                 # the gate: typecheck, then every suite, writes off
+```
+
+```bash [the repository]
 npm run new-domain -- bookings --entity booking
 ```
+
+:::
+
+A project made by `create-marg-app` has the `marg` command: `marg web`, `marg new`, `marg evals`,
+`marg verdict`, `marg check`.
 
 Then follow the build order: tools, probe, schema, skill, steps, evals.
 [A new domain](/build/new-domain) walks through it; [the example](/build/example) is the

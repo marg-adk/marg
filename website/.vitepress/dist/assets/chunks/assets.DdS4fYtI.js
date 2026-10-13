@@ -1,0 +1,1 @@
+var e=`/marg/assets/playground.DXaaQW8a.gif`;export{e as t};

@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["**/dist/**", "**/node_modules/**", "packages/create-marg-app/payload/**", "**/results/**", "templates/**", "domains/**", ".data/**", "website/src/**", "website/.vitepress/cache/**", "website/.vitepress/dist/**"],
+    ignores: ["**/dist/**", "**/node_modules/**", "packages/create-marg-app/payload/**", "packages/marg/payload/**", "**/results/**", "templates/**", "domains/**", ".data/**", "website/src/**", "website/.vitepress/cache/**", "website/.vitepress/dist/**"],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
