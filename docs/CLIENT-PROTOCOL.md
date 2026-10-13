@@ -73,6 +73,27 @@ an image loads from `file_base + "/" + key` when no `url` is given.
 Record a note, POST the bytes; the stream opens with `transcript`, then the normal events. The
 note IS the message (no edit step); STT runs server-side so keys never reach the client.
 
+## Embedding the widget
+
+```html
+<script src="https://your-gateway/widget.js" data-agent-auto></script>
+```
+
+or `AgentChat.init(opts)` from your own script. The options that shape how it sits in a page:
+
+| Option | What |
+|---|---|
+| `inline` | a selector or element to render into, full size; otherwise a floating bubble |
+| `header` | `false` hides the widget's own title bar — for a host page with its own chrome (the playground) |
+| `title`, `accent`, `greeting`, `starters` | the title bar text, the brand colour, the first message, chips shown with it |
+| `token` | a user Bearer token, or a function returning the current one (docs/SDK-AUTH.md) |
+| `onSession(id)` | the active session changed (or `null` on reset) |
+| `onPreview(state)` | the host draws the live draft; the widget renders no pane of its own |
+| `onTurn(turn)` | after every completed turn: `{user, display, ms, domain, kind, tool_trace, usage, completion, reply, ui}` — what the playground's trace pane shows |
+| `linkSchemes` | URL schemes a `link` block may open besides http(s) |
+
+`AgentChat.open()`, `newChat()` and `openSession(id)` are the public methods.
+
 ## Errors
 `{error, code?, error_id?}`. Codes: `login_required`, `token_expired`, `auth_unavailable`,
 `rate_limit` (with `Retry-After`), `usage_cap` (`scope`, `percent`, `resets_in_s`), `completed`.

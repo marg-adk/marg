@@ -9,6 +9,14 @@
 - **docs**: a review of adk.dev and what Marg takes from it (`docs/reviews/`), and ROADMAP
   "0.3 — the surface": the site, the playground as the dev UI, a `marg` CLI, a skill for coding
   agents, provider pages, user simulation.
+- **playground**: redesigned as the dev UI — a plain top bar with the model and writes status,
+  one centred conversation, the live draft and a new **trace** pane (per turn: runtime or model,
+  every tool call with its time, usage, the create) as side panels that collapse, past chats in a
+  drawer, the domains' example openers on the empty state, usable on a phone. The README GIF is
+  re-recorded on it.
+- **widget**: `header: false` for host pages with their own chrome; `onTurn(turn)` hands the host
+  every completed turn's facts (domain, kind, tool trace, usage, completion); bubbles hug their
+  text. `/api/health` lists each domain's example openers.
 - **deploy**: the image ships `tsconfig.base.json` (without it tsx lost the path mappings and
   the gateway crashed at boot — the first Render deploy failed on this); CI now builds the image
   and probes its health, playground and widget (`image` job, required).

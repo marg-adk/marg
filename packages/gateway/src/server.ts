@@ -153,7 +153,7 @@ app.get("/api/health", (_req, res) => {
     stt: { enabled: sttEnabled(), provider: sttConfig.provider || null },
     media: { domain: mediaDomain() ?? null, file_base: mediaConfig.fileBase || null },
     metering: { sink: meteringSink.enabled },
-    domains: domains.map((d) => ({ name: d.name, title: d.title, tools: getDomainToolDefs(d.name).length, steps: d.steps ? true : false })),
+    domains: domains.map((d) => ({ name: d.name, title: d.title, tools: getDomainToolDefs(d.name).length, steps: d.steps ? true : false, examples: (d.route_hints?.examples ?? []).slice(0, 4) })),
     mcp: mcpState(),
     capabilities: listCapabilities(),
     sessions: sessionCount(),

@@ -137,9 +137,10 @@
     ".panel.open{display:flex}",
     ".panel.inline{position:static;width:100%;height:100%;border-radius:0;box-shadow:none}",
     ".head{background:var(--accent);color:#fff;padding:14px 16px;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center}",
+    ".head.mini{background:none;padding:6px 10px;justify-content:flex-end}",
     ".head button{background:none;border:none;color:#fff;font-size:18px;cursor:pointer}",
     ".msgs{flex:1;overflow-y:auto;padding:12px;background:#f6f7f9}",
-    ".msg{max-width:85%;margin:6px 0;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}",
+    ".msg{max-width:85%;width:fit-content;margin:6px 0;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}",
     ".msg.user{background:var(--accent);color:#fff;margin-left:auto;border-bottom-right-radius:4px}",
     ".msg.bot{background:#fff;color:#1a1a1a;border:1px solid #e5e7eb;border-bottom-left-radius:4px}",
     ".msg.err{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}",
@@ -352,6 +353,11 @@
    * @param {string} [opts.accent]   brand colour (CSS colour string)
    * @param {string} [opts.greeting] first bot message shown locally
    * @param {Array}  [opts.starters] chips shown with the greeting
+   * @param {boolean} [opts.header]   false hides the widget's own header bar — for an inline
+   *                                 host page that has its own chrome (the playground)
+   * @param {Function} [opts.onTurn]  called after every completed turn with
+   *                                 {user, display, ms, domain, kind, tool_trace, usage,
+   *                                 completion, reply, ui} — what a host's trace pane shows
    */
   function Widget(opts) {
     this.gateway = (opts.gateway || SCRIPT_ORIGIN || "").replace(/\/+$/, "");
@@ -367,6 +373,8 @@
     // Guided entry point: chips shown with the greeting — set these per vertical
     // (one per entry flow). Override with opts.starters, [] to hide.
     this.starters = opts.starters || [];
+    this.header = opts.header !== false; // the panel's own title bar; a host page with its own chrome turns it off
+    this.onTurn = opts.onTurn || null; // host trace hook: the finished turn's facts (#trace)
     // URL schemes a `link` block may open besides http(s) (your app's own scheme). The gateway filters too.
     this.linkSchemes = opts.linkSchemes || [];
     this.sessionId = null;
@@ -460,15 +468,16 @@
     // The docked pane itself — hidden until the user opens it via the 🏠 button.
     this.previewBox = h("div", { class: "pv" });
     this.previewBox.style.display = "none";
-    this.panel = h("div", { class: "panel" }, [
-      h("div", { class: "head" }, headKids),
+    var kids = this.header ? [h("div", { class: "head" }, headKids)] : [];
+    if (!this.header && !this.onPreview) kids.push(h("div", { class: "head mini" }, [this.pvBtn]));
+    this.panel = h("div", { class: "panel" }, kids.concat([
       this.previewBox,
       this.msgs,
       this.mediaBar,
       h("div", { class: "foot" }, [this.input, this.clipBtn, this.micBtn, this.sendBtn]),
       this.fileInput,
       this.usageBar = h("div", { class: "usage" })
-    ]);
+    ]));
     this.panel.style.setProperty("--accent", this.accent);
     this.shadow.appendChild(this.panel);
 
@@ -1725,7 +1734,7 @@
     // Bundle everything a transport needs into one context object, then pick
     // the transport: streaming SSE when the browser supports ReadableStream,
     // otherwise the plain JSON request/response fallback.
-    var ctx = { text: text, display: display, isRetry: isRetry, typing: typing, status: status, cleanup: cleanup, recover: recover };
+    var ctx = { text: text, display: display, isRetry: isRetry, typing: typing, status: status, cleanup: cleanup, recover: recover, t0: Date.now() };
     if (typeof ReadableStream !== "undefined" && window.fetch) this._streamChat(ctx);
     else this._jsonChat(ctx);
   };
@@ -1797,6 +1806,7 @@
                 else if (botEl) { botEl.textContent = ""; renderRichText(botEl, ev.data.reply || acc); }
                 self._renderUi(ev.data.ui);
                 self._updateUsage(ev.data.usage);
+                self._turnDone(ctx, ev.data);
                 if (ev.data.completion) self._enterCompleted(ev.data.completion); // entity created → end chat
               } else if (ev.event === "error") {
                 finished = true;
@@ -1830,6 +1840,18 @@
     try { return { event: event, data: JSON.parse(data) }; } catch (e) { return null; }
   };
 
+  /**
+   * The finished turn's facts for the host (#trace): the user's text, the elapsed time, which
+   * domain answered, whether the runtime or the model did (kind), every tool call with its
+   * time, usage and the completion. The host's errors never break the chat.
+   */
+  Widget.prototype._turnDone = function (ctx, data) {
+    if (!this.onTurn || !data) return;
+    try {
+      this.onTurn({ user: ctx.text, display: ctx.display || null, ms: Date.now() - (ctx.t0 || Date.now()), domain: data.domain || null, kind: data.kind || null, tool_trace: data.tool_trace || [], usage: data.usage || null, completion: data.completion || null, reply: data.reply || "", ui: data.ui || [] });
+    } catch (e) {}
+  };
+
   // Non-streaming fallback (older browsers / no ReadableStream).
   /**
    * POSTs the turn to /api/chat and waits for the complete JSON response
@@ -1856,6 +1878,7 @@
         self._bot(res.j.reply);
         self._renderUi(res.j.ui);
         self._updateUsage(res.j.usage);
+        self._turnDone(ctx, res.j);
         if (res.j.completion) self._enterCompleted(res.j.completion);
       })
       .catch(function () { ctx.cleanup(); self._error("Connection lost — try again."); });

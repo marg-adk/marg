@@ -1,7 +1,7 @@
 /** widget.test.ts — the real widget under Node: every block's tap sends the right message, forms gate and echo, resume replays, uploads land, a lost session recovers. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { file, makeWorld } from "./widget-harness.js";
+import { file, makeWorld, type Json } from "./widget-harness.js";
 
 const chips = { type: "chips", options: [{ label: "Billing", value: "billing" }, { label: "Technical", value: "technical" }] };
 
@@ -163,4 +163,23 @@ test("a lost session recovers once: a new session is minted and the message is r
   assert.equal(world.calls.filter((c) => c.method === "POST" && c.path === "/api/session").length, 2);
   assert.deepEqual(world.turns.map((t) => t.message), ["hello"]);
   assert.ok(world.texts(".msg.bot").some((t) => /Reconnected/.test(t)));
+});
+
+test("onTurn: the host receives the finished turn's facts on both transports; header:false mounts no title bar", async () => {
+  for (const stream of [true, false]) {
+    const turns: Json[] = [];
+    const world = await makeWorld({ stream, previews: true, init: { header: false, onTurn: (t: Json) => turns.push(t) } });
+    world.chatReply = { reply: "Priority set to High.", ui: [], usage: { input_tokens: 10, output_tokens: 4 }, domain: "support-intake", kind: "priority", tool_trace: [{ tool: "validate_ticket_slots", ms: 3 }] };
+    world.w._send("high");
+    await world.settle(8);
+    assert.equal(turns.length, 1, `stream=${stream}`);
+    assert.equal(turns[0].user, "high");
+    assert.equal(turns[0].domain, "support-intake");
+    assert.equal(turns[0].kind, "priority");
+    assert.deepEqual(JSON.parse(JSON.stringify(turns[0].tool_trace)), [{ tool: "validate_ticket_slots", ms: 3 }]);
+    assert.equal(turns[0].usage.output_tokens, 4);
+    assert.equal(typeof turns[0].ms, "number");
+    assert.equal(world.qa(".head").length, 0, "no title bar when header:false");
+    assert.ok(world.qa(".foot textarea").length === 1, "the composer is still there");
+  }
 });
