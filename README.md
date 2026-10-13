@@ -2,6 +2,10 @@
 
 **The Agent Development Kit for conversational agents that finish a job.**
 
+<p align="center">
+  <img src="docs/images/playground.gif" width="900" alt="The playground: a ticket typed in one sentence, a customer picker, category chips, a details card the runtime draws and reads, priority chips, a summary with provenance, the create.">
+</p>
+
 Marg (मार्ग, "the path") is a TypeScript framework for agents that take a person from a first
 sentence to a completed action against a real backend: a ticket raised, a listing published, a
 booking made, an application submitted, an order placed. It ships the runtime, the client, the

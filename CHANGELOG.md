@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **docs**: the README opens with `docs/images/playground.gif`, the six-turn journey recorded from
+  the playground on the mock model (0.14 MB).
 - **playground**: `render.yaml`, a Render Blueprint for the hosted playground (mock model,
   writes off, no login, rate limits on).
 - **core**: the form-reply pair parser scans instead of matching a regex that backtracked
