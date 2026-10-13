@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+- **core**: the form-reply pair parser scans instead of matching a regex that backtracked
+  polynomially on long runs of spaces in user text (CodeQL, high). The Docker healthcheck and
+  the CI gate poll `/api/health`, the path the gateway serves.
 - **repository**: the gate runs on Node 22 and 24 with `npm run lint` (ESLint, correctness
-  rules only) first; CodeQL, a security workflow (dependency review, verified-secrets scan,
-  `npm audit`) and the OpenSSF Scorecard run on every PR or weekly; Dependabot keeps npm and
+  rules only) first; CodeQL, a security workflow (dependency review, `npm audit`; GitHub secret
+  scanning with push protection on the repository) and the OpenSSF Scorecard run on every PR or weekly; Dependabot keeps npm and
   Actions current in grouped weekly PRs; CODEOWNERS, issue templates (bug, feature, domain
   request), a pull-request template that asks for the gate output and a classification of every
   red, `RELEASING.md`, `.nvmrc`, `.editorconfig`, and badges in the README.

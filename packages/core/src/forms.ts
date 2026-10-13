@@ -21,7 +21,31 @@ import type { FormBlock, FormRow } from "@marg/types";
 
 export type { FormBlock, FormRow };
 
-const PAIR_RE = /^\s*([^:[\]]+?)\s*(?:\[([a-z0-9_]+)\])?\s*:\s*(.*?)\s*$/is;
+const KEY_RE = /^[a-z0-9_]+$/i;
+
+/**
+ * `Label [key]: value` → its parts, by scanning rather than a regex: user-typed text reaches
+ * this, and the earlier pattern (a lazy label, an optional bracketed key and the value, each
+ * padded with \s*) backtracked polynomially on long runs of spaces (CodeQL js/polynomial-redos,
+ * 2026-10-13). Same contract: the head is everything before the first colon; an optional
+ * bracketed key must end the head and name only [a-z0-9_]; the label before it has at least one
+ * character and no brackets; the value is the rest, trimmed.
+ */
+function splitPair(part: string): { label: string; key?: string; value: string } | null {
+  const colon = part.indexOf(":");
+  if (colon < 0) return null;
+  let head = part.slice(0, colon).trimEnd();
+  let key: string | undefined;
+  const open = head.indexOf("[");
+  if (open >= 0) {
+    if (!head.endsWith("]")) return null;
+    key = head.slice(open + 1, -1);
+    if (!KEY_RE.test(key)) return null;
+    head = head.slice(0, open);
+  }
+  if (head.length === 0 || head.includes("]")) return null;
+  return { label: head, key, value: part.slice(colon + 1).trim() };
+}
 
 /** The message a client sends for the filled rows. */
 export function formReply(rows: FormRow[], values: Record<string, string>): string {
@@ -42,12 +66,12 @@ export function parseFormReply(text: string, rows: FormRow[] = []): Record<strin
   const out: Record<string, string> = {};
   let pairs = 0;
   for (const part of text.split(/;\s*/)) {
-    const m = PAIR_RE.exec(part);
-    if (!m) continue;
-    const key = m[2] ?? byLabel.get(m[1].trim().toLowerCase());
+    const pair = splitPair(part);
+    if (!pair) continue;
+    const key = pair.key ?? byLabel.get(pair.label.trim().toLowerCase());
     if (!key) continue;
     pairs++;
-    out[key] = m[3];
+    out[key] = pair.value;
   }
   return pairs > 0 ? out : undefined;
 }
