@@ -1,0 +1,14 @@
+node_modules/
+
+# local runtime state — never commit
+.env
+.env.*.local
+/.data/
+.sessions/
+.usage/
+*.log
+.DS_Store
+
+# eval transcripts (regenerated every run)
+**/evals/results/
+**/probe/results/

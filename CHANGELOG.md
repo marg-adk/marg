@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+- **packages**: every package is publishable — a build per package (`tsc -p tsconfig.build.json`
+  to `dist/`, ESM + `.d.ts`), `exports`, `types`, `files`, `publishConfig.access: public`;
+  `@marg/widget` is now a package (the file plus a manifest); `@marg/gateway` ships a
+  `marg-gateway` command that registers the tsx loader and runs the compiled server. The tsx
+  development path through `tsconfig.json` paths is unchanged.
+- **create-marg-app**: `npx create-marg-app my-agent` copies the templates, the example domain,
+  the shared skills and the scaffolder into a fresh project depending on the published packages.
+- **core**: when installed from npm the project root is the working directory (walking up to the
+  nearest `package.json` or `.git`), so `.env`, `domains/`, `examples/` and `shared-skills/` are
+  found in the user's project; `AGENT_REPO_ROOT` still overrides.
+- **gateway**: the playground page and the widget are located relative to their packages, not
+  the repository; `/api/skills` honours `AGENT_SHARED_SKILLS_DIR`.
+- **checks**: `check:pack` (every package packs clean) and `check:create` (a project from local
+  tarballs installs, boots and passes the example suite); a `packages` CI job runs both.
+- **release**: a tag `v*` runs the gate and publishes every package with provenance
+  (`NPM_TOKEN`).
+
 ## 0.1.0 — 2026-10-13
 
 First open-source release, extracted and generalised from a production agent.

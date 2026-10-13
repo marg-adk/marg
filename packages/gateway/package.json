@@ -1,15 +1,59 @@
 {
   "name": "@marg/gateway",
   "version": "0.1.0",
-  "private": true,
+  "license": "Apache-2.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marg-adk/marg.git",
+    "directory": "packages/gateway"
+  },
+  "homepage": "https://github.com/marg-adk/marg#readme",
+  "bugs": {
+    "url": "https://github.com/marg-adk/marg/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Marg gateway — the HTTP/SSE server clients talk to: sessions, chat turns, the super-agent router, rate limits, usage caps, security, media, voice, nudges, health and metrics.",
-  "main": "src/server.ts",
+  "keywords": [
+    "agents",
+    "agent-framework",
+    "llm",
+    "mcp",
+    "typescript",
+    "gateway",
+    "sse"
+  ],
+  "bin": {
+    "marg-gateway": "./bin/marg-gateway.js"
+  },
+  "main": "./dist/server.js",
+  "exports": {
+    ".": "./dist/server.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "public",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
   "dependencies": {
     "@marg/core": "0.1.0",
+    "@marg/metering": "0.1.0",
     "@marg/types": "0.1.0",
     "@marg/verdict": "0.1.0",
+    "@marg/widget": "0.1.0",
     "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "tsx": "^4.19.0"
   }
 }

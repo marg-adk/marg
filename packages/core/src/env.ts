@@ -2,37 +2,56 @@
  * env.ts — minimal .env loader + repo-root locator + typed env readers.
  *
  * MUST be the first import of any entrypoint (gateway, MCP server, scripts) so
- * process.env is populated before config modules capture it. Walks up from this
- * file until it finds the repo root (a package.json declaring workspaces, or a
- * .git dir), so it works however deep the caller lives.
+ * process.env is populated before config modules capture it.
+ *
+ * THE PROJECT ROOT (REPO_ROOT): where .env, domains/, examples/ and shared-skills/ live.
+ *  - In this monorepo: walk up from this file to the package.json declaring workspaces (or a
+ *    .git dir), so it works however deep the caller lives.
+ *  - Installed from npm (this file sits under node_modules/): the project is where the process
+ *    runs — walk up from the working directory to the nearest package.json or .git.
+ *  - AGENT_REPO_ROOT overrides both.
  *
  * Every Marg setting is `AGENT_<NAME>`; model endpoints are `LLM_<NAME>_*`;
  * decisions are `VERDICT_*`. The helpers below read them with their defaults.
  */
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-function findRepoRoot(start: string): string {
+/** Walk up from `start` to the first directory `isRoot` accepts; null when none within 12 levels. */
+function walkUp(start: string, isRoot: (dir: string) => boolean): string | null {
   let dir = start;
   for (let i = 0; i < 12; i++) {
-    const pkg = join(dir, "package.json");
-    if (existsSync(pkg)) {
-      try {
-        if (JSON.parse(readFileSync(pkg, "utf8")).workspaces) return dir;
-      } catch {
-        /* malformed package.json — keep walking */
-      }
-    }
-    if (existsSync(join(dir, ".git"))) return dir;
+    if (isRoot(dir)) return dir;
     const parent = dirname(dir);
     if (parent === dir) break;
     dir = parent;
   }
-  return start;
+  return null;
+}
+const hasPackageJson = (dir: string, needWorkspaces: boolean): boolean => {
+  const pkg = join(dir, "package.json");
+  if (!existsSync(pkg)) return false;
+  if (!needWorkspaces) return true;
+  try {
+    return Boolean(JSON.parse(readFileSync(pkg, "utf8")).workspaces);
+  } catch {
+    return false; // malformed package.json — keep walking
+  }
+};
+const isGitDir = (dir: string): boolean => existsSync(join(dir, ".git"));
+
+function locateRoot(): string {
+  if (process.env.AGENT_REPO_ROOT) return process.env.AGENT_REPO_ROOT;
+  const here = dirname(fileURLToPath(import.meta.url));
+  if (here.split(sep).includes("node_modules")) {
+    const cwd = process.cwd();
+    return walkUp(cwd, (d) => hasPackageJson(d, false) || isGitDir(d)) ?? cwd;
+  }
+  return walkUp(here, (d) => hasPackageJson(d, true) || isGitDir(d)) ?? here;
 }
 
-const repoRoot = process.env.AGENT_REPO_ROOT ?? findRepoRoot(dirname(fileURLToPath(import.meta.url)));
+const repoRoot = locateRoot();
 
 try {
   const raw = readFileSync(join(repoRoot, ".env"), "utf8");
@@ -44,7 +63,7 @@ try {
   /* no .env — rely on the real environment */
 }
 
-/** The monorepo root (where package.json with workspaces lives). */
+/** The project root: the monorepo root here, the user's project when installed from npm (see the header). */
 export const REPO_ROOT = repoRoot;
 
 /** A positive number from the environment, else the fallback. */

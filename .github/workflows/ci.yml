@@ -1,5 +1,6 @@
 # The gate every change runs: types, unit tests, and the example domain end to end on the
 # scripted mock model (writes off, no key, no network). docs/guides/evals.md explains the report.
+# A second job proves the packages still build, pack and install into a fresh create-marg-app project.
 name: ci
 on:
   push:
@@ -40,3 +41,15 @@ jobs:
           name: eval-results
           path: examples/support-intake/evals/results/
           if-no-files-found: ignore
+  packages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check:pack
+      - run: npm run check:create

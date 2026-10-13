@@ -15,6 +15,8 @@ npm test                         # unit tests (core, verdict, metering, the widg
 npm run check:otel               # the OpenTelemetry seam
 npm run check:scaffold           # the templates still produce a domain that compiles and passes its suite
 npm run check:e2e                # the real write path (writes ON against the example's file backend)
+npm run check:pack               # every package builds and packs clean (touch a package.json or a build config)
+npm run check:create             # a create-marg-app project from local tarballs installs, boots and passes its suite
 npm run gateway:evals &          # writes off, :8788
 npm run evals                    # the example suite must stay green
 ```

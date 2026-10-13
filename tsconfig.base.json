@@ -1,0 +1,12 @@
+{
+  "//": "Shared compiler options. tsconfig.json (typecheck, paths to src) and every packages/*/tsconfig.build.json (emit to dist) extend this.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  }
+}

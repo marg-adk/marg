@@ -1,0 +1,44 @@
+{
+  "name": "create-marg-app",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marg-adk/marg.git",
+    "directory": "packages/create-marg-app"
+  },
+  "homepage": "https://github.com/marg-adk/marg#readme",
+  "bugs": {
+    "url": "https://github.com/marg-adk/marg/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "npx create-marg-app my-agent — a fresh Marg project: the templates, the example domain, the shared skills and the scaffolder, depending on the published @marg packages.",
+  "keywords": [
+    "agents",
+    "agent-framework",
+    "llm",
+    "mcp",
+    "typescript",
+    "create",
+    "scaffold"
+  ],
+  "bin": {
+    "create-marg-app": "./bin/create-marg-app.js"
+  },
+  "files": [
+    "bin",
+    "project",
+    "payload",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "prepack": "node scripts/sync-payload.js"
+  }
+}
