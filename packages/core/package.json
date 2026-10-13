@@ -1,0 +1,12 @@
+{
+  "name": "@marg/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Marg core runtime — the domain-agnostic agent loop: prompt assembly, the model chain, MCP tools, sessions, durable stores, runtime-owned steps, readers, guards, observability.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@marg/types": "0.1.0"
+  }
+}

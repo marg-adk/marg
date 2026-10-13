@@ -1,0 +1,37 @@
+{
+  "name": "support-intake",
+  "title": "Support ticket intake",
+  "description": "Create a support ticket for a customer: who, what, how urgent, and the details an engineer needs.",
+  "route_hints": {
+    "examples": [
+      "create a ticket for Northwind: login fails on mobile",
+      "log an issue for Contoso, their invoice export is broken",
+      "new support request",
+      "raise a bug for the dashboard timing out",
+      "open a ticket"
+    ],
+    "keywords": ["ticket", "issue", "bug", "support", "incident", "complaint", "outage"]
+  },
+  "mcp": { "command": "npx", "args": ["tsx", "examples/support-intake/mcp/server.ts"] },
+  "skills": ["skills/support-intake"],
+  "shared_skills": ["conversation-behaviour", "visual-presentation"],
+  "steps": "steps/index.ts",
+  "step_order": ["details", "priority"],
+  "mock": "mock/policy.ts",
+  "evals": "evals",
+  "entity": { "singular": "ticket", "plural": "tickets", "id_key": "entity_id" },
+  "slot_labels": {
+    "title": "Title",
+    "customer_name": "Customer",
+    "category": "Category",
+    "priority": "Priority",
+    "channel": "Channel",
+    "environment": "Environment",
+    "affected_users": "Affected users",
+    "steps_to_reproduce": "Steps to reproduce",
+    "plan": "Plan",
+    "city": "City"
+  },
+  "hidden_slots": ["customer_id"],
+  "attested_lists": ["tags"]
+}

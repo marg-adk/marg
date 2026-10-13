@@ -1,0 +1,9 @@
+{
+  "name": "@marg/evals",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Marg evals — the regression gate: scripted conversations replayed against a writes-disabled gateway, deterministic checks, sharding, flake classification, a gate report.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

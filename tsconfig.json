@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@marg/types": [
+        "packages/types/src/index.ts"
+      ],
+      "@marg/core": [
+        "packages/core/src/index.ts"
+      ],
+      "@marg/verdict": [
+        "packages/verdict/src/index.ts"
+      ],
+      "@marg/evals": [
+        "packages/evals/src/index.ts"
+      ],
+      "@marg/metering": [
+        "packages/metering/src/index.ts"
+      ]
+    },
+    "noEmit": true
+  },
+  "include": [
+    "packages/**/*.ts",
+    "examples/**/*.ts",
+    "domains/**/*.ts",
+    "scripts/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules",
+    "templates/**",
+    "**/results/**"
+  ]
+}

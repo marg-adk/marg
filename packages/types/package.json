@@ -1,0 +1,9 @@
+{
+  "name": "@marg/types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cross-package types for Marg: the domain manifest, the client protocol (ui blocks, stream events, preview, completion), step state.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

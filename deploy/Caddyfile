@@ -1,0 +1,17 @@
+# deploy/Caddyfile — TLS at the edge; SSE streams pass through unbuffered.
+# No `encode` here on purpose: compressing text/event-stream delays chat deltas.
+{$AGENT_DOMAIN} {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+	reverse_proxy gateway:8787 {
+		flush_interval -1
+		transport http {
+			read_timeout 10m
+			write_timeout 10m
+		}
+	}
+}

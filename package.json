@@ -1,0 +1,61 @@
+{
+  "name": "marg",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Marg \u2014 an open-source Agent Development Kit for conversational agents that complete a job, step by step: runtime-owned steps, typed decisions, evals as the ratchet, and a production ops spine.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "gateway": "tsx packages/gateway/src/server.ts",
+    "gateway:evals": "AGENT_ALLOW_WRITES=false AGENT_REQUIRE_LOGIN=false AGENT_RATE_DISABLED=true GATEWAY_PORT=8788 tsx packages/gateway/src/server.ts",
+    "evals": "tsx examples/support-intake/evals/run-evals.ts",
+    "typecheck": "tsc -p . --noEmit",
+    "test": "node --import tsx --test \"packages/*/src/**/*.test.ts\" \"packages/*/test/**/*.test.ts\" \"examples/*/test/**/*.test.ts\"",
+    "test:core": "node --import tsx --test \"packages/core/src/**/*.test.ts\"",
+    "test:verdict": "node --import tsx --test \"packages/verdict/src/**/*.test.ts\"",
+    "test:widget": "node --import tsx --test \"packages/widget/test/**/*.test.ts\"",
+    "verdict": "tsx packages/verdict/src/cli.ts",
+    "verdict:mcp": "tsx packages/verdict/src/mcp-server.ts",
+    "new-domain": "tsx scripts/new-domain.ts",
+    "check:otel": "tsx scripts/check-otel.ts",
+    "o2:bootstrap": "tsx scripts/o2-bootstrap.ts",
+    "db:up": "mkdir -p .data/redis .data/mongo && redis-server --port 6379 --dir .data/redis --daemonize yes --logfile redis.log && mongod --dbpath .data/mongo --port 27017 --fork --logpath .data/mongo/mongod.log --quiet",
+    "db:down": "redis-cli shutdown nosave 2>/dev/null; mongod --dbpath .data/mongo --shutdown 2>/dev/null; true",
+    "check:scaffold": "bash scripts/check-scaffold.sh",
+    "o2:dashboards": "tsx scripts/make-dashboards.ts",
+    "check:e2e": "bash scripts/check-e2e.sh"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/context-async-hooks": "^2.11.0",
+    "@opentelemetry/core": "^2.11.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "^0.222.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.222.0",
+    "@opentelemetry/instrumentation": "^0.222.0",
+    "@opentelemetry/instrumentation-undici": "^0.32.0",
+    "@opentelemetry/resources": "^2.11.0",
+    "@opentelemetry/sdk-metrics": "^2.11.0",
+    "@opentelemetry/sdk-trace-base": "^2.11.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mongodb": "^7.5.0",
+    "redis": "^6.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}

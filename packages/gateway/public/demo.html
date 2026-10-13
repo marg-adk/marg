@@ -1,0 +1,190 @@
+<!doctype html>
+<!--
+  demo.html — the gateway's home page: a two-pane playground around the embeddable widget.
+
+  LEFT: this user's past chats (GET /api/my/sessions). CENTRE: the widget from /widget.js
+  mounted inline in #chat — exactly what a host app gets. RIGHT: the live draft pane, fed
+  by the widget's onPreview hook (the "form filling itself" effect).
+
+  Login: when the gateway requires it, paste a token (your app would do the exchange —
+  docs/SDK-AUTH.md). The token lives only in this browser's localStorage.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__BRAND__ — playground</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f6f7f9; color: #111827; display: flex; overflow: hidden; }
+    aside { width: 280px; flex: none; background: #111d33; color: #e5e7eb; display: flex; flex-direction: column; }
+    .brand { padding: 18px 18px 12px; display: flex; align-items: baseline; gap: 8px; }
+    .brand .logo { font-weight: 700; font-size: 17px; letter-spacing: .5px; color: #fff; }
+    .brand .tag { font-size: 11px; opacity: .55; }
+    .newchat { margin: 4px 14px 12px; padding: 10px 14px; border: 1px solid rgba(255,255,255,.25); border-radius: 10px; background: none; color: #fff; font-size: 13.5px; font-weight: 600; cursor: pointer; text-align: left; }
+    .newchat:hover { background: rgba(255,255,255,.08); }
+    .listhead { padding: 4px 18px 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .8px; color: #94a3b8; }
+    #sessions { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
+    .row { position: relative; padding: 9px 10px; border-radius: 9px; cursor: pointer; margin: 2px 0; }
+    .row:hover { background: rgba(255,255,255,.07); }
+    .row.active { background: rgba(255,255,255,.14); }
+    .row .t { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 22px; }
+    .row .m { font-size: 11px; opacity: .55; margin-top: 2px; }
+    .row .x { position: absolute; right: 6px; top: 8px; border: none; background: none; color: #94a3b8; cursor: pointer; font-size: 13px; display: none; }
+    .row:hover .x { display: block; }
+    .sb-note { padding: 10px 18px; font-size: 12px; opacity: .6; }
+    .sb-user { padding: 12px 18px; border-top: 1px solid rgba(255,255,255,.1); font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .sb-user button { background: none; border: 1px solid rgba(255,255,255,.25); color: #e5e7eb; border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: 11px; }
+    main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+    #chat { flex: 1; min-height: 0; }
+    .pv { width: 320px; flex: none; background: #fff; border-left: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+    .pv-h { padding: 14px 16px; font-weight: 600; font-size: 13px; border-bottom: 1px solid #f0f1f3; display: flex; justify-content: space-between; align-items: center; }
+    .pv-h .st { font-size: 11px; font-weight: 500; color: #6b7280; }
+    .pv-h .st.ok { color: #047857; }
+    .pv-body { flex: 1; overflow-y: auto; padding: 8px 16px; }
+    .pv-f { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f3f4f6; font-size: 12.5px; }
+    .pv-f .k { color: #6b7280; }
+    .pv-f .v { font-weight: 500; text-align: right; }
+    .pv-empty { color: #9ca3af; font-size: 12.5px; padding: 20px 0; text-align: center; }
+    .pv-m { font-size: 12px; color: #b45309; background: #fffbeb; border-radius: 8px; padding: 8px 10px; margin-top: 10px; }
+    .pv-media { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; }
+    .pv-media img, .pv-media span { width: 56px; height: 56px; border-radius: 6px; object-fit: cover; background: #f3f4f6; display: inline-flex; align-items: center; justify-content: center; }
+    #login { position: fixed; inset: 0; background: rgba(17,29,51,.75); display: none; align-items: center; justify-content: center; z-index: 50; }
+    #login.on { display: flex; }
+    .box { background: #fff; border-radius: 14px; padding: 24px; width: 360px; }
+    .box h2 { margin: 0 0 6px; font-size: 18px; }
+    .box p { margin: 0 0 14px; font-size: 13px; color: #6b7280; }
+    .box input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; margin-bottom: 10px; }
+    .box button.go { width: 100%; padding: 10px; border: none; border-radius: 8px; background: #111d33; color: #fff; font-weight: 600; cursor: pointer; }
+    .box .err { color: #b91c1c; font-size: 12px; min-height: 16px; margin-top: 8px; }
+    @media (max-width: 900px) { aside, .pv { display: none; } }
+  </style>
+</head>
+<body>
+  <aside>
+    <div class="brand"><span class="logo">__BRAND__</span><span class="tag">playground</span></div>
+    <button class="newchat" id="newchat">＋&nbsp; New chat</button>
+    <div class="listhead">Your chats</div>
+    <div id="sessions"><div class="sb-note">Loading…</div></div>
+    <div class="sb-user"><span id="sbname">not signed in</span><button id="logout">Sign out</button></div>
+  </aside>
+  <main><div id="chat"></div></main>
+  <aside class="pv">
+    <div class="pv-h"><span>Live draft</span><span class="st" id="pvstate"></span></div>
+    <div class="pv-body" id="pvbody"><div class="pv-empty">Start a chat — the draft fills in here as you answer.</div></div>
+  </aside>
+
+  <div id="login">
+    <div class="box">
+      <h2>Sign in</h2>
+      <p>This gateway requires a user token. Paste the token your app would exchange (docs/SDK-AUTH.md), or run the gateway with AGENT_REQUIRE_LOGIN=false for local work.</p>
+      <input id="token" type="password" placeholder="Bearer token" autocomplete="off" />
+      <button class="go" id="savetoken">Continue</button>
+      <div class="err" id="loginerr"></div>
+    </div>
+  </div>
+
+  <script src="/widget.js"></script>
+  <script>
+    (function () {
+      var AUTH_KEY = "marg:auth";
+      var loginEl = document.getElementById("login");
+      var loginErr = document.getElementById("loginerr");
+      var requireLogin = true;
+      var activeSid = null;
+      var widget = null;
+
+      function token() { try { return localStorage.getItem(AUTH_KEY) || ""; } catch (e) { return ""; } }
+      function authHeaders() { var t = token(); return t ? { Authorization: "Bearer " + t } : {}; }
+
+      function startApp() {
+        if (widget) return;
+        widget = AgentChat.init({
+          gateway: location.origin,
+          inline: "#chat",
+          title: "__BRAND__",
+          accent: "#111d33",
+          token: function () { return token() || undefined; },
+          onSession: function (id) { activeSid = id; markActive(); setTimeout(refresh, 400); },
+          onPreview: renderPreview
+        });
+        refresh();
+        setInterval(refresh, 15000);
+        document.getElementById("sbname").textContent = token() ? "signed in" : (requireLogin ? "not signed in" : "local (no login)");
+      }
+
+      fetch("/api/health").then(function (r) { return r.json(); }).then(function (j) {
+        requireLogin = !(j && j.auth && j.auth.require_login === false);
+        if (requireLogin && !token()) loginEl.classList.add("on"); else startApp();
+      }).catch(function () { loginEl.classList.add("on"); });
+
+      document.getElementById("savetoken").addEventListener("click", function () {
+        var t = document.getElementById("token").value.trim();
+        if (!t) { loginErr.textContent = "Paste a token first."; return; }
+        try { localStorage.setItem(AUTH_KEY, t); } catch (e) {}
+        loginEl.classList.remove("on");
+        startApp();
+      });
+      document.getElementById("logout").addEventListener("click", function () {
+        try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
+        location.reload();
+      });
+      document.getElementById("newchat").addEventListener("click", function () { if (widget) AgentChat.newChat(); clearPreview(); });
+
+      // ---- the chat list -------------------------------------------------------------
+      var listEl = document.getElementById("sessions");
+      function refresh() {
+        fetch("/api/my/sessions?limit=100", { headers: authHeaders() })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (j) {
+            if (!j) return;
+            listEl.textContent = "";
+            if (!j.sessions.length) { listEl.appendChild(el("div", "sb-note", "No chats yet.")); return; }
+            j.sessions.forEach(function (s) {
+              var row = el("div", "row" + (s.session_id === activeSid ? " active" : ""));
+              row.dataset.sid = s.session_id;
+              row.appendChild(el("div", "t", (s.completed ? "✅ " : "") + (s.preview || "(empty chat)")));
+              row.appendChild(el("div", "m", new Date(s.updated_at).toLocaleString() + " · " + s.turns + " turns"));
+              var x = el("button", "x", "✕"); x.title = "Delete this chat";
+              x.addEventListener("click", function (e) {
+                e.stopPropagation();
+                fetch("/api/session/" + encodeURIComponent(s.session_id), { method: "DELETE", headers: authHeaders() }).then(function () { if (s.session_id === activeSid) AgentChat.newChat(); refresh(); });
+              });
+              row.appendChild(x);
+              row.addEventListener("click", function () { AgentChat.openSession(s.session_id); activeSid = s.session_id; markActive(); });
+              listEl.appendChild(row);
+            });
+          }).catch(function () {});
+      }
+      function markActive() {
+        Array.prototype.forEach.call(listEl.querySelectorAll(".row"), function (r) { r.classList.toggle("active", r.dataset.sid === activeSid); });
+      }
+
+      // ---- the live draft pane ---------------------------------------------------------
+      var pvBody = document.getElementById("pvbody"), pvState = document.getElementById("pvstate");
+      function clearPreview() { pvBody.textContent = ""; pvBody.appendChild(el("div", "pv-empty", "Start a chat — the draft fills in here as you answer.")); pvState.textContent = ""; }
+      function renderPreview(data) {
+        if (!data) { clearPreview(); return; }
+        var slots = data.slots || {}, defaults = data.defaults || [];
+        var keys = Object.keys(slots).filter(function (k) { return k !== "confirmed" && k.indexOf("hide_") !== 0; });
+        pvBody.textContent = "";
+        if (!keys.length) { pvBody.appendChild(el("div", "pv-empty", "Nothing captured yet.")); }
+        keys.forEach(function (k) {
+          var f = el("div", "pv-f");
+          f.appendChild(el("span", "k", k.replace(/_/g, " ").replace(/^\w/, function (c) { return c.toUpperCase(); })));
+          f.appendChild(el("span", "v", String(slots[k]) + (defaults.indexOf(k) >= 0 ? " (default)" : "")));
+          pvBody.appendChild(f);
+        });
+        if (data.missing && data.missing.length) pvBody.appendChild(el("div", "pv-m", "Still needed: " + data.missing.slice(0, 6).join("; ")));
+        var steps = data.steps || {};
+        var done = Object.keys(steps).filter(function (k) { return steps[k].status === "settled" || steps[k].status === "skipped"; });
+        if (done.length) pvBody.appendChild(el("div", "pv-m", "Steps done: " + done.join(", ")));
+        pvState.textContent = data.state === "created" ? "✓ created" : data.state === "validated" ? "ready" : "in progress";
+        pvState.className = "st" + (data.state === "created" || data.state === "validated" ? " ok" : "");
+      }
+      function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+    })();
+  </script>
+</body>
+</html>

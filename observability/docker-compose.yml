@@ -1,0 +1,42 @@
+# observability/docker-compose.yml — a local OpenObserve for traces, metrics and logs (ADR-0003).
+#
+#   docker compose -f observability/docker-compose.yml up -d
+#   open http://localhost:5080   (admin@example.com / Complexpass#123 — override both below)
+#   npm run o2:bootstrap          # the starter dashboards
+#   npm run check:otel            # "done = visible on a panel"
+#
+# The gateway exports OTLP/protobuf straight to OpenObserve (see OTEL_* in .env.example).
+# Add `--profile collector` to put an OpenTelemetry Collector in front (fan-out, sampling).
+services:
+  openobserve:
+    image: public.ecr.aws/zinclabs/openobserve:latest
+    container_name: marg-openobserve
+    environment:
+      ZO_ROOT_USER_EMAIL: ${O2_ROOT_USER_EMAIL:-admin@example.com}
+      ZO_ROOT_USER_PASSWORD: ${O2_ROOT_USER_PASSWORD:-Complexpass#123}
+      ZO_DATA_DIR: /data
+      ZO_TELEMETRY_ENABLED: "false"
+    ports:
+      - "127.0.0.1:5080:5080"
+    volumes:
+      - o2-data:/data
+    restart: unless-stopped
+
+  otel-collector:
+    profiles: ["collector"]
+    image: otel/opentelemetry-collector-contrib:0.118.0
+    container_name: marg-otel-collector
+    command: ["--config=/etc/otelcol/config.yaml"]
+    environment:
+      O2_BASIC_AUTH: ${O2_BASIC_AUTH:?base64 of "email:password"}
+    volumes:
+      - ./otel-collector.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
+    depends_on:
+      - openobserve
+    restart: unless-stopped
+
+volumes:
+  o2-data:

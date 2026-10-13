@@ -1,0 +1,23 @@
+{
+  "//": "Declarative slot registry — one file per entity. The skill narrates the flow; THIS file is the truth about slots. The validate tool reads it; probe findings get folded back in.",
+  "entity": "__ENTITY__",
+  "types": {
+    "//": "Variants that change the slot set. Delete if the entity has one shape.",
+    "default": { "label": "Default" }
+  },
+  "purposes": ["<e.g. sale|rent, new|renewal>"],
+  "slots": {
+    "title": { "type": "string", "source": "ask", "ask_priority": 1, "notes": "usually volunteered in the opener" },
+    "<record_id>": { "type": "id", "source": "derive_<record>", "ask_priority": 1, "notes": "resolved from search_<records>; never invented" },
+    "<enum_slot>": { "type": "enum", "source": "ask", "ask_priority": 2, "values": ["a", "b"], "notes": "offered as chips from reference_data" },
+    "<default_slot>": { "type": "enum", "source": "default", "values": ["x", "y"], "default": "x" },
+    "<step_slot>": { "type": "string", "source": "runtime_step:details" },
+    "<list_slot>": { "type": "list", "source": "ask", "notes": "attested list — only items the user typed or picked survive the guard" }
+  },
+  "mandatory": ["title", "<record_id>", "<enum_slot>"],
+  "ask_sets": [{ "slots": ["title", "<record_name>"], "phrasing_hint": "What is it, and for whom?" }],
+  "runtime_steps": ["details"],
+  "probe_findings_YYYY_MM_DD": {
+    "//": "Empirical backend truth from the probe run — what the server actually enforces, schema warts (misspelled keys that are the REAL fields), endpoint corrections, which GETs write. Date-stamped, appended, never deleted."
+  }
+}

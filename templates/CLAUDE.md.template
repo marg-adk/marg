@@ -1,0 +1,36 @@
+# CLAUDE.md — <Product> agent
+
+<!-- Standing context for every session. Keep it SHORT — it loads every time. Link out. -->
+
+Built on Marg (docs/PATTERN.md first in any session that touches architecture).
+
+## Architecture in one line
+Within a domain, compose skills; across domains, delegate through the super agent (ADR-0001).
+The model owns the conversation; the runtime owns the moments that must be right (ADR-0004).
+
+## Working conventions
+- **Evals are the ratchet**: `npm run gateway:evals & npm run evals` before AND after any skill,
+  step or refactor change. Classify every red before fixing: check brittleness / model flake /
+  pre-existing / transport / regression.
+- **Done = visible on a panel** (ADR-0003): a span, a counter or behaviour event, a log line with the trace id.
+- Commits: `Topic: imperative summary (#tag)`; the tag threads roadmap ↔ code ↔ scenario ids.
+- File headers: WHAT THIS IS / WHAT COMES IN–OUT / WHO TALKS TO IT; guard code cites the incident.
+- Build order for a new domain: tools → probe → schema → skill → steps → evals.
+- One branch per fix; never push to a branch with an open PR.
+
+## Never weaken
+- Agent-side validation (assume the backend validates nothing until the probe proves otherwise).
+- The confirm gate ×3 (skill rule, tool schema, runtime guard).
+- `AGENT_ALLOW_WRITES` must equal the literal "true"; evals run with writes off.
+- Links are tool-composed, never model-invented; `internal_*` tools stay hidden from the model.
+- The user's token rides `_meta`, never arguments, never persisted.
+
+## Environment
+- `npm install`; `cp .env.example .env`; `npm run gateway` → :8787; evals gateway → :8788.
+- Optional: `npm run db:up` (Redis + Mongo), `docker compose -f observability/docker-compose.yml up -d`.
+
+## External asks (numbered, with owners)
+1. <prod base URL + auth contract — owner, status>
+
+## Current phase
+<one paragraph: what's shipped, what's next, where the roadmap lives>

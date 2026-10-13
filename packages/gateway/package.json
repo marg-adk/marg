@@ -1,0 +1,15 @@
+{
+  "name": "@marg/gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Marg gateway — the HTTP/SSE server clients talk to: sessions, chat turns, the super-agent router, rate limits, usage caps, security, media, voice, nudges, health and metrics.",
+  "main": "src/server.ts",
+  "dependencies": {
+    "@marg/core": "0.1.0",
+    "@marg/types": "0.1.0",
+    "@marg/verdict": "0.1.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

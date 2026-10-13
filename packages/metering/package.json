@@ -1,0 +1,9 @@
+{
+  "name": "@marg/metering",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Marg metering client — buffered, idempotent, fail-open usage events for a metering/billing service (pass-through: bill what vendors bill you).",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}
