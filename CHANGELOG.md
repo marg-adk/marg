@@ -10,7 +10,8 @@
 - **docs**: the README opens with `docs/images/playground.gif`, the six-turn journey recorded from
   the playground on the mock model (0.14 MB).
 - **playground**: `render.yaml`, a Render Blueprint for the hosted playground (mock model,
-  writes off, no login, rate limits on).
+  writes off, no login, rate limits on), deployed at https://marg-playground.onrender.com and
+  linked from the README.
 - **core**: the form-reply pair parser scans instead of matching a regex that backtracked
   polynomially on long runs of spaces in user text (CodeQL, high). The Docker healthcheck and
   the CI gate poll `/api/health`, the path the gateway serves.

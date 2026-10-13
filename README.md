@@ -43,6 +43,10 @@ absence cost something.
 
 ## Two minutes to a running agent
 
+**Or zero minutes:** the hosted playground at **https://marg-playground.onrender.com** runs the
+example on the mock model with writes off. It sleeps when idle (the first load takes a moment) and
+keeps no disk, so a session may be lost on a redeploy; everything else is the real thing.
+
 ```bash
 npx create-marg-app my-agent && cd my-agent
 npm install
