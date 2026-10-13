@@ -35,7 +35,11 @@
     "build": "tsx scripts/build.ts",
     "clean": "rm -rf packages/*/dist packages/*/LICENSE packages/create-marg-app/payload",
     "check:pack": "bash scripts/check-pack.sh",
-    "check:create": "bash scripts/check-create.sh"
+    "check:create": "bash scripts/check-create.sh",
+    "site:sync": "node website/sync.mjs",
+    "site:dev": "npm run -s site:sync && vitepress dev website",
+    "site:build": "npm run -s site:sync && vitepress build website",
+    "site:preview": "vitepress preview website"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
@@ -65,6 +69,7 @@
     "globals": "^17.13.0",
     "tsx": "^4.19.0",
     "typescript": "^5.5.0",
-    "typescript-eslint": "^8.71.2"
+    "typescript-eslint": "^8.71.2",
+    "vitepress": "^1.6.4"
   }
 }

@@ -27,3 +27,8 @@ observability/openobserve/alerts/
 packages/*/dist/
 packages/*/LICENSE
 packages/create-marg-app/payload/
+
+# the site: mirrored content and build output (npm run site:build)
+website/src/
+website/.vitepress/cache/
+website/.vitepress/dist/
