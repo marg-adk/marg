@@ -387,23 +387,31 @@ export function normalizePath(path: string): string {
 export function providerName(name: string, kind: string, base: string): string {
   if (kind === "anthropic") return "anthropic";
   if (kind === "mock") return "mock";
-  if (/openai\.com/.test(base)) return "openai";
-  if (/openai\.azure\.com|cognitiveservices\.azure\.com/.test(base)) return "azure.ai.openai";
-  if (/aiplatform\.googleapis/.test(base)) return "gcp.vertex_ai";
-  if (/googleapis/.test(base)) return "gcp.gemini";
-  if (/amazonaws\.com/.test(base)) return "aws.bedrock";
-  if (/api\.x\.ai/.test(base)) return "x_ai";
-  if (/cohere/.test(base)) return "cohere";
-  if (/perplexity/.test(base)) return "perplexity";
-  if (/huggingface/.test(base)) return "huggingface";
-  if (/nvidia/.test(base)) return "nvidia";
-  if (/cerebras/.test(base)) return "cerebras";
-  if (/deepseek/.test(base)) return "deepseek";
-  if (/fireworks/.test(base)) return "fireworks";
-  if (/together/.test(base)) return "together";
-  if (/groq/.test(base)) return "groq";
-  if (/mistral/.test(base)) return "mistral";
-  if (/openrouter/.test(base)) return "openrouter";
-  if (/localhost|127\.0\.0\.1/.test(base)) return "local";
+  // the label comes from the endpoint's host, parsed — never a substring match over the URL
+  let host = "";
+  try {
+    host = new URL(base).hostname.toLowerCase();
+  } catch {
+    return name;
+  }
+  const under = (...domains: string[]): boolean => domains.some((d) => host === d || host.endsWith("." + d));
+  if (under("localhost") || host === "127.0.0.1" || host === "[::1]" || host === "::1" || host.endsWith(".local")) return "local";
+  if (under("openai.azure.com", "cognitiveservices.azure.com")) return "azure.ai.openai";
+  if (under("aiplatform.googleapis.com")) return "gcp.vertex_ai";
+  if (under("googleapis.com")) return "gcp.gemini";
+  if (under("openai.com")) return "openai";
+  if (under("amazonaws.com")) return "aws.bedrock";
+  if (under("x.ai")) return "x_ai";
+  if (under("cohere.ai", "cohere.com")) return "cohere";
+  if (under("perplexity.ai")) return "perplexity";
+  if (under("huggingface.co")) return "huggingface";
+  if (under("nvidia.com")) return "nvidia";
+  if (under("cerebras.ai")) return "cerebras";
+  if (under("deepseek.com")) return "deepseek";
+  if (under("fireworks.ai")) return "fireworks";
+  if (under("together.xyz", "together.ai")) return "together";
+  if (under("groq.com")) return "groq";
+  if (under("mistral.ai")) return "mistral";
+  if (under("openrouter.ai")) return "openrouter";
   return name;
 }
