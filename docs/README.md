@@ -24,5 +24,5 @@ Start with the pattern, then the playbook. Everything else is reference.
 | [integrations/](integrations/) | Observability backends, stores, speech, decisions, hosting, other frameworks, coding agents |
 | [../skills/build-a-domain/SKILL.md](../skills/build-a-domain/SKILL.md) | The method as a skill for a coding agent (Claude Code loads it from `.claude/skills`) |
 | [posts/](posts/) | The launch post: the number that shaped the design |
-| [reviews/](reviews/) | Studies of other frameworks and what Marg takes from them |
+| [reviews/](reviews/) | Studies of other frameworks and what Marg takes from them; the 0.3 review walked as a stranger |
 | [adr/](adr/) | Architecture decision records 0001–0006 + the template |

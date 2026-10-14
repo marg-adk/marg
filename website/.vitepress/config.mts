@@ -115,6 +115,7 @@ export default defineConfig({
         { text: "Writing", items: [
           { text: "The model must never read yes", link: "/community/posts/the-model-must-never-read-yes" },
           { text: "Review: adk.dev", link: "/community/reviews/adk-dev-2026-10" },
+          { text: "Review: 0.3 and its peers", link: "/community/reviews/0.3-review-2026-10" },
         ] },
       ],
     },

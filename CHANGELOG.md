@@ -16,6 +16,11 @@
   offer them as suggestions.
 - **site**: `/llms.txt` — the site's index for coding agents (every page with its title, by
   section), written by the sync from the same page map as the nav.
+- **docs**: a review of 0.3 walked as a stranger and set beside Google ADK, the OpenAI Agents SDK,
+  LangGraph and Pydantic AI, area by area, with every gap ranked and classified
+  (`docs/reviews/0.3-review-2026-10.md`), and ROADMAP "0.4 — what the walk found": the trace pane
+  that shows what the gateway knows and survives a reload, a model-played user, the since line and
+  the live version on the site, the skill installable in one line.
 - **templates**: a Python tool server. `npm run new-domain -- <name> --lang python` (and `marg new
   … --lang python`) writes `mcp/server.py` on the official `mcp` SDK (2.x, `MCPServer` over stdio)
   and `mcp/requirements.txt`, with the same tools and contracts as the TypeScript server: the
