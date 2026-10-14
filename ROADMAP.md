@@ -159,6 +159,55 @@ the same deterministic checks and the same classification.
 
 Accept: one example scenario runs with a simulated user in CI on the mock model.
 
+## 0.4 — what the walk found
+
+0.3 made Marg findable. The 0.3 review ([docs/reviews/0.3-review-2026-10.md](docs/reviews/0.3-review-2026-10.md))
+walked it as a stranger and set it beside its peers; what was small was fixed before 0.3.0, what
+was declined says why there, and these four are what is left, in order of leverage.
+
+### 1. The trace pane shows what the gateway knows, and survives a reload
+
+The 0.3 item promised the route decision with its confidence, each step's state, every tool call
+with its arguments and result, the model's turns and timings; the pane shows who answered, the
+tools with their time, usage and the create. The gateway logs the rest per turn already. Add it
+to the turn's facts (`onTurn`, the SSE `done` event) behind a dev-UI flag, draw it in the pane
+with the arguments and result folded, and give the transcript endpoint the draft and the per-turn
+facts so a reload rebuilds both panes instead of emptying them. Content stays off telemetry.
+
+Accept: on the six-turn journey the pane shows `search_customers` with its query and the two
+matches, the route decision and its confidence on the first turn, the Details step as asked →
+redrawn → settled, and a reload shows the same panes; `npm test` (the widget under the fake DOM)
+and the example suite stay green.
+
+### 2. A model-played user
+
+`UserSim` admits one; none ships. `modelUser({ persona, goal, model })` asks the configured
+chain for the next message from the same view `cooperativeUser` sees, stops on completion or a
+refused write, and is bounded by `max`. Runs outside CI by design; the checks and the
+classification are the same.
+
+Accept: one example scenario with `modelUser` runs green against a real model three times with
+the same failing set (none), and is skipped on the mock chain with a line saying so.
+
+### 3. The "since" line, and the live version on the site
+
+The sync adds a line under every mirrored page's title ("since 0.1", "since 0.3", from a map in
+`website/sync.mjs`, the authored pages carry theirs), and the home page and the nav show the
+released version from the root `package.json` with a link to the changelog.
+
+Accept: every page under Build, Components and Run carries a since line; the home page shows the
+version that `npm view @marg-adk/core version` prints.
+
+### 4. The skill, installable in one line anywhere
+
+`create-marg-app` installs `build-a-domain`; a project that did not come from it has no one-line
+path. Make the repository's `skills/` directory what `npx skills add marg-adk/marg` expects, say
+so on the coding-agents page and in the skill's own README, and keep the copy in
+`create-marg-app` in sync at build.
+
+Accept: in an empty folder `npx skills add marg-adk/marg --skill build-a-domain` installs the
+skill where Claude Code and Codex look; `check:create` still asserts the copied skill.
+
 ## Later
 
 - A calibration workbench for Verdict: label, fit, plot reliability, choose the abstention threshold.
