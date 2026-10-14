@@ -47,13 +47,38 @@ export type Turn = {
   act?: (ctx: { session_id: string; gateway: string; all: TurnResult[] }) => Promise<unknown>;
   checks?: Check[];
 };
+/** What a simulated user sees before choosing its next message. */
+export interface SimView {
+  /** 0 before the first message. */
+  turn: number;
+  last?: TurnResult;
+  all: TurnResult[];
+  /** The blocks on screen: what the last turn drew, or what a reload would redraw. */
+  ui: any[];
+  draft: any;
+  completed: boolean;
+}
+/**
+ * A simulated user: scripted (a persona that reacts to what is on screen) or model-played (a
+ * function that asks any model for the next message). It returns the next turn, a bare message,
+ * or null when it is done; `max` bounds the conversation (default 12).
+ */
+export interface UserSim {
+  next(view: SimView): Promise<Turn | string | null> | Turn | string | null;
+  max?: number;
+}
 export interface Scenario {
   id: string;
   goal: string;
   /** The scenario ends in a real write: refused unless the gateway reports writes:false. */
   creates?: boolean;
   tags?: string[];
+  /** Scripted turns — or leave empty and set `user`. */
   turns: Turn[];
+  /** A simulated user generates the turns instead of `turns`. */
+  user?: UserSim;
+  /** Checks applied to every turn (the invariants: no error, one question, no leak…). */
+  everyTurn?: Check[];
   finalChecks?: Check[];
 }
 
@@ -118,6 +143,65 @@ export function tap(label: string): (all: TurnResult[]) => string {
   };
 }
 
+// ---- simulated users ----------------------------------------------------------------------
+export interface CooperativeUserOptions {
+  /** The first message. */
+  opener: string;
+  /** Form rows by key → the value to type; a required row with no answer is left empty (the runtime redraws it). */
+  answers?: Record<string, string>;
+  /** Labels to tap when offered (chips, list items, card actions), in order of preference; else the first option. */
+  prefer?: string[];
+  /** Free text to say instead of answering, once, after the given turn count (a question beside an open ask, a digression). */
+  asides?: { after: number; say: string }[];
+  /** Done when the job completed, or a create was refused because writes are off (the evals gateway). Override to end elsewhere. */
+  done?: (view: SimView) => boolean;
+  max?: number;
+}
+const refusedWrite = (t?: TurnResult): boolean => Boolean(t && /writes are disabled/i.test(t.reply));
+/**
+ * A persona that cooperates: opens with one sentence, fills the cards it is shown from `answers`,
+ * taps what it prefers among what is offered, confirms the summary, and says its asides at the
+ * turns you set. Deterministic, so a scenario with it runs in CI on the mock model; the checks
+ * stay the same deterministic checks. A model-played user is the same `UserSim` shape with
+ * `next` asking a model — write one where free text beyond a script matters, outside CI.
+ */
+export function cooperativeUser(o: CooperativeUserOptions): UserSim {
+  const said = new Set<number>();
+  const prefer = o.prefer ?? [];
+  const pick = (options: { label: string; value?: string }[]): string | undefined => {
+    const live = options.filter((x) => x && !(x as any).off && !(x as any).ghost);
+    for (const p of prefer) { const hit = live.find((x) => x.label === p || x.value === p); if (hit) return String(hit.value ?? hit.label); }
+    return live[0] ? String(live[0].value ?? live[0].label) : undefined;
+  };
+  return {
+    max: o.max,
+    next(view) {
+      if (view.turn === 0) return o.opener;
+      if (o.done ? o.done(view) : view.completed || refusedWrite(view.last)) return null;
+      const aside = (o.asides ?? []).find((a) => a.after === view.turn && !said.has(a.after));
+      if (aside) { said.add(aside.after); return aside.say; }
+      for (const b of [...view.ui].reverse()) {
+        if (b?.type === "form" && Array.isArray(b.rows)) {
+          const parts: string[] = [];
+          for (const r of b.rows) {
+            const v = o.answers?.[r.key] ?? r.value;
+            if (v) parts.push(`${r.label} [${r.key}]: ${String(v).replace(/;/g, ",")}`);
+          }
+          if (parts.length) return parts.join("; ");
+        }
+        if (b?.type === "card" && Array.isArray(b.actions) && b.actions.length) {
+          const confirm = b.actions.find((a: any) => /^confirm/i.test(String(a.label ?? "")));
+          const chosen = confirm ? String(confirm.value ?? confirm.label) : pick(b.actions);
+          if (chosen) return chosen;
+        }
+        if ((b?.type === "chips" || b?.type === "multichips") && Array.isArray(b.options)) { const v = pick(b.options); if (v) return v; }
+        if (b?.type === "list" && Array.isArray(b.items)) { const v = pick(b.items.map((it: any) => ({ label: it.title, value: it.value ?? it.title }))); if (v) return v; }
+      }
+      return null; // nothing to answer: the user has nothing more to say
+    },
+  };
+}
+
 // ---- the runner ---------------------------------------------------------------------------
 export interface RunOptions {
   gateway: string;
@@ -162,7 +246,28 @@ export async function runScenario(s: Scenario, o: RunOptions): Promise<ScenarioR
   const passed: string[] = [];
   const failed: string[] = [];
   let transport = false;
-  for (const turn of s.turns) {
+  const viewOf = (): SimView => {
+    const last = all[all.length - 1];
+    return { turn: all.length, last, all, ui: last ? (last.lastEntry?.ui?.length ? last.lastEntry.ui : last.ui) : [], draft: last?.preview ?? null, completed: Boolean(last?.completion) };
+  };
+  let scripted = 0;
+  for (;;) {
+    let turn: Turn | undefined;
+    if (s.user) {
+      if (all.length >= (s.user.max ?? 12)) { failed.push(`[${s.id}] the simulated user did not finish within ${s.user.max ?? 12} turns`); break; }
+      let nextTurn: Turn | string | null;
+      try {
+        nextTurn = await s.user.next(viewOf());
+      } catch (e) {
+        failed.push(`[${s.id}] t${all.length + 1} user: ${(e as Error).message}`);
+        break;
+      }
+      if (nextTurn === null) break;
+      turn = typeof nextTurn === "string" ? { send: nextTurn } : nextTurn;
+    } else {
+      turn = s.turns[scripted++];
+      if (!turn) break;
+    }
     const tt0 = Date.now();
     let actResult: unknown;
     if (turn.act) actResult = await turn.act({ session_id, gateway: o.gateway, all });
@@ -204,7 +309,7 @@ export async function runScenario(s: Scenario, o: RunOptions): Promise<ScenarioR
     }
     (result as TurnResult & { actResult?: unknown }).actResult = actResult;
     all.push(result);
-    for (const c of turn.checks ?? []) (c.pass(result, all) ? passed : failed).push(`[${s.id}] t${all.length} ${c.name}`);
+    for (const c of [...(s.everyTurn ?? []), ...(turn.checks ?? [])]) (c.pass(result, all) ? passed : failed).push(`[${s.id}] t${all.length} ${c.name}`);
     if (o.verbose) console.log(`   t${all.length} ${message === undefined ? "(act)" : JSON.stringify(message).slice(0, 80)} → ${result.kind ? `[${result.kind}] ` : ""}${result.reply.slice(0, 120).replace(/\n/g, " ")} ${result.ui.length ? "ui:" + result.ui.map((b) => b.type).join(",") : ""}`);
   }
   for (const c of s.finalChecks ?? []) (c.pass(all[all.length - 1], all) ? passed : failed).push(`[${s.id}] final ${c.name}`);

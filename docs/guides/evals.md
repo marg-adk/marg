@@ -33,6 +33,33 @@ only against a gateway whose health says writes are off.
 `completed`, `notCompleted`, `reloadRedraws(type)`, `oneQuestion`, `noLeak(re)`.
 A refused write shows in the trace as `create_x (refused)` — assert on it explicitly.
 
+## Simulated users
+
+A scenario can hand the user's side to a **simulated user** instead of a turn list: `user` is
+asked for the next message given what is on screen (the last reply, the blocks a reload would
+redraw, the draft, whether the job completed) until it returns null. The checks are the same
+deterministic checks: `everyTurn` applies to every turn, `finalChecks` to the end.
+
+```ts
+{
+  id: "simulated-user", goal: "…", creates: true, turns: [],
+  user: cooperativeUser({
+    opener: "ticket for Contoso: the invoice export has been broken since Monday",
+    prefer: ["Billing", "High", "Confirm & create ticket"],            // taps, in order of preference
+    answers: { environment: "production", steps_to_reproduce: "…" },     // form rows by key
+    asides: [{ after: 2, say: "what does environment mean?" }],         // free text beside an open ask
+  }),
+  everyTurn: [noError, oneQuestion, noLeak(/SKILL\.md/)],
+  finalChecks: [toolCalledThisTurn("create_ticket"), notCompleted, replyMatches(/writes are disabled/i)],
+}
+```
+
+`cooperativeUser` is deterministic, so the scenario runs in CI on the mock model; it covers
+what a scripted turn list cannot — the user reacting to whatever the runtime draws. A
+**model-played user** is the same `UserSim` shape with `next` asking a model (a persona, a goal,
+the view as context); write one where free text beyond a script matters, and run it outside CI
+against a real model, with the same checks and the same classification of every red.
+
 ## The gate report
 `✅ PASS · 🟡 FLAKE (green on rerun or in the ledger) · 🟠 TRANSPORT (429 / outage / "briefly
 unavailable") · ❌ FAIL`. The exit code is 0 only with no FAIL and no TRANSPORT. Results and
