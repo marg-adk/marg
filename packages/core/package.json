@@ -1,6 +1,6 @@
 {
   "name": "@marg-adk/core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
@@ -44,7 +44,7 @@
     "build": "tsc -p tsconfig.build.json && cp src/log-worker.mjs dist/"
   },
   "dependencies": {
-    "@marg-adk/types": "0.2.0",
+    "@marg-adk/types": "0.2.1",
     "@anthropic-ai/sdk": "^0.133.0",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "@opentelemetry/api": "^1.9.1",
