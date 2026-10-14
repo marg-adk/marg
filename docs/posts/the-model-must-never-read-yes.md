@@ -131,7 +131,7 @@ runtime guard) and never weakens.
 Everything runs offline: the example domain ships a scripted mock model, so the eval suite and
 CI need no key. `npx create-marg-app my-agent` opens the playground.
 
-The write-up with the numbers and a twenty-line step: [link to the post]. Happy to answer
+The write-up with the numbers and a twenty-line step: https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes. Happy to answer
 questions about the readers, the step engine, or what we got wrong first.
 
 ---
@@ -158,7 +158,7 @@ gated three times. The whole thing runs offline on a scripted mock model, so the
 the CI gate with no key.
 
 It's open source as Marg (TypeScript, MCP, Apache-2.0): https://github.com/marg-adk/marg
-Post with the code: [link]. Curious whether others have measured their yes-readers.
+Post with the code: https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes. Curious whether others have measured their yes-readers.
 
 ---
 
@@ -192,4 +192,4 @@ the only validation.
 
 8/ Everything runs offline: the example ships a scripted mock model, so the eval suite is a CI
 gate with no API key. Marg, TypeScript + MCP + any model, Apache-2.0:
-https://github.com/marg-adk/marg — `npx create-marg-app my-agent`. The write-up: [link]
+https://github.com/marg-adk/marg — `npx create-marg-app my-agent`. The write-up: https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes
