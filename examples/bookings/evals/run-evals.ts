@@ -11,7 +11,7 @@
  */
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { draftHas, hasUi, inDomain, neverTool, noError, noLeak, notCompleted, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
+import { cooperativeUser, draftHas, hasUi, inDomain, neverTool, noError, noLeak, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
 
 // 2026-11-06 is a Friday; 2026-11-02 a Monday (Harbour House is closed on Mondays).
 const scenarios: Scenario[] = [
@@ -90,6 +90,21 @@ const scenarios: Scenario[] = [
     id: "route-to-tickets",
     goal: "The super agent routes a ticket opener to the other example — the same gateway, two domains",
     turns: [{ send: "ticket for Northwind: login fails on mobile", checks: [noError, inDomain("support-intake"), toolCalled("search_customers")] }],
+  },
+  {
+    id: "simulated-user",
+    goal: "A simulated guest books from one opener: picks the venue from the list, fills the card, asks about walk-ins beside it, picks a time, confirms",
+    creates: true,
+    tags: ["simulation"],
+    turns: [],
+    user: cooperativeUser({
+      opener: "table for 2 at Harbour",
+      prefer: ["Harbour Lights", "19:30", "Confirm & create booking"],
+      answers: { date: "2026-11-06", party_size: "2", occasion: "date night" },
+      asides: [{ after: 2, say: "do you take walk-ins?" }],
+    }),
+    everyTurn: [noError, oneQuestion, inDomain("bookings")],
+    finalChecks: [toolCalledThisTurn("create_booking"), notCompleted, replyMatches(/writes are disabled/i), draftHas("venue_name", /Harbour Lights/), draftHas("slot_time", /^\d\d:\d\d$/), stepStatus("details", "settled"), stepStatus("slot", "settled")],
   },
 ];
 

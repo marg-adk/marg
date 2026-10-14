@@ -13,7 +13,7 @@
  */
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { draftHas, draftState, hasUi, neverTool, noError, noLeak, noUi, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
+import { cooperativeUser, draftHas, draftState, hasUi, neverTool, noError, noLeak, noUi, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
 
 const scenarios: Scenario[] = [
   {
@@ -94,6 +94,21 @@ const scenarios: Scenario[] = [
       { send: "low", checks: [noError, runtimeTurn("priority"), hasUi("card"), replyOrUiMatches(/email \(default\)/i), noUi("form")] },
       { send: "ok create it", checks: [noError, toolCalledThisTurn("create_ticket"), notCompleted] },
     ],
+  },
+  {
+    id: "simulated-user",
+    goal: "A simulated user plays the whole journey from one opener — fills the card it is shown, taps what it prefers, asks a question beside the open card, confirms — and every turn keeps the invariants",
+    creates: true,
+    tags: ["simulation"],
+    turns: [],
+    user: cooperativeUser({
+      opener: "ticket for Contoso: the invoice export has been broken since Monday",
+      prefer: ["Billing", "High", "Confirm & create ticket"],
+      answers: { environment: "production", affected_users: "12", steps_to_reproduce: "Open Billing, export March, the file is empty" },
+      asides: [{ after: 2, say: "what does environment mean?" }],
+    }),
+    everyTurn: [noError, oneQuestion, noLeak(/Non-negotiable platform rules|SKILL\.md/)],
+    finalChecks: [toolCalledThisTurn("create_ticket"), notCompleted, replyMatches(/writes are disabled/i), draftHas("category", /billing/), draftHas("priority", /^high$/), draftHas("environment", /production/), stepStatus("details", "settled"), stepStatus("priority", "settled"), neverTool("create_ticket (refused)")],
   },
 ];
 
