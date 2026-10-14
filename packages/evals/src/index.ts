@@ -91,6 +91,14 @@ export const hasUi = (type?: string, tag?: Record<string, unknown>): Check => ({
   name: `ui has ${type ?? "a block"}${tag ? " " + JSON.stringify(tag) : ""}`,
   pass: (t) => (t.ui ?? []).some((b) => (!type || b?.type === type) && (!tag || Object.entries(tag).every(([k, v]) => b?.[k] === v))),
 });
+/** A form block on this turn has row `key` with a value / an error matching (a partial submit comes back pre-filled and marked). */
+export const formRow = (key: string, want: { value?: RegExp; error?: RegExp }): Check => ({
+  name: `form row ${key}${want.value ? ` value ~ ${want.value}` : ""}${want.error ? ` error ~ ${want.error}` : ""}`,
+  pass: (t) =>
+    (t.ui ?? []).some(
+      (b) => b?.type === "form" && (Array.isArray(b.rows) ? b.rows : []).some((r: any) => r?.key === key && (!want.value || want.value.test(String(r.value ?? ""))) && (!want.error || want.error.test(String(r.error ?? "")))),
+    ),
+});
 export const noUi = (type: string): Check => ({ name: `ui has no ${type}`, pass: (t) => !(t.ui ?? []).some((b) => b?.type === type) });
 export const toolCalled = (name: string): Check => ({ name: `tool ${name} called (so far)`, pass: (_t, all) => all.some((x) => x.tool_trace?.some((tr) => tr.tool === name)) });
 export const toolCalledThisTurn = (name: string): Check => ({ name: `tool ${name} called this turn`, pass: (t) => t.tool_trace?.some((tr) => tr.tool === name) });

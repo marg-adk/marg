@@ -157,6 +157,11 @@ function withSkip(step: StepDefinition, ui: UiBlock[]): UiBlock[] {
 /** Draw a step's ask, store the open state, count the event. Returns the runtime turn (lead + ui). */
 export async function drawStep(domain: DomainManifest, session: Session, step: StepDefinition, via: StepVia, extraState?: Partial<StepState>): Promise<{ turn: RuntimeTurn; draw: StepDraw }> {
   const ctx = makeContext(domain, session, step.key);
+  // A redraw's state (a partial form's pending values and per-row errors, a multi-pick's picks so
+  // far) is what the step draws again, so it must be on the context BEFORE draw() runs — it used
+  // to be merged into the stored state only after, and a partial submit came back empty and
+  // unmarked (seen on the playground, 2026-10-14).
+  if (extraState && ctx.state) ctx.state = { ...ctx.state, ...extraState };
   const draw = await withSpan(`runtime.step.draw ${step.key}`, { attrs: { "agent.step": step.key, "agent.step.via": via } }, () => step.draw(ctx, via));
   const prev = ctx.draft.steps![step.key];
   const ui = withSkip(step, tagged(draw.ui, step.key));
