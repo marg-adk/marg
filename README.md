@@ -71,6 +71,9 @@ cp .env.example .env        # LLM_CHAIN=mock — a scripted offline model, no ke
 npm run gateway             # http://localhost:8787
 ```
 
+npm 11 may warn that `esbuild` and `fsevents` have install scripts it did not run; approving them
+is optional — nothing here needs them to run.
+
 Open the playground and type **"ticket for Northwind: login fails on mobile"**. You will see a
 customer picker, category chips, a details card the runtime draws and reads itself, priority
 chips, a summary card with *Change something*, and the create. Switch to a real model by editing
@@ -235,6 +238,9 @@ These are the numbers that justified the design, from the agent Marg was extract
 | Typed replies a leading-word reader mis-read as a bare yes or no, blind corpus of 521 | 235 |
 | The same corpus, read by the whole content | 0 |
 | `ui` blocks malformed around the fence in production traffic | about 1 in 40, all parsed |
+
+The reader numbers were measured with the Hinglish register loaded (`AGENT_LEXICONS=hinglish`);
+the core vocabulary is English and the example domains load no register.
 
 ## Layout
 

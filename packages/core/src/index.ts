@@ -40,7 +40,9 @@ export {
 export { closeStores, eventTap, getCounterStore, initStores, mongoSessions, recordEvent, recordUsageEvent, storeState, type CounterStore, type LedgerEvent, type UsageEvent, type WindowCount } from "./stores.js";
 export { dedupeBlocks, dedupeSentences, extractUiBlocks, humanise, linkAllowed, rowsFromSlots, sanitizeUi, splitUi, visibleSoFar } from "./ui-blocks.js";
 export { canonicalPick, formEcho, formReply, isIsoDay, looksLikeFormReply, missingRows, parseFormReply, validateFormValues } from "./forms.js";
-export { CONFIRM_WORDS, NEUTRAL, REFUSE_WORDS, SOFT_ACK, VALUE_NOUNS, extendLexicon, isPlainNo, isPlainSkip, isPlainYes, isQuestionShaped, wordsOf } from "./reply-words.js";
+export { CONFIRM_WORDS, NEUTRAL, REFUSE_WORDS, SOFT_ACK, VALUE_NOUNS, extendLexicon, isPlainNo, isPlainSkip, isPlainYes, isQuestionShaped, wordsOf, type LexiconExtension } from "./reply-words.js";
+export { availableLexicons, loadLexicons, loadLexiconsFromEnv, loadedLexicons } from "./lexicons/index.js";
+export { hinglish } from "./lexicons/hinglish.js";
 export { DEFAULT_UNITS, allWordsIn, norm, readAmount, readChoice, readNumber, readYesNo, type AmountRead, type ChoiceRead, type YesNoRead } from "./readers.js";
 export { DRAFT_TOOL, SLOT_CAP, WRITE_TOOL, detectCompletion, detectPreview, draftFingerprint } from "./preview.js";
 export { attestNote, attestedListGuard, guardCreate, isCreateYes, type AttestResult } from "./guards.js";

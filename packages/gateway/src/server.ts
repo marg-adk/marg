@@ -41,6 +41,7 @@ import {
   initStores,
   isCompleted,
   listCapabilities,
+  loadLexiconsFromEnv,
   listSessions,
   llmChainSnapshot,
   log,
@@ -79,6 +80,8 @@ import { meteringSink } from "./metering-sink.js";
 import { looksLikeFormReply } from "@marg-adk/core";
 
 initOtel({ service: process.env.OTEL_SERVICE_NAME ?? "marg-gateway" });
+// the readers' registers (AGENT_LEXICONS=hinglish,…): loaded once, before any reply is read
+const lexicons = loadLexiconsFromEnv();
 primeMetrics();
 registerGatewayGauges();
 
@@ -467,7 +470,7 @@ const domains = await installDomains();
 const router = initRouter(domains);
 const server = app.listen(PORT, () => {
   const llm = llmChainSnapshot();
-  log.info("gateway started", { port: PORT, brand: BRAND, chain: llm.chain.map((c) => `${c.name}:${c.model}`), domains: domains.map((d) => d.name), writes: WRITES_ALLOWED, login: securityConfig.requireLogin, router: router.links, otel: otelState.enabled ? otelState.endpoint : "off" });
+  log.info("gateway started", { port: PORT, brand: BRAND, chain: llm.chain.map((c) => `${c.name}:${c.model}`), domains: domains.map((d) => d.name), writes: WRITES_ALLOWED, login: securityConfig.requireLogin, router: router.links, lexicons, otel: otelState.enabled ? otelState.endpoint : "off" });
   console.error(`[gateway] ${BRAND} on http://localhost:${PORT}/  |  <script src="http://localhost:${PORT}/widget.js" data-agent-auto></script>`);
 });
 

@@ -34,6 +34,7 @@ literal string `"true"`; stores fall back with a warning rather than failing boo
 | `AGENT_GATEWAY_KEYS`, `AGENT_ADMIN_KEY`, `AGENT_CORS_ORIGINS`, `AGENT_TRUST_PROXY`, `AGENT_MAX_MESSAGE_CHARS` (4000), `AGENT_LINK_SCHEMES` | — | Gateway hardening. |
 | `AGENT_GUARDS` | on | `false` disables the runtime guards (raw-model evals only). |
 | `AGENT_TYPED_PROMPT` | on | `false` loads every type's skill and tools. |
+| `AGENT_LEXICONS` | — | Registers for the readers, comma-separated (`hinglish`); the core is English ([readers](guides/readers.md)). |
 
 ## Limits and cost
 `AGENT_RATE_SESSIONS_PER_IP` (20), `AGENT_RATE_CHAT_PER_SESSION` (10), `AGENT_RATE_CHAT_PER_IP` (60),
