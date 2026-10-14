@@ -183,9 +183,9 @@ export async function runDomainAgent(domain: DomainManifest, session: Session, u
               onEvent({ type: "delta", text: vis.slice(emitted) });
               emitted = vis.length;
             }
-          }, { spanAttributes });
+          }, { spanAttributes, domain: domain.name });
         } else {
-          assistant = await chatComplete(messages, tools, { spanAttributes });
+          assistant = await chatComplete(messages, tools, { spanAttributes, domain: domain.name });
         }
         recordUsage(session, assistant.usage);
         log.trace("llm.call", { session: session.id, turn: turnNo, round: rounds, endpoint: assistant.usage?.provider, model: assistant.usage?.model, tokens: assistant.usage, finish: assistant.tool_calls?.length ? "tool_calls" : "stop", text: head(assistant.content, 200), tools: assistant.tool_calls?.map((c) => c.function.name) });

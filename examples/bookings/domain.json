@@ -1,0 +1,34 @@
+{
+  "name": "bookings",
+  "title": "Table bookings",
+  "description": "Book a table at a venue: which venue, which day, for how many, which time, then confirm and create the booking.",
+  "route_hints": {
+    "examples": [
+      "book a table at Harbour House for 4 on Friday",
+      "table for 2 at Luna Rooftop tomorrow night",
+      "reserve Mezze House for a birthday dinner",
+      "I need a reservation for six people"
+    ],
+    "keywords": ["book", "booking", "table", "reserve", "reservation", "venue", "restaurant", "dinner", "lunch"]
+  },
+  "mcp": { "command": "npx", "args": ["tsx", "examples/bookings/mcp/server.ts"] },
+  "skills": ["skills/bookings"],
+  "shared_skills": ["conversation-behaviour", "visual-presentation"],
+  "steps": "steps/index.ts",
+  "step_order": ["details", "slot"],
+  "mock": "mock/policy.ts",
+  "evals": "evals",
+  "entity": { "singular": "booking", "plural": "bookings", "id_key": "entity_id" },
+  "slot_labels": {
+    "venue_name": "Venue",
+    "cuisine": "Cuisine",
+    "area": "Area",
+    "date": "Date",
+    "party_size": "Party size",
+    "occasion": "Occasion",
+    "slot_time": "Time",
+    "notes": "Notes"
+  },
+  "hidden_slots": ["venue_id"],
+  "attested_lists": []
+}

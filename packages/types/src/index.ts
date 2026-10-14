@@ -195,7 +195,8 @@ export interface LinkBlock {
   label: string;
   url: string;
 }
-export type FormRowKind = "pick" | "multi" | "text" | "num" | "area";
+/** `date` is an ISO day (YYYY-MM-DD): the widget draws a date input; forms.ts validates the shape. */
+export type FormRowKind = "pick" | "multi" | "text" | "num" | "area" | "date";
 export interface FormRow {
   key: string;
   label: string;

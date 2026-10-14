@@ -154,4 +154,4 @@ registerMockModel(async (messages, _tools) => {
   if (/^(?:title|issue)\s*[:=]\s*(.+)$/i.test(last)) return tools(call("validate_ticket_slots", { ...v.draft, title: last.replace(/^(?:title|issue)\s*[:=]\s*/i, "") }));
   if (/^no\b|\bchange\b|\binstead\b/.test(lower)) return say("Tell me what to change — the title, the customer or the category.");
   return say("Noted.");
-});
+}, "support-intake");

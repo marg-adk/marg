@@ -49,6 +49,7 @@ jobs:
           done
           curl -fsS http://localhost:8788/api/health
           npm run evals
+          npm run evals:bookings
       - name: Gateway log (on failure)
         if: failure()
         run: tail -n 200 gateway.log || true
@@ -56,7 +57,7 @@ jobs:
         if: failure()
         with:
           name: eval-results-node${{ matrix.node }}
-          path: examples/support-intake/evals/results/
+          path: examples/*/evals/results/
           if-no-files-found: ignore
   packages:
     runs-on: ubuntu-latest

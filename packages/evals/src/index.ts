@@ -26,6 +26,8 @@ export interface TurnResult {
   ui: any[];
   tool_trace: { tool: string; ms: number }[];
   kind?: string;
+  /** The domain that answered (the super agent's pick), from the chat response. */
+  domain?: string;
   error?: string;
   status?: number;
   ms: number;
@@ -69,6 +71,8 @@ export const toolCalled = (name: string): Check => ({ name: `tool ${name} called
 export const toolCalledThisTurn = (name: string): Check => ({ name: `tool ${name} called this turn`, pass: (t) => t.tool_trace?.some((tr) => tr.tool === name) });
 export const neverTool = (name: string): Check => ({ name: `tool ${name} NEVER called`, pass: (_t, all) => !all.some((x) => x.tool_trace?.some((tr) => tr.tool === name)) });
 export const neverToolThisTurn = (name: string): Check => ({ name: `tool ${name} NOT called this turn`, pass: (t) => !t.tool_trace?.some((tr) => tr.tool === name) });
+/** The super agent routed this turn to `name` (a two-domain gateway). */
+export const inDomain = (name: string): Check => ({ name: `routed to ${name}`, pass: (t) => t.domain === name });
 export const runtimeTurn = (kind?: string): Check => ({ name: `answered by the runtime${kind ? ` (${kind})` : ""}`, pass: (t) => Boolean(t.kind) && (!kind || t.kind === kind) });
 export const modelTurn: Check = { name: "answered by the model", pass: (t) => !t.kind };
 export const draftHas = (slot: string, re?: RegExp): Check => ({
@@ -181,7 +185,7 @@ export async function runScenario(s: Scenario, o: RunOptions): Promise<ScenarioR
           result = { user: message, reply: "", ui: [], tool_trace: [], ms: Date.now() - tt0, error: `${out.status}: ${out.json?.error ?? ""}`, status: out.status };
           if (out.status >= 500 || out.status === 429) transport = true;
         } else {
-          result = { user: message, reply: String(out.json.reply ?? ""), ui: out.json.ui ?? [], tool_trace: out.json.tool_trace ?? [], kind: out.json.kind, completion: out.json.completion, ms: Date.now() - tt0 };
+          result = { user: message, reply: String(out.json.reply ?? ""), ui: out.json.ui ?? [], tool_trace: out.json.tool_trace ?? [], kind: out.json.kind, domain: out.json.domain, completion: out.json.completion, ms: Date.now() - tt0 };
           if (/briefly unavailable/i.test(result.reply)) transport = true;
         }
       } catch (e) {

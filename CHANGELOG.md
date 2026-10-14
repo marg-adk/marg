@@ -6,6 +6,15 @@
   agent follows (the worksheet, the build order, the gate, the classification rule, the never-rules);
   Claude Code loads it from `.claude/skills`, `AGENTS.md` points other agents at it, `create-marg-app`
   installs it in new projects, and the site shows it under Build.
+- **example**: `examples/bookings`, the second domain, built by following the build-a-domain
+  skill: a venue picker, a Details card with a `date` row, a bespoke Time step fed by an
+  availability tool (the no-availability path offers the nearest days and moves the date), its
+  own mock policy and nine scenarios including routing to each domain (`npm run evals:bookings`,
+  in CI).
+- **core**: a `date` form row kind (an ISO day; the widget draws a date input; `isIsoDay`); the
+  mock model registry is per domain (`registerMockModel(fn, domain)`), and the agent names its
+  domain on every model call, so two example domains share one gateway; a utility hop with no
+  domain gets an empty mock answer. **evals**: `TurnResult.domain` and the `inDomain(name)` check.
 - **repository**: CI fails when a generated path (the site's mirrored docs or build, a package's
   `dist/` or payload) is tracked; Dependabot ignores major bumps of `@types/node` (the engine is
   Node 22).

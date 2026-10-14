@@ -47,6 +47,7 @@ export default defineConfig({
           { text: "The domain worksheet", link: "/build/worksheet" },
           { text: "The example domain", link: "/build/example" },
           { text: "Build with a coding agent", link: "/build/coding-agent" },
+          { text: "The bookings example", link: "/build/example-bookings" },
         ] },
         { text: "Guides", items: [
           { text: "A new domain", link: "/build/new-domain" },

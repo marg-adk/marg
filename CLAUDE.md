@@ -34,7 +34,7 @@ Classify every red before fixing it: check brittleness, model flake, pre-existin
 - Runtime: `packages/core/src` (steps in `steps/`, readers in `reply-words.ts` + `readers.ts`,
   guards in `guards.ts`, the review picker in `sections.ts`).
 - Decisions: `packages/verdict/src`. Gateway: `packages/gateway/src`. Client: `packages/widget`.
-- The example domain: `examples/support-intake`. Scaffolding: `templates/`, `scripts/new-domain.ts`.
+- The example domains: `examples/support-intake`, `examples/bookings` (the super agent routes between them). Scaffolding: `templates/`, `scripts/new-domain.ts`.
 - Checks: `scripts/check-*.{ts,sh}`. Observability as code: `observability/openobserve/`.
 - The site: `website/` (VitePress; `sync.mjs` mirrors docs/ into `website/src` with links rewritten;
   authored pages in `website/pages`; `npm run site:build`; deployed by `.github/workflows/pages.yml`).
