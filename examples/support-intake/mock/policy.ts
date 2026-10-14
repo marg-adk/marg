@@ -70,12 +70,33 @@ const call = (name: string, args: Record<string, unknown>): ToolCall => ({ id: `
 const say = (content: string, ui?: unknown[]): ChatMessage => ({ role: "assistant", content: ui?.length ? `${content}\n${ui.map((b) => "```ui\n" + JSON.stringify(b) + "\n```").join("\n")}` : content });
 const tools = (...calls: ToolCall[]): ChatMessage => ({ role: "assistant", content: null, tool_calls: calls });
 
-/** "ticket for Northwind: login fails" → { customer: "Northwind", title: "login fails" } */
+const squash = (s: string): string => s.replace(/\s+/g, " ").trim();
+/** The text after the first occurrence of `marker` (case-insensitive), or undefined. */
+function after(text: string, marker: string): string | undefined {
+  const i = text.toLowerCase().indexOf(marker);
+  return i < 0 ? undefined : text.slice(i + marker.length);
+}
+/** "ticket for Northwind: login fails" → { customer: "Northwind", title: "login fails" } — a scan, not a regex, so user text cannot make it slow. */
 function parseOpener(text: string): { customer?: string; title?: string } {
-  const m = /\bfor\s+([A-Za-z][\w&' .-]*?)\s*[:,—-]\s*(.+)$/i.exec(text) ?? /\bfor\s+([A-Za-z][\w&' .-]*?)[,:]\s*(.+)$/i.exec(text);
-  if (m) return { customer: m[1].trim(), title: m[2].trim() };
-  const m2 = /^(.*?)\s+for\s+([A-Za-z][\w&' .-]+)$/i.exec(text);
-  if (m2) return { title: m2[1].replace(/^(?:create|open|log|raise)\s+(?:a\s+)?(?:ticket|issue|bug)\s*(?:for)?\s*/i, "").trim(), customer: m2[2].trim() };
+  const t = squash(text);
+  const rest = after(t, " for ");
+  if (rest) {
+    // "for <customer>: <title>" / "for <customer>, <title>" / "for <customer> — <title>"
+    let cut = -1;
+    for (const sep of [":", ",", " — ", " - "]) {
+      const j = rest.indexOf(sep);
+      if (j > 0 && (cut < 0 || j < cut)) cut = j;
+    }
+    if (cut > 0) {
+      const customer = rest.slice(0, cut).trim();
+      const title = rest.slice(cut).replace(/^[:,—-]+/, "").trim();
+      if (customer && title) return { customer, title };
+    }
+    // "<title> for <customer>"
+    const customer = rest.trim();
+    const title = t.slice(0, t.toLowerCase().indexOf(" for ")).replace(/^(?:create|open|log|raise) (?:a )?(?:ticket|issue|bug)\s?(?:for)?/i, "").trim();
+    if (customer && /^[a-z]/i.test(customer)) return { customer, title: title || undefined };
+  }
   return {};
 }
 
@@ -151,7 +172,7 @@ registerMockModel(async (messages, _tools) => {
     return say("Which customer is this for?");
   }
   // a correction of the title
-  if (/^(?:title|issue)\s*[:=]\s*(.+)$/i.test(last)) return tools(call("validate_ticket_slots", { ...v.draft, title: last.replace(/^(?:title|issue)\s*[:=]\s*/i, "") }));
+  if (/^(?:title|issue)\s*[:=]/i.test(last)) return tools(call("validate_ticket_slots", { ...v.draft, title: last.slice(last.search(/[:=]/) + 1).trim() }));
   if (/^no\b|\bchange\b|\binstead\b/.test(lower)) return say("Tell me what to change — the title, the customer or the category.");
   return say("Noted.");
 }, "support-intake");

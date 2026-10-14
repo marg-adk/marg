@@ -41,7 +41,7 @@ const scenarios: Scenario[] = [
     goal: "A closed day: the Time step offers the nearest alternatives; picking one moves the date and settles the time",
     turns: [
       { send: "book Harbour House for 2", checks: [noError, hasUi("form")] },
-      { send: submitForm({ date: "2026-11-02", party_size: "2" }), checks: [noError, runtimeTurn("details"), hasUi("chips", { step: "slot" }), replyOrUiMatches(/nothing free .* on mon 2 nov .*nearest/i)] },
+      { send: submitForm({ date: "2026-11-02", party_size: "2" }), checks: [noError, runtimeTurn("details"), hasUi("chips", { step: "slot" }), replyOrUiMatches(/Nothing free at Harbour House on Mon 2 Nov \(closed that day\) — the nearest/i)] },
       { send: tap("Tue 3 Nov · 18:00"), checks: [noError, runtimeTurn("slot"), draftHas("date", /^2026-11-03$/), draftHas("slot_time", /^18:00$/), replyMatches(/Moved to Tue 3 Nov at 18:00/i), hasUi("card")] },
     ],
   },
