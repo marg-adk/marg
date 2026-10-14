@@ -47,6 +47,6 @@ jobs:
       - run: npm run check:create
       - name: Publish (dependency order, OIDC — provenance is automatic)
         run: |
-          for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway marg create-marg-app; do
+          for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway @marg-adk/cli create-marg-app; do
             npm publish --access public -w "$w"
           done

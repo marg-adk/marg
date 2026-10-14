@@ -29,7 +29,7 @@
     "sse"
   ],
   "bin": {
-    "marg-gateway": "./bin/marg-gateway.js"
+    "marg-gateway": "bin/marg-gateway.js"
   },
   "main": "./dist/server.js",
   "exports": {

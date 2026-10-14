@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **cli**: the package is `@marg-adk/cli` (npm refuses the bare name `marg` as too similar to
+  existing packages); the command is still `marg`. `bin` paths no longer start with `./`, which
+  npm 11 rewrote on publish.
 - **release**: npm publishing by trusted publishing (OIDC, no token, provenance automatic);
   `scripts/publish-first.sh` for a package's first version by hand; RELEASING.md describes the
   one-time setup per package.

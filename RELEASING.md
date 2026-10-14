@@ -35,7 +35,7 @@ git tag -a v<version> -m "Marg <version>" && git push origin v<version>
 
 `.github/workflows/release.yml` runs the full gate again, then `npm publish` for `@marg-adk/types`,
 `@marg-adk/core`, `@marg-adk/verdict`, `@marg-adk/evals`, `@marg-adk/metering`, `@marg-adk/widget`,
-`@marg-adk/gateway`, `marg` and `create-marg-app`, in that order, by **trusted publishing**: the
+`@marg-adk/gateway`, `@marg-adk/cli` (the `marg` command) and `create-marg-app`, in that order, by **trusted publishing**: the
 workflow authenticates to npm with a short-lived OIDC token (no secret in the repository), and
 npm generates provenance that ties each package to the commit and the run.
 
