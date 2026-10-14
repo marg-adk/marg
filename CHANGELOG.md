@@ -14,6 +14,8 @@
 - **playground**: the empty state skips a domain's example openers that are still the template's
   placeholders (`<verbatim thing a user would type>`), so a freshly scaffolded domain does not
   offer them as suggestions.
+- **site**: `/llms.txt` — the site's index for coding agents (every page with its title, by
+  section), written by the sync from the same page map as the nav.
 - **templates**: a Python tool server. `npm run new-domain -- <name> --lang python` (and `marg new
   … --lang python`) writes `mcp/server.py` on the official `mcp` SDK (2.x, `MCPServer` over stdio)
   and `mcp/requirements.txt`, with the same tools and contracts as the TypeScript server: the
