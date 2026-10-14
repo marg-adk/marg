@@ -194,7 +194,8 @@
       function startApp() {
         if (widget) return;
         var starters = [];
-        ((health && health.domains) || []).forEach(function (d) { (d.examples || []).slice(0, 3).forEach(function (x) { starters.push({ label: x, value: x }); }); });
+        // a freshly scaffolded domain still carries the template's placeholders ("<verbatim thing a user would type>"): not openers
+        ((health && health.domains) || []).forEach(function (d) { (d.examples || []).filter(function (x) { return !/^\s*<.*>\s*$/.test(String(x)); }).slice(0, 3).forEach(function (x) { starters.push({ label: x, value: x }); }); });
         widget = AgentChat.init({
           gateway: location.origin,
           inline: "#chat",
