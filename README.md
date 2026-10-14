@@ -15,7 +15,7 @@ absence cost something.
 
 [![ci](https://github.com/marg-adk/marg/actions/workflows/ci.yml/badge.svg)](https://github.com/marg-adk/marg/actions/workflows/ci.yml) [![codeql](https://github.com/marg-adk/marg/actions/workflows/codeql.yml/badge.svg)](https://github.com/marg-adk/marg/actions/workflows/codeql.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/marg-adk/marg/badge)](https://scorecard.dev/viewer/?uri=github.com/marg-adk/marg) [![licence](https://img.shields.io/badge/licence-Apache--2.0-blue.svg)](LICENSE) [![node](https://img.shields.io/badge/node-%E2%89%A522-brightgreen.svg)](.nvmrc) [![docs](https://img.shields.io/badge/docs-marg--adk.github.io%2Fmarg-111d33.svg)](https://marg-adk.github.io/marg/)
 
-<!-- npm badge once published: [![npm](https://img.shields.io/npm/v/@marg-adk/core.svg)](https://www.npmjs.com/package/@marg-adk/core) -->
+[![npm](https://img.shields.io/npm/v/@marg-adk/core.svg)](https://www.npmjs.com/package/@marg-adk/core)
 
 ## Is Marg for you?
 
@@ -162,6 +162,7 @@ post: the one number that shaped the design, and a step in twenty lines.
 
 ```bash
 npm run new-domain -- bookings --entity booking      # scaffolds domains/bookings from templates/
+npm run new-domain -- bookings --lang python         # the same, with the tool server in Python
 ```
 
 Then build in this order, because each step feeds the next
@@ -198,7 +199,8 @@ other agent at it, and `create-marg-app` installs it in new projects.
 - **The widget alone.** Implement [docs/CLIENT-PROTOCOL.md](docs/CLIENT-PROTOCOL.md) behind it.
 
 On npm: `@marg-adk/core`, `@marg-adk/types`, `@marg-adk/verdict`, `@marg-adk/evals`, `@marg-adk/metering`,
-`@marg-adk/gateway` (with the `marg-gateway` command), `@marg-adk/widget`, and `create-marg-app`.
+`@marg-adk/gateway` (with the `marg-gateway` command), `@marg-adk/widget`, `@marg-adk/cli` (the `marg`
+command: `web | new | evals | verdict | check`), and `create-marg-app`.
 The repository builds them with `npm run build`; development runs the TypeScript sources
 directly through `tsx`, no build needed.
 
@@ -262,9 +264,10 @@ the core vocabulary is English and the example domains load no register.
 
 ## Status and roadmap
 
-v0.1.0. Everything runs end to end offline and under typecheck; the real-model adapters are the
-ones proven in production. See [ROADMAP.md](ROADMAP.md) for what is next and
-[CHANGELOG.md](CHANGELOG.md) for what is here. Contributions follow
+Released on npm every two to three weeks ([RELEASING.md](RELEASING.md)); the npm badge above is
+the current version. Everything runs end to end offline and under typecheck; the real-model
+adapters are the ones proven in production. See [CHANGELOG.md](CHANGELOG.md) for what each
+version holds and [ROADMAP.md](ROADMAP.md) for what is next. Contributions follow
 [CONTRIBUTING.md](CONTRIBUTING.md); security reports follow [SECURITY.md](SECURITY.md).
 
 Licence: Apache-2.0.

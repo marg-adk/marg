@@ -19,9 +19,11 @@ be lost on a redeploy. Everything else is the real thing.
 - **Words beside an open ask.** While the Details card is open, type "what counts as
   production?". The model answers in a line; the card is drawn again under it. A typed "yes"
   while a card is open is never an answer to it.
-- **A premature yes.** Type "yes, create it" before the summary. The runtime guard refuses: the
-  summary must have been shown for this draft, and the reply must be a plain go-ahead by its
-  whole content.
+- **A premature yes.** Type "yes, create it" while the Details card is open. Nothing is created:
+  the runtime says the card is still open and draws it again, because a typed yes is never an
+  answer to a card, and the create gate requires the summary to have been shown for this draft
+  and the reply to be a plain go-ahead by its whole content. The trace pane shows the turn was
+  the runtime's, with no tool call.
 - **Change something.** On the summary, pick a section; the step's own card re-opens
   pre-filled; the summary returns.
 - **Reload.** Refresh the page mid-journey. The open ask is drawn again from the transcript.

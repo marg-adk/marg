@@ -12,7 +12,7 @@
 - [ ] `npm run check:otel` — all otel cases pass
 - [ ] `npm run check:scaffold` — GATE: 3/3
 - [ ] `npm run check:e2e` — e2e create OK, proof record removed
-- [ ] `npm run gateway:evals & npm run evals` — GATE: 7/7
+- [ ] `npm run gateway:evals & npm run evals` — GATE: 8/8 · `npm run evals:bookings` — GATE: 10/10
 - [ ] `npm run check:pack` / `npm run check:create` — if a `package.json`, a build config or the templates changed
 
 Reds and their classification:

@@ -91,7 +91,7 @@ answers and never writes, you want a hosted platform, or your stack must be Pyth
 ## Frequently asked questions
 
 ::: details Which models can I use?
-Anthropic, and any OpenAI-compatible endpoint: OpenAI, Ollama, vLLM, Fireworks, Together, DeepSeek, Gemini through its OpenAI-compatible API. A chain of endpoints with failover and a circuit breaker is one environment line, `LLM_CHAIN=openai,anthropic`. The scripted mock model runs everything with no key. [Environment](/run/environment).
+Anthropic natively, and any OpenAI-compatible endpoint: OpenAI, Gemini, Vertex AI, Azure OpenAI, Bedrock, Ollama, vLLM, LiteLLM, Groq, Mistral, DeepSeek, Fireworks, Together, OpenRouter, xAI, Cohere, Hugging Face, Cerebras, Perplexity, NVIDIA, one environment line each ([Models](/providers/)). A chain of endpoints with failover and a circuit breaker is one line, `LLM_CHAIN=openai,anthropic`. The scripted mock model runs everything with no key.
 :::
 
 ::: details What makes Marg different from an agent framework?
