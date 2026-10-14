@@ -388,7 +388,16 @@ export function providerName(name: string, kind: string, base: string): string {
   if (kind === "anthropic") return "anthropic";
   if (kind === "mock") return "mock";
   if (/openai\.com/.test(base)) return "openai";
+  if (/openai\.azure\.com|cognitiveservices\.azure\.com/.test(base)) return "azure.ai.openai";
+  if (/aiplatform\.googleapis/.test(base)) return "gcp.vertex_ai";
   if (/googleapis/.test(base)) return "gcp.gemini";
+  if (/amazonaws\.com/.test(base)) return "aws.bedrock";
+  if (/api\.x\.ai/.test(base)) return "x_ai";
+  if (/cohere/.test(base)) return "cohere";
+  if (/perplexity/.test(base)) return "perplexity";
+  if (/huggingface/.test(base)) return "huggingface";
+  if (/nvidia/.test(base)) return "nvidia";
+  if (/cerebras/.test(base)) return "cerebras";
   if (/deepseek/.test(base)) return "deepseek";
   if (/fireworks/.test(base)) return "fireworks";
   if (/together/.test(base)) return "together";

@@ -1,6 +1,16 @@
 // VitePress configuration for marg-adk.github.io/marg. The content under website/src is
 // mirrored from the repository by website/sync.mjs; the authored pages live in website/pages.
+import { readFileSync } from "node:fs";
 import { defineConfig } from "vitepress";
+
+/** Written by website/sync.mjs: one entry per page under docs/providers and docs/integrations. */
+const generated: { providers: { text: string; link: string }[]; integrations: { text: string; link: string }[] } = (() => {
+  try {
+    return JSON.parse(readFileSync(new URL("./generated-sidebar.json", import.meta.url), "utf8"));
+  } catch {
+    return { providers: [], integrations: [] };
+  }
+})();
 
 const adr = ["0001-domains-and-routing", "0002-durable-stores", "0003-observability", "0004-runtime-owned-steps", "0005-typed-decisions", "0006-metering-pass-through"];
 
@@ -26,6 +36,8 @@ export default defineConfig({
       { text: "Build", link: "/build/pattern" },
       { text: "Components", link: "/components/architecture" },
       { text: "Run", link: "/run/environment" },
+      { text: "Models", link: "/providers/" },
+      { text: "Integrations", link: "/integrations/" },
       { text: "Reference", link: "/reference/roadmap" },
       { text: "Community", link: "/community/contributing" },
       { text: "Playground", link: "https://marg-playground.onrender.com" },
@@ -73,6 +85,12 @@ export default defineConfig({
           { text: "Production checklist", link: "/run/production-checklist" },
           { text: "Deploy", link: "/run/deploy" },
         ] },
+      ],
+      "/providers/": [
+        { text: "Models", items: [{ text: "Overview", link: "/providers/" }, ...generated.providers] },
+      ],
+      "/integrations/": [
+        { text: "Integrations", items: [{ text: "Overview", link: "/integrations/" }, ...generated.integrations] },
       ],
       "/reference/": [
         { text: "Reference", items: [

@@ -150,6 +150,17 @@ const PRESETS: Record<string, Partial<LlmEndpoint>> = {
   groq: { base: "https://api.groq.com/openai/v1" },
   mistral: { base: "https://api.mistral.ai/v1" },
   openrouter: { base: "https://openrouter.ai/api/v1" },
+  xai: { base: "https://api.x.ai/v1" },
+  cerebras: { base: "https://api.cerebras.ai/v1" },
+  perplexity: { base: "https://api.perplexity.ai" },
+  cohere: { base: "https://api.cohere.ai/compatibility/v1" },
+  huggingface: { base: "https://router.huggingface.co/v1" },
+  nvidia: { base: "https://integrate.api.nvidia.com/v1" },
+  litellm: { base: "http://localhost:4000/v1" },
+  // the base names your resource / project / region: LLM_<NAME>_BASE is required (docs/providers/)
+  azure: { authHeader: "api-key" },
+  vertex: {},
+  bedrock: {},
 };
 
 /** Built-in price table (USD per 1M tokens). Override per endpoint with LLM_<NAME>_PRICE="input,cached,output[,cache_write]". Unknown models cost 0 and say so once. */

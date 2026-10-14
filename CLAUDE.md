@@ -35,6 +35,8 @@ Classify every red before fixing it: check brittleness, model flake, pre-existin
   guards in `guards.ts`, the review picker in `sections.ts`).
 - Decisions: `packages/verdict/src`. Gateway: `packages/gateway/src`. Client: `packages/widget`.
 - The example domains: `examples/support-intake`, `examples/bookings` (the super agent routes between them). Scaffolding: `templates/`, `scripts/new-domain.ts`.
+- Providers and integrations: `docs/providers/` (one page per model preset; presets live in
+  `packages/core/src/llm.ts`, their semconv names in `otel.ts`) and `docs/integrations/`.
 - Checks: `scripts/check-*.{ts,sh}`. Observability as code: `observability/openobserve/`.
 - The site: `website/` (VitePress; `sync.mjs` mirrors docs/ into `website/src` with links rewritten;
   authored pages in `website/pages`; `npm run site:build`; deployed by `.github/workflows/pages.yml`).

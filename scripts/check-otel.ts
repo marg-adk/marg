@@ -118,7 +118,16 @@ report(logLine.includes('"service":"marg-check"') && logLine.includes('"_timesta
 
 // 5. normalisation helpers used by span names
 report(otel.normalizePath("/v1/items/6a7b70a8f1e2d3c4b5a69788") === "/v1/items/:id", "normalizePath collapses 24-hex ids", otel.normalizePath("/v1/items/6a7b70a8f1e2d3c4b5a69788"));
-report(otel.providerName("anthropic", "anthropic", "") === "anthropic" && typeof otel.providerName("openai", "openai", "https://api.openai.com/v1") === "string", "providerName maps endpoints to the semconv vocabulary");
+report(
+  otel.providerName("anthropic", "anthropic", "") === "anthropic" &&
+    otel.providerName("openai", "openai-compatible", "https://api.openai.com/v1") === "openai" &&
+    otel.providerName("vertex", "openai-compatible", "https://us-central1-aiplatform.googleapis.com/v1/projects/p/locations/us-central1/endpoints/openapi") === "gcp.vertex_ai" &&
+    otel.providerName("gemini", "openai-compatible", "https://generativelanguage.googleapis.com/v1beta/openai") === "gcp.gemini" &&
+    otel.providerName("azure", "openai-compatible", "https://res.openai.azure.com/openai/v1") === "azure.ai.openai" &&
+    otel.providerName("bedrock", "openai-compatible", "https://bedrock-runtime.us-east-1.amazonaws.com/openai/v1") === "aws.bedrock" &&
+    otel.providerName("ollama", "openai-compatible", "http://localhost:11434/v1") === "local",
+  "providerName maps endpoints to the semconv vocabulary",
+);
 
 stub.close();
 await otel.shutdownOtel(1000);

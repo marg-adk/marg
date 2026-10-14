@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **models**: presets for every provider a developer is likely to meet — Vertex AI, Azure OpenAI
+  (the `api-key` header), Bedrock, LiteLLM, xAI, Cohere, Hugging Face, Cerebras, Perplexity,
+  NVIDIA — beside the existing OpenAI, Gemini, Ollama, vLLM, Groq, Mistral, DeepSeek, Fireworks,
+  Together, OpenRouter and the native Anthropic adapter; `gen_ai.provider.name` follows the
+  semantic conventions for the new ones; a unit test resolves every preset from the environment.
+- **docs**: `docs/providers/` (one page per model provider, with the env lines; Gemma, gateways
+  such as Apigee, on-device runtimes explained) and `docs/integrations/` (observability backends
+  over OTLP — Langfuse, Datadog, Grafana Cloud, Honeycomb, Phoenix, SigNoz, New Relic, Jaeger —
+  stores, speech, decisions, MCP tools, other frameworks, hosting, coding agents); both are
+  sections on the site.
 - **skill**: `skills/build-a-domain/SKILL.md`, the method for building a domain as a skill a coding
   agent follows (the worksheet, the build order, the gate, the classification rule, the never-rules);
   Claude Code loads it from `.claude/skills`, `AGENTS.md` points other agents at it, `create-marg-app`

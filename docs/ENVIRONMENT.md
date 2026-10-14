@@ -7,7 +7,7 @@ literal string `"true"`; stores fall back with a warning rather than failing boo
 | Variable | Meaning |
 |---|---|
 | `LLM_CHAIN` | Ordered endpoint names, e.g. `openai,anthropic`, `ollama`, `mock`. Unset ⇒ legacy single provider (`ANTHROPIC_API_KEY` / `LLM_API_BASE`+`LLM_MODEL`) or the mock. |
-| `LLM_<NAME>_PRESET` | Reuse a preset under another name (two models of one provider). Presets: anthropic, mock, openai, ollama, vllm, llamacpp, lmstudio, fireworks, together, deepseek, gemini, groq, mistral, openrouter. |
+| `LLM_<NAME>_PRESET` | Reuse a preset under another name (two models of one provider). Presets: anthropic, mock, openai, gemini, vertex, azure, bedrock, ollama, vllm, llamacpp, lmstudio, litellm, groq, mistral, deepseek, fireworks, together, openrouter, xai, cohere, huggingface, cerebras, perplexity, nvidia — one page each in [providers/](providers/README.md). |
 | `LLM_<NAME>_BASE` / `_MODEL` / `_API_KEY` | The endpoint. Local bases need no key. |
 | `LLM_<NAME>_TEMPERATURE` | number or `none` (omit the field). |
 | `LLM_<NAME>_REASONING_EFFORT` | `low`/`medium`/`high`/`none`/`omit`. |
