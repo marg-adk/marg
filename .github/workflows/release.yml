@@ -45,6 +45,13 @@ jobs:
           npm run evals:bookings
       - run: npm run check:pack
       - run: npm run check:create
+      - name: No token in the npm config — OIDC only
+        # setup-node writes an _authToken placeholder into the runner's npmrc; with trusted publishing
+        # there is no token, and a placeholder can shadow the OIDC exchange. Keep only the registry.
+        run: |
+          echo "registry=https://registry.npmjs.org/" > "$NPM_CONFIG_USERCONFIG"
+          echo "npm $(npm --version) · registry $(npm config get registry) · OIDC available: $([ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] && echo yes || echo no)"
+          echo "workflow ref: ${GITHUB_WORKFLOW_REF}"
       - name: Publish (dependency order, OIDC — provenance is automatic)
         run: |
           for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway @marg-adk/cli create-marg-app; do
