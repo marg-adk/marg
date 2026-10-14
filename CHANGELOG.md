@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-10-14
+
+The release the site already describes: tools in Python, simulated users in the evals, an English
+reader core with opt-in registers; plus what the 0.3 review's walk as a stranger found and fixed.
 
 - **core**: a partial form submit is drawn again pre-filled and with the missing or invalid rows
   marked. The redraw's state (pending values, per-row errors, a multi-pick's picks so far) reached

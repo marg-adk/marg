@@ -10,6 +10,7 @@ node_modules/
 *.log
 *.tsbuildinfo
 .DS_Store
+.claude/settings.local.json
 
 # eval transcripts (regenerated every run)
 **/evals/results/
