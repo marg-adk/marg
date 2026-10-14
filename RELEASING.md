@@ -33,11 +33,22 @@ git checkout main && git pull
 git tag -a v<version> -m "Marg <version>" && git push origin v<version>
 ```
 
-`.github/workflows/release.yml` runs the full gate again, then `npm publish --provenance` for
-`@marg-adk/types`, `@marg-adk/core`, `@marg-adk/verdict`, `@marg-adk/evals`, `@marg-adk/metering`, `@marg-adk/widget`,
-`@marg-adk/gateway` and `create-marg-app`, in that order. It needs one repository secret,
-`NPM_TOKEN`: an npm **automation** token (granular, publish rights on the `@marg` scope and
-`create-marg-app`, no 2FA prompt). Provenance ties each package to the commit and the workflow run.
+`.github/workflows/release.yml` runs the full gate again, then `npm publish` for `@marg-adk/types`,
+`@marg-adk/core`, `@marg-adk/verdict`, `@marg-adk/evals`, `@marg-adk/metering`, `@marg-adk/widget`,
+`@marg-adk/gateway`, `marg` and `create-marg-app`, in that order, by **trusted publishing**: the
+workflow authenticates to npm with a short-lived OIDC token (no secret in the repository), and
+npm generates provenance that ties each package to the commit and the run.
+
+### The one-time setup per package
+
+A trusted publisher is configured on an existing package, so a package's **first** version is
+published by hand: `npm login` (the npm user in the `marg-adk` org, 2FA on), then
+`bash scripts/publish-first.sh`, which builds, packs and publishes the nine packages in
+dependency order, asking for your one-time code. Then, on npmjs.com, for each package:
+Settings → Trusted publishing → GitHub Actions → Organization `marg-adk`, Repository `marg`,
+Workflow `release.yml`, and allow `npm publish`. Under Publishing access choose "Require
+two-factor authentication and disallow tokens". A new trusted-publisher setting must see one
+successful CI publish within two days, so cut the next version from CI promptly.
 
 After the run is green:
 
