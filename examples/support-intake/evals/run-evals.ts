@@ -13,7 +13,7 @@
  */
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cooperativeUser, draftHas, draftState, hasUi, neverTool, noError, noLeak, noUi, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
+import { cooperativeUser, draftHas, draftState, formRow, hasUi, neverTool, noError, noLeak, noUi, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
 
 const scenarios: Scenario[] = [
   {
@@ -57,7 +57,7 @@ const scenarios: Scenario[] = [
     turns: [
       { send: "ticket for Litware: password reset email never arrives", checks: [noError] },
       { send: "Account", checks: [noError, hasUi("form")] },
-      { send: submitForm({ environment: "production", steps_to_reproduce: null }), checks: [noError, runtimeTurn("details"), stepStatus("details", "asked"), hasUi("form"), replyMatches(/to fix/i)] },
+      { send: submitForm({ environment: "production", steps_to_reproduce: null }), checks: [noError, runtimeTurn("details"), stepStatus("details", "asked"), hasUi("form"), replyMatches(/to fix/i), formRow("environment", { value: /^production$/ }), formRow("steps_to_reproduce", { error: /required/i })] },
       { send: submitForm({ environment: "production", steps_to_reproduce: "Request a reset, wait ten minutes, nothing" }), checks: [noError, stepStatus("details", "settled")] },
     ],
   },

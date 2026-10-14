@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **core**: a partial form submit is drawn again pre-filled and with the missing or invalid rows
+  marked. The redraw's state (pending values, per-row errors, a multi-pick's picks so far) reached
+  the stored step only after the draw, so the card came back empty; the playground showed it.
+  **evals**: `formRow(key, { value, error })` checks a drawn form's row; the example's
+  partial-redraw scenario now asserts the pre-fill and the mark (red on the old engine).
 - **templates**: a Python tool server. `npm run new-domain -- <name> --lang python` (and `marg new
   … --lang python`) writes `mcp/server.py` on the official `mcp` SDK (2.x, `MCPServer` over stdio)
   and `mcp/requirements.txt`, with the same tools and contracts as the TypeScript server: the
