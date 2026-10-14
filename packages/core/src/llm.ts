@@ -101,6 +101,8 @@ export interface CallOpts {
   /** Extra request-body fields for this call only (e.g. {logprobs:true, top_logprobs:20}). OpenAI-compatible endpoints only. */
   body?: Record<string, unknown>;
   temperature?: number;
+  /** The domain whose agent is calling (the mock endpoint dispatches to that domain's policy). */
+  domain?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -316,12 +318,23 @@ export function activeProvider(): LlmProvider {
 
 export type MockModel = (messages: ChatMessage[], tools: ToolDef[], opts?: CallOpts) => ChatMessage | Promise<ChatMessage>;
 let mockModel: MockModel | undefined;
-/** Register the scripted model the "mock" endpoint serves (the example domain's policy, a test's canned replies). */
-export function registerMockModel(fn: MockModel | undefined): void {
-  mockModel = fn;
+const mockModels = new Map<string, MockModel>();
+/**
+ * Register the scripted model the "mock" endpoint serves. With a domain name the policy answers
+ * that domain's agent only (two example domains in one gateway each keep their own); without one
+ * it is the default for every caller. A utility hop with no domain (the router's one-letter
+ * question) gets an empty answer, so a typed decision falls through to its sticky fallback.
+ */
+export function registerMockModel(fn: MockModel | undefined, domain?: string): void {
+  if (domain) {
+    if (fn) mockModels.set(domain, fn);
+    else mockModels.delete(domain);
+  } else mockModel = fn;
 }
 async function runMock(messages: ChatMessage[], tools: ToolDef[], opts?: CallOpts): Promise<ChatMessage> {
-  const fn: MockModel = mockModel ?? (() => ({ role: "assistant", content: "I'm the mock model — register a policy with registerMockModel() or configure LLM_CHAIN." }) as ChatMessage);
+  const forDomain = opts?.domain ? mockModels.get(opts.domain) : undefined;
+  if (!forDomain && !opts?.domain && opts?.modelNotes === false) return { role: "assistant", content: "" };
+  const fn: MockModel = forDomain ?? mockModel ?? (mockModels.size === 1 ? [...mockModels.values()][0] : undefined) ?? (() => ({ role: "assistant", content: "I'm the mock model — register a policy with registerMockModel() or configure LLM_CHAIN." }) as ChatMessage);
   const out = await fn(messages, tools, opts);
   const usage = out.usage ?? { input: Math.ceil(messages.reduce((n, m) => n + (m.content?.length ?? 0), 0) / 4), output: Math.ceil((out.content?.length ?? 0) / 4), cache_read: 0, cache_write: 0 };
   return { ...out, usage };
@@ -585,7 +598,7 @@ export async function chatComplete(messages: ChatMessage[], tools: ToolDef[], op
 }
 
 /** Streaming completion: text deltas via onDelta, then the same ChatMessage as chatComplete. Failover happens only before the first delta. */
-export async function chatCompleteStream(messages: ChatMessage[], tools: ToolDef[], onDelta: (text: string) => void, opts?: Pick<CallOpts, "spanAttributes" | "maxTokens">): Promise<ChatMessage> {
+export async function chatCompleteStream(messages: ChatMessage[], tools: ToolDef[], onDelta: (text: string) => void, opts?: Pick<CallOpts, "spanAttributes" | "maxTokens" | "domain">): Promise<ChatMessage> {
   messagesForShape = messages;
   let emitted = 0;
   return chatSpan(messages, tools, opts, true, (onFirstDelta) => {

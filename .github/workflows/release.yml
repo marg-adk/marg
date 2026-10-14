@@ -39,6 +39,7 @@ jobs:
           npm run gateway:evals > gateway.log 2>&1 &
           for i in $(seq 1 60); do curl -fsS http://localhost:8788/api/health > /dev/null 2>&1 && break; sleep 1; done
           npm run evals
+          npm run evals:bookings
       - run: npm run check:pack
       - run: npm run check:create
       - name: Publish (dependency order)

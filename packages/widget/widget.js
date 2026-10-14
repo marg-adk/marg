@@ -1560,7 +1560,10 @@
             };
           } else {
             var numeric = kind === "num" || kind === "area";
-            var input = h("input", { class: "fi", type: "text", inputmode: kind === "num" ? "decimal" : "text", placeholder: r.unit ? "in " + String(r.unit) : (r.placeholder ? String(r.placeholder) : "") });
+            // a date row is a native date input: the value is already YYYY-MM-DD, which forms.ts validates
+            var input = kind === "date"
+              ? h("input", { class: "fi", type: "date" })
+              : h("input", { class: "fi", type: "text", inputmode: kind === "num" ? "decimal" : "text", placeholder: r.unit ? "in " + String(r.unit) : (r.placeholder ? String(r.placeholder) : "") });
             if (fvals[key]) input.value = fvals[key];
             var inSync = function () {
               var v = input.value.trim();

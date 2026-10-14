@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { FormBlock, FormRow } from "@marg-adk/types";
-import { canonicalPick, formEcho, formReply, looksLikeFormReply, missingRows, parseFormReply, validateFormValues } from "./forms.js";
+import { canonicalPick, formEcho, formReply, looksLikeFormReply, missingRows, parseFormReply, validateFormValues, isIsoDay } from "./forms.js";
 
 const rows: FormRow[] = [
   { key: "environment", label: "Environment", kind: "pick", required: true, options: [{ label: "Production", value: "production" }, { label: "Staging", value: "staging" }], say: "{v}" },
@@ -39,4 +39,13 @@ test("the echo follows the say templates", () => {
   assert.equal(formEcho(block, { environment: "production", affected_users: "1", steps: "x" }), "Details confirmed: Production · 1 user");
   assert.equal(formEcho(block, { environment: "staging", affected_users: "5" }), "Details confirmed: Staging · 5 users");
   assert.equal(formEcho({ ...block, echo: undefined }, { environment: "staging" }), "Staging");
+});
+
+test("date rows: the ISO day shape and a real calendar day, nothing else", () => {
+  const rows = [{ key: "date", label: "Date", kind: "date" as const, required: true }];
+  assert.deepEqual(validateFormValues(rows, { date: "2026-11-06" }), {});
+  assert.equal(validateFormValues(rows, { date: "6 Nov" }).date, "Enter a date as YYYY-MM-DD");
+  assert.equal(validateFormValues(rows, { date: "2026-02-31" }).date, "Enter a date as YYYY-MM-DD");
+  assert.equal(validateFormValues(rows, { date: "2026-13-01" }).date, "Enter a date as YYYY-MM-DD");
+  assert.ok(isIsoDay("2024-02-29") && !isIsoDay("2023-02-29"));
 });

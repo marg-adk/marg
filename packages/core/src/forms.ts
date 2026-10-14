@@ -81,6 +81,14 @@ export function looksLikeFormReply(text: string): boolean {
   return /\[[a-z0-9_]+\]\s*:/i.test(text);
 }
 
+/** A real calendar day in ISO form (YYYY-MM-DD): the shape and the date itself (no 31 February). */
+export function isIsoDay(v: string): boolean {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v.trim());
+  if (!m) return false;
+  const d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+  return d.getUTCFullYear() === Number(m[1]) && d.getUTCMonth() === Number(m[2]) - 1 && d.getUTCDate() === Number(m[3]);
+}
+
 /** The rows still missing after a submit — required rows with no value. */
 export function missingRows(rows: FormRow[], values: Record<string, string>): FormRow[] {
   return rows.filter((r) => r.required && !(values[r.key] ?? r.value ?? "").trim());
@@ -100,6 +108,7 @@ export function validateFormValues(rows: FormRow[], values: Record<string, strin
       if (bad.length) errors[r.key] = `Not an option: ${bad.join(", ")}`;
     }
     if (r.kind === "num" && !/^[\d.,]+\s*[a-zA-Z%]*$/.test(v)) errors[r.key] = "Enter a number";
+    if (r.kind === "date" && !isIsoDay(v)) errors[r.key] = "Enter a date as YYYY-MM-DD";
   }
   return errors;
 }

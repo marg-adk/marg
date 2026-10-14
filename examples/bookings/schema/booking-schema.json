@@ -1,0 +1,23 @@
+{
+  "//": "Declarative slot registry — the truth about the booking's slots. The skill narrates the flow; the validate tool reads this; probe findings get folded back in.",
+  "entity": "booking",
+  "slots": {
+    "venue_name": { "type": "string", "source": "ask", "ask_priority": 1, "notes": "usually volunteered in the opening message; resolved by search_venues" },
+    "venue_id": { "type": "id", "source": "derive_venue", "ask_priority": 1, "notes": "from search_venues — the model never invents it" },
+    "cuisine": { "type": "string", "source": "derive_venue", "notes": "filled from the venue record on validate — shown, never asked" },
+    "area": { "type": "string", "source": "derive_venue" },
+    "date": { "type": "date", "source": "runtime_step:details", "notes": "an ISO day from the card's date row; the slot step may move it to an alternative when nothing is free" },
+    "party_size": { "type": "number", "source": "runtime_step:details", "notes": "pre-filled when the opener said 'for 4'; validate checks it against the venue's max_party" },
+    "occasion": { "type": "enum", "source": "runtime_step:details", "values": ["birthday", "business", "date night", "none"], "default": "none" },
+    "slot_time": { "type": "enum", "source": "runtime_step:slot", "notes": "one of the venue's open times on the date, from the availability tool; alternatives on another day when the date is full" },
+    "notes": { "type": "string", "source": "ask", "notes": "optional: dietary needs, a high chair" }
+  },
+  "mandatory": ["venue_id"],
+  "ask_sets": [
+    { "slots": ["venue_name"], "phrasing_hint": "Where would you like to book?" }
+  ],
+  "runtime_steps": ["details", "slot"],
+  "probe_findings_2026_10_14": {
+    "//": "The example backend is a local JSON file: it validates nothing on create (like most real backends) — the validate tool is the only gate. Availability is computed, not stored: a venue's closed day returns no slots and the nearest open days as alternatives."
+  }
+}

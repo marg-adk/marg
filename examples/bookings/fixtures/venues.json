@@ -1,0 +1,10 @@
+[
+  { "venue_id": "v-101", "name": "Harbour House", "cuisine": "Seafood", "area": "Harbourside", "max_party": 8, "closed_on": [1] },
+  { "venue_id": "v-102", "name": "Harbour Lights", "cuisine": "Bistro", "area": "The Pier", "max_party": 6, "closed_on": [] },
+  { "venue_id": "v-103", "name": "The Copper Pot", "cuisine": "Modern European", "area": "Old Town", "max_party": 10, "closed_on": [0] },
+  { "venue_id": "v-104", "name": "Mezze House", "cuisine": "Levantine", "area": "Market Square", "max_party": 12, "closed_on": [] },
+  { "venue_id": "v-105", "name": "Saffron Court", "cuisine": "Indian", "area": "Riverside", "max_party": 8, "closed_on": [1] },
+  { "venue_id": "v-106", "name": "Pine & Oak", "cuisine": "Grill", "area": "Hill District", "max_party": 6, "closed_on": [] },
+  { "venue_id": "v-107", "name": "Luna Rooftop", "cuisine": "Cocktails & small plates", "area": "Downtown", "max_party": 4, "closed_on": [2] },
+  { "venue_id": "v-108", "name": "Market Table", "cuisine": "Farm to table", "area": "Market Square", "max_party": 8, "closed_on": [] }
+]

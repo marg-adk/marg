@@ -241,6 +241,7 @@ These are the numbers that justified the design, from the agent Marg was extract
 | `packages/widget` | The embeddable client and its test harness |
 | `packages/metering` | The pass-through metering client |
 | `examples/support-intake` | A complete domain to copy from |
+| `examples/bookings` | The second example: a date row, a tool-fed step with the no-availability path, two-domain routing |
 | `templates/`, `scripts/` | Scaffolding, rename, the checks, dashboards, the OpenObserve bootstrap |
 | `skills/`, `shared-skills/` | The build-a-domain skill for coding agents; the prompt skills every domain shares |
 | `deploy/`, `observability/` | Image, Compose, Caddy; OpenObserve, collector, dashboards and alerts as code |

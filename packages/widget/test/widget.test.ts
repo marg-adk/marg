@@ -183,3 +183,15 @@ test("onTurn: the host receives the finished turn's facts on both transports; he
     assert.ok(world.qa(".foot textarea").length === 1, "the composer is still there");
   }
 });
+
+test("form: a date row is a native date input and its value travels as YYYY-MM-DD", async () => {
+  const world = await makeWorld();
+  world.draw({ type: "form", title: "Booking details", submit: "Done", rows: [{ key: "date", label: "Date", kind: "date", required: true }, { key: "party_size", label: "Party size", kind: "num", required: true }] });
+  const date = world.qa("input.fi")[0];
+  assert.equal(date.getAttribute("type"), "date");
+  world.type(date, "2026-11-06");
+  world.type(world.qa("input.fi")[1], "4");
+  world.btn("Done").click();
+  await world.settle();
+  assert.equal(world.chat.at(-1), "Date [date]: 2026-11-06; Party size [party_size]: 4");
+});
