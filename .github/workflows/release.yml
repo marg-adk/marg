@@ -55,6 +55,11 @@ jobs:
       - name: Publish (dependency order, OIDC — provenance is automatic)
         run: |
           # from each package's own directory: the OIDC exchange is made for the package being published
+          # idempotent: a version already on the registry is skipped, so a rerun after one package
+          # failed (a trusted-publisher setting, a registry hiccup) publishes only what is missing
           for d in types core verdict evals metering widget gateway marg create-marg-app; do
-            (cd "packages/$d" && echo "▶ $(node -p "require('./package.json').name")" && npm publish --access public)
+            name=$(node -p "require('./packages/$d/package.json').name")
+            version=$(node -p "require('./packages/$d/package.json').version")
+            if npm view "$name@$version" version > /dev/null 2>&1; then echo "skip  $name@$version — already on npm"; continue; fi
+            (cd "packages/$d" && echo "▶ $name@$version" && npm publish --access public)
           done
