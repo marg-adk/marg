@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **release**: npm publishing by trusted publishing (OIDC, no token, provenance automatic);
+  `scripts/publish-first.sh` for a package's first version by hand; RELEASING.md describes the
+  one-time setup per package.
+
 ## 0.2.0 — 2026-10-14
 
 The adoption release: installable from npm, a site, a playground that is also the dev UI, one
@@ -86,7 +92,7 @@ of a public repository.
 - **checks**: `check:pack` (every package packs clean) and `check:create` (a project from local
   tarballs installs, boots and passes the example suite); a `packages` CI job runs both.
 - **release**: a tag `v*` runs the gate and publishes every package with provenance
-  (`NPM_TOKEN`).
+  (with a token at the time; trusted publishing since — see Unreleased).
 
 ## 0.1.0 — 2026-10-13
 
