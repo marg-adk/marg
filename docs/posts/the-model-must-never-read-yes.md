@@ -1,7 +1,8 @@
 # The model must never read "yes"
 
-*The launch post for Marg 0.2, the first release on npm. The long form first; the Show HN
-comment, the r/LLMDevs post and the thread follow. Publish all four the day the packages land.*
+*The launch post for Marg. The long form is this page, mirrored on the site and opened as
+[Discussion #30](https://github.com/marg-adk/marg/discussions/30); the Show HN comment, the
+r/LLMDevs post, the X thread and the LinkedIn post follow, paste-ready. 0.3.0 is the release on npm.*
 
 ---
 
@@ -30,6 +31,12 @@ Reading the whole message instead mis-read **0** of the 521. The rule is short: 
 plain yes only when **every** word in it is a confirm word, politeness, filler, or a noun of
 the question. Anything else is content. Content goes to the model, which answers it, and the
 runtime draws its question again underneath.
+
+The corpus was the traffic that agent actually saw, Hinglish and English, read with that
+register's vocabulary loaded. The rule does not depend on the language; the vocabulary does, so
+in the kit the core is English, a register is an opt-in lexicon, and the guide says to measure a
+new one on a blind corpus before shipping it. Every word added to the yes list is a hole at the
+gate until it is measured.
 
 The cost is asymmetric, which is why the rule can be this strict. A false "that's content" costs
 the user one repeated tap. A false yes costs a write under their name.
@@ -95,24 +102,34 @@ really enforces.
 The part that keeps all of this true after the next change is the eval suite. A scenario is a
 scripted conversation replayed against a gateway with writes off, with deterministic checks per
 turn: which block was drawn, which tool was or was not called, what the draft holds, whether a
-reload redraws the open question. The example domain ships a scripted mock model that plays the
+reload redraws the open question. The example domains ship a scripted mock model that plays the
 model's part of the journey as a state machine, so the whole suite, and the whole platform, runs
 in CI with no API key and no network. Every red is classified before anything is fixed: a brittle
 check, a model flake, pre-existing, transport, or a regression. The distinction is what makes the
 suite trustworthy.
 
-Marg is TypeScript on Node 22, MCP for tools, any model behind an OpenAI-compatible endpoint or
-Anthropic, Apache-2.0. `npx create-marg-app my-agent` gives you the example domain and the
-playground in two minutes.
+Marg is TypeScript on Node 22, MCP for tools (the tool server can be TypeScript or Python), any
+model behind an OpenAI-compatible endpoint or Anthropic, Apache-2.0. 0.3.0 is on npm.
+`npx create-marg-app my-agent` gives you the example domain and the playground in two minutes;
+the hosted playground gives you the same thing in none.
 
+- The hosted playground, the example on the mock model with writes off: https://marg-playground.onrender.com
 - Repository: https://github.com/marg-adk/marg
-- The readers, with the rule and how to extend the vocabulary without opening a hole:
-  https://github.com/marg-adk/marg/blob/main/docs/guides/readers.md
-- The example domain to copy from: https://github.com/marg-adk/marg/tree/main/examples/support-intake
+- The docs site: https://marg-adk.github.io/marg
+- The readers, with the rule, the registers, and how to extend the vocabulary without opening a
+  hole: https://marg-adk.github.io/marg/build/readers
+- The two example domains to copy from:
+  https://github.com/marg-adk/marg/tree/main/examples/support-intake and
+  https://github.com/marg-adk/marg/tree/main/examples/bookings
+- Where Marg sits beside Google ADK, the OpenAI Agents SDK, LangGraph and Pydantic AI:
+  https://marg-adk.github.io/marg/get-started/compare
 
 ---
 
 ## Show HN
+
+Submit the repository URL, https://github.com/marg-adk/marg, with this title, and post the
+comment as the first comment.
 
 **Title:** Show HN: Marg – an agent kit where the runtime, not the model, reads "yes"
 
@@ -128,10 +145,13 @@ conversation and the runtime owns the moments that cost when wrong: forms, picke
 the confirmation summary, and the write, which is gated three times (skill rule, tool schema,
 runtime guard) and never weakens.
 
-Everything runs offline: the example domain ships a scripted mock model, so the eval suite and
-CI need no key. `npx create-marg-app my-agent` opens the playground.
+Everything runs offline: the example domains ship a scripted mock model, so the eval suite and
+CI need no key. Try it without installing anything at https://marg-playground.onrender.com (a
+free tier, so the first load takes a moment), or `npx create-marg-app my-agent` for the
+playground on your machine. Tool servers can be TypeScript or Python.
 
-The write-up with the numbers and a twenty-line step: https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes. Happy to answer
+The write-up with the numbers and a twenty-line step:
+https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes. Happy to answer
 questions about the readers, the step engine, or what we got wrong first.
 
 ---
@@ -157,12 +177,16 @@ the draft, carries the value into every tool call, and tells the model one fact.
 gated three times. The whole thing runs offline on a scripted mock model, so the eval suite is
 the CI gate with no key.
 
-It's open source as Marg (TypeScript, MCP, Apache-2.0): https://github.com/marg-adk/marg
-Post with the code: https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes. Curious whether others have measured their yes-readers.
+It's open source as Marg (TypeScript, MCP, Apache-2.0, tool servers in TS or Python):
+https://github.com/marg-adk/marg
+Try it in the browser: https://marg-playground.onrender.com
+Post with the code: https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes
+
+Curious whether others have measured their yes-readers.
 
 ---
 
-## The thread (X or LinkedIn)
+## The X thread
 
 1/ We measured what happens when an LLM agent reads "yes". On 521 real typed replies, a
 leading-word reader mis-read 235 as a bare yes or no. Reading the whole message: 0. That one
@@ -190,6 +214,45 @@ pickers, chips, the summary, the write. A step is ~15 lines of code, not a promp
 The first backend we probed accepted a create with every field stripped. Your validation may be
 the only validation.
 
-8/ Everything runs offline: the example ships a scripted mock model, so the eval suite is a CI
+8/ Everything runs offline: the examples ship a scripted mock model, so the eval suite is a CI
 gate with no API key. Marg, TypeScript + MCP + any model, Apache-2.0:
-https://github.com/marg-adk/marg — `npx create-marg-app my-agent`. The write-up: https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes
+https://github.com/marg-adk/marg — try it in the browser at https://marg-playground.onrender.com,
+or `npx create-marg-app my-agent`. The write-up:
+https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes
+
+---
+
+## The LinkedIn post
+
+One post, no thread. The first two lines show before the fold, so the number leads.
+
+We measured what happens when an LLM agent reads "yes". On 521 real typed replies, a
+leading-word reader mis-read 235 as a bare yes or no. Reading the whole message: 0.
+
+"Yes but change the title to login fails." "No, create it later." Each starts with a yes/no
+word. Each would have settled a value or performed a write under a real user's name.
+
+The rule that reads 0 of 521 wrong is short: a reply is a plain yes only when every word in it
+is a confirm word, politeness, filler, or a noun of the question. Anything else is content for
+the model, and the runtime asks its question again underneath. The rule can be this strict
+because the cost is asymmetric: a false "that's content" costs one repeated tap, a false yes
+costs a write.
+
+The same measurement generalised. With the model asking required questions under a prompt rule,
+it skipped them on 25 to 50 percent of turns, depending on the model. It attested list items the
+user never said in 1 chat in 64, with a prompt note covering that exact case. Better prompts
+lower the rate. They do not reach zero.
+
+So the design we ended up with: the model owns the conversation, the runtime owns the moments
+that must be right. Forms, pickers, option chips, the confirmation summary, and the write, which
+is gated three times and never weakens. A step is about fifteen lines of code, not a prompt
+paragraph. The examples ship a scripted mock model, so the whole eval suite runs in CI with no
+API key.
+
+It is open source today as Marg: TypeScript, MCP for tools (TypeScript or Python), any model,
+Apache-2.0. Try it in the browser, or `npx create-marg-app my-agent`.
+
+The write-up, with the numbers and the twenty-line step:
+https://marg-adk.github.io/marg/community/posts/the-model-must-never-read-yes
+The repository: https://github.com/marg-adk/marg
+The playground: https://marg-playground.onrender.com
