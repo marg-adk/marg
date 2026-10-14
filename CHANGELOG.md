@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-10-14
+
+The adoption release: installable from npm, a site, a playground that is also the dev UI, one
+command, a method for coding agents, a second example, every model provider, and the pipelines
+of a public repository.
 
 - **models**: presets for every provider a developer is likely to meet — Vertex AI, Azure OpenAI
   (the `api-key` header), Bedrock, LiteLLM, xAI, Cohere, Hugging Face, Cerebras, Perplexity,

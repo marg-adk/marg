@@ -1,6 +1,6 @@
 {
   "name": "@marg-adk/example-bookings",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Example domain — table bookings: a venue picker, a Details card with a date row, availability drawn as runtime chips (with the no-availability path), the summary, the create. The second domain, so the super agent routes.",
@@ -9,8 +9,8 @@
     "evals": "tsx evals/run-evals.ts"
   },
   "dependencies": {
-    "@marg-adk/core": "0.1.0",
-    "@marg-adk/evals": "0.1.0",
+    "@marg-adk/core": "0.2.0",
+    "@marg-adk/evals": "0.2.0",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "zod": "^3.23.8"
   }
