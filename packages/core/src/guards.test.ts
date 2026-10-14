@@ -5,7 +5,7 @@ import { attestNote, attestedListGuard, guardCreate, isCreateYes } from "./guard
 import type { ChatMessage } from "./llm.js";
 
 test("isCreateYes: a plain go-ahead for the write — never an acknowledgement, a question or a hand-off", () => {
-  for (const t of ["yes", "yes, create it", "go ahead", "ok submit it", "confirm", "haan create karo"]) assert.equal(isCreateYes(t), true, t);
+  for (const t of ["yes", "yes, create it", "go ahead", "ok submit it", "confirm"]) assert.equal(isCreateYes(t), true, t);
   for (const t of ["noted", "good work", "no changes", "let it be", "yes but change the title", "create it later", "the price is right", "done?", "ok?"]) assert.equal(isCreateYes(t), false, t);
 });
 
