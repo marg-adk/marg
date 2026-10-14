@@ -51,6 +51,20 @@ const MAP = {
   "SECURITY.md": "community/security-policy",
 };
 for (const f of readdirSync(join(repo, "docs/adr"))) if (f.endsWith(".md")) MAP[`docs/adr/${f}`] = `reference/adr/${f.replace(/\.md$/, "").toLowerCase()}`;
+/** Models and integrations: every page under docs/providers and docs/integrations, index first. */
+const generated = { providers: [], integrations: [] };
+for (const dir of ["providers", "integrations"]) {
+  const d = join(repo, "docs", dir);
+  if (!existsSync(d)) continue;
+  MAP[`docs/${dir}/README.md`] = `${dir}/index`;
+  for (const f of readdirSync(d).sort()) {
+    if (!f.endsWith(".md") || f === "README.md") continue;
+    const slug = f.replace(/\.md$/, "");
+    MAP[`docs/${dir}/${f}`] = `${dir}/${slug}`;
+    const title = (readFileSync(join(d, f), "utf8").match(/^# (.+)$/m) ?? [])[1] ?? slug;
+    generated[dir].push({ text: title, link: `/${dir}/${slug}` });
+  }
+}
 for (const dir of ["posts", "reviews"]) {
   const d = join(repo, "docs", dir);
   if (!existsSync(d)) continue;
@@ -87,7 +101,8 @@ for (const [src, dest] of Object.entries(MAP)) {
 mkdirSync(join(out, "images"), { recursive: true });
 cpSync(join(repo, "docs/images"), join(out, "images"), { recursive: true });
 cpSync(join(here, "pages"), out, { recursive: true });
-console.log(`site:sync — ${n} documents mirrored, authored pages applied`);
+writeFileSync(join(here, ".vitepress", "generated-sidebar.json"), JSON.stringify(generated, null, 2));
+console.log(`site:sync — ${n} documents mirrored, authored pages applied, sidebar: ${generated.providers.length} providers, ${generated.integrations.length} integrations`);
 
 function escapeOutsideCode(md) {
   // Real HTML the docs use on purpose stays; every other "<" is text (placeholders like <name>).

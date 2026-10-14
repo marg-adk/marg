@@ -33,3 +33,4 @@ packages/marg/payload/
 website/src/
 website/.vitepress/cache/
 website/.vitepress/dist/
+website/.vitepress/generated-sidebar.json

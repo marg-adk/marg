@@ -41,6 +41,12 @@ absence cost something.
 - Your stack must be Python end to end. Marg is Node ≥ 22 / TypeScript; your backend and tools
   can be anything that can sit behind an MCP tool server.
 
+Models: Anthropic natively, and any OpenAI-compatible endpoint — OpenAI, Gemini, Vertex AI, Azure
+OpenAI, Bedrock, Ollama, vLLM, LiteLLM, Groq, Mistral, DeepSeek, Fireworks, Together, OpenRouter,
+xAI, Cohere, Hugging Face, Cerebras, Perplexity, NVIDIA — one environment line each
+([docs/providers](docs/providers/README.md)). Observability to OpenObserve or any OTLP backend,
+stores, speech, decisions and hosting are listed in [docs/integrations](docs/integrations/README.md).
+
 ## Two minutes to a running agent
 
 The documentation site is **https://marg-adk.github.io/marg** — the same docs as this repository,
