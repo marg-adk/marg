@@ -21,11 +21,12 @@ replies, a reader that looked at the leading word mis-read 235 as a bare yes or 
 whole message mis-read none. Marg's gate is the runtime's, three times over: the skill rule, the
 tool schema, the runtime guard. [The pattern](/build/pattern#5-the-write-gate-three-times).
 
-**Human input.** A graph node that pauses for input still leaves the question's wording, the
-choice of control and the reading of the answer to the model or to your code. In Marg a step
-draws its ask (a form card, chips, a picker), reads the reply by its whole content, carries the
-value into every later tool call, and tells the model one fact. Three helpers cover most steps.
-[A new step](/build/new-step).
+**Human input.** A graph node that pauses for input (an `interrupt`, a `RequestInput`), now
+often with a response schema, validates the *shape* of what comes back; the question's wording,
+the choice of control and the reading of a typed reply are still the model's or your code's. In
+Marg a step draws its ask (a form card, chips, a picker), reads the reply by its whole content,
+carries the value into every later tool call, and tells the model one fact. Three helpers cover
+most steps. [A new step](/build/new-step).
 
 **Evaluation.** Trajectory and rubric evaluation judge a run after the fact, often with another
 model. Marg's scenarios assert what must *always* hold, deterministically, against a writes-off

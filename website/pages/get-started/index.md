@@ -37,10 +37,13 @@ Open http://localhost:8787 and type **"ticket for Northwind: login fails on mobi
    beside it and the model answers while the card is drawn again underneath.
 4. **Priority chips**, then **the summary**: every value with its provenance (a record, a default,
    what you said), *Change something* to re-open one step, and the create.
-5. **The create.** Refused with writes off, which is how the evals and CI run; with
-   `AGENT_ALLOW_WRITES=true` it writes to the example's JSON backend.
+5. **The create.** The project's `.env` has `AGENT_ALLOW_WRITES=true`, so the ticket lands in
+   the example's JSON backend and a completion card appears. The evals, CI and the hosted
+   playground run with writes off, where the same tap is refused by the create gate.
 
-The right-hand pane shows the draft filling itself as you answer.
+The **Draft** pane shows the draft filling itself as you answer, with where each value came
+from; the **Trace** pane shows who answered each turn (the runtime or the model) and every tool
+call with its time.
 
 ## Switch the model
 
@@ -81,8 +84,8 @@ npm run new-domain -- bookings --entity booking
 
 :::
 
-A project made by `create-marg-app` has the `marg` command: `marg web`, `marg new`, `marg evals`,
-`marg verdict`, `marg check`.
+A project made by `create-marg-app` has the `marg` command: `marg web`, `marg new` (`--lang python`
+for a tool server in Python), `marg evals`, `marg verdict`, `marg check`.
 
 Then follow the build order: tools, probe, schema, skill, steps, evals.
 [A new domain](/build/new-domain) walks through it; [the example](/build/example) is the
