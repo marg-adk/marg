@@ -11,6 +11,9 @@
   printed) instead of ignoring it: an older `marg new … --lang python` scaffolded a TypeScript
   server and said nothing. `marg new` fails when the templates lack the server template for the
   chosen language; `marg --version` prints the version; `marg verdict --help` reaches Verdict.
+- **playground**: the empty state skips a domain's example openers that are still the template's
+  placeholders (`<verbatim thing a user would type>`), so a freshly scaffolded domain does not
+  offer them as suggestions.
 - **templates**: a Python tool server. `npm run new-domain -- <name> --lang python` (and `marg new
   … --lang python`) writes `mcp/server.py` on the official `mcp` SDK (2.x, `MCPServer` over stdio)
   and `mcp/requirements.txt`, with the same tools and contracts as the TypeScript server: the
