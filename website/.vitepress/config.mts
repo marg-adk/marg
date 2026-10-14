@@ -36,6 +36,7 @@ export default defineConfig({
           { text: "Quickstart", link: "/get-started/" },
           { text: "The playground", link: "/get-started/playground" },
           { text: "Your first domain", link: "/build/new-domain" },
+          { text: "Build with a coding agent", link: "/build/coding-agent" },
           { text: "Marg and other frameworks", link: "/get-started/compare" },
         ] },
       ],
@@ -45,6 +46,7 @@ export default defineConfig({
           { text: "The playbook", link: "/build/playbook" },
           { text: "The domain worksheet", link: "/build/worksheet" },
           { text: "The example domain", link: "/build/example" },
+          { text: "Build with a coding agent", link: "/build/coding-agent" },
         ] },
         { text: "Guides", items: [
           { text: "A new domain", link: "/build/new-domain" },

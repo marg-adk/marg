@@ -38,6 +38,8 @@ Classify every red before fixing it: check brittleness, model flake, pre-existin
 - Checks: `scripts/check-*.{ts,sh}`. Observability as code: `observability/openobserve/`.
 - The site: `website/` (VitePress; `sync.mjs` mirrors docs/ into `website/src` with links rewritten;
   authored pages in `website/pages`; `npm run site:build`; deployed by `.github/workflows/pages.yml`).
+- The method for a domain, as a skill: `skills/build-a-domain/SKILL.md` (Claude Code loads it from
+  `.claude/skills/build-a-domain`, a symlink; `AGENTS.md` points other agents at it; create-marg-app ships it).
 - The CLI: `packages/marg` (`marg web|new|evals|verdict|check`, plain JS, templates synced into
   its payload at build). Projects from create-marg-app use it; the repository keeps its npm scripts.
 - Publishing: `scripts/build.ts` (dist per package, in dependency order), `packages/create-marg-app`

@@ -172,7 +172,9 @@ Then build in this order, because each step feeds the next
    probe, resume.
 
 Walk the journey in the playground as you go. The example domain is the reference for every
-part; copy from it freely.
+part; copy from it freely. **Building with a coding agent?** [skills/build-a-domain](skills/build-a-domain/SKILL.md)
+is the whole method as a skill: Claude Code loads it from `.claude/skills`, `AGENTS.md` points every
+other agent at it, and `create-marg-app` installs it in new projects.
 
 ## Use all of it, or a part
 
@@ -240,6 +242,7 @@ These are the numbers that justified the design, from the agent Marg was extract
 | `packages/metering` | The pass-through metering client |
 | `examples/support-intake` | A complete domain to copy from |
 | `templates/`, `scripts/` | Scaffolding, rename, the checks, dashboards, the OpenObserve bootstrap |
+| `skills/`, `shared-skills/` | The build-a-domain skill for coding agents; the prompt skills every domain shares |
 | `deploy/`, `observability/` | Image, Compose, Caddy; OpenObserve, collector, dashboards and alerts as code |
 | `docs/` | The pattern, the lessons, the playbook, references, guides, ADRs |
 

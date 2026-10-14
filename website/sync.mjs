@@ -30,6 +30,7 @@ const MAP = {
   "docs/guides/readers.md": "build/readers",
   "docs/guides/evals.md": "build/evals",
   "examples/support-intake/README.md": "build/example",
+  "skills/build-a-domain/SKILL.md": "build/coding-agent",
   "docs/ARCHITECTURE.md": "components/architecture",
   "docs/CLIENT-PROTOCOL.md": "components/client-protocol",
   "docs/DECISIONS.md": "components/decisions",
