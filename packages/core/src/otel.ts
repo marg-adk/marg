@@ -397,7 +397,7 @@ export function providerName(name: string, kind: string, base: string): string {
   const under = (...domains: string[]): boolean => domains.some((d) => host === d || host.endsWith("." + d));
   if (under("localhost") || host === "127.0.0.1" || host === "[::1]" || host === "::1" || host.endsWith(".local")) return "local";
   if (under("openai.azure.com", "cognitiveservices.azure.com")) return "azure.ai.openai";
-  if (under("aiplatform.googleapis.com")) return "gcp.vertex_ai";
+  if (host.endsWith("aiplatform.googleapis.com")) return "gcp.vertex_ai"; // regional hosts: us-central1-aiplatform.googleapis.com
   if (under("googleapis.com")) return "gcp.gemini";
   if (under("openai.com")) return "openai";
   if (under("amazonaws.com")) return "aws.bedrock";
