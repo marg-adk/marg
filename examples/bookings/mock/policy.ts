@@ -62,19 +62,41 @@ const call = (name: string, args: Record<string, unknown>): ToolCall => ({ id: `
 const say = (content: string, ui?: unknown[]): ChatMessage => ({ role: "assistant", content: ui?.length ? `${content}\n${ui.map((b) => "```ui\n" + JSON.stringify(b) + "\n```").join("\n")}` : content });
 const tools = (...calls: ToolCall[]): ChatMessage => ({ role: "assistant", content: null, tool_calls: calls });
 
+const STOPS = [" for ", " on ", " tomorrow", " tonight", " this ", " next ", ",", ".", "!", "?"];
+const squash = (s: string): string => s.replace(/\s+/g, " ").trim();
+/** The text after the first occurrence of `marker` (case-insensitive), or undefined. */
+function after(text: string, marker: string): string | undefined {
+  const i = text.toLowerCase().indexOf(marker);
+  return i < 0 ? undefined : text.slice(i + marker.length);
+}
+/** A venue name: the text up to the first stop word or punctuation — a scan, not a regex, so user text cannot make it slow. */
+function nameFrom(rest: string | undefined): string | undefined {
+  if (!rest) return undefined;
+  const low = rest.toLowerCase();
+  let end = rest.length;
+  for (const stop of STOPS) {
+    const j = low.indexOf(stop);
+    if (j >= 0 && j < end) end = j;
+  }
+  const name = rest.slice(0, end).trim();
+  return name && /^[a-z]/i.test(name) && !/^(a|the|me|us|table)$/i.test(name) ? name : undefined;
+}
 /** "book a table at Harbour House for 4" → { venue: "Harbour House", party: 4 } */
 function parseOpener(text: string): { venue?: string; party?: number } {
-  const party = /\bfor\s+(\d{1,2})\b/i.exec(text) ?? /\btable\s+for\s+(\d{1,2})\b/i.exec(text);
-  const at = /\b(?:at|@)\s+([A-Z][\w&' ]*?)(?=\s+(?:for|on|tomorrow|tonight|this|next)\b|\s*[,.!]|$)/i.exec(text);
-  if (at) return { venue: at[1].trim(), party: party ? Number(party[1]) : undefined };
-  const verb = /\b(?:book|reserve)\s+(?:a\s+table\s+at\s+)?([A-Z][\w&' ]*?)(?=\s+(?:for|on|tomorrow|tonight|this|next)\b|\s*[,.!]|$)/i.exec(text);
-  if (verb && !/^(a|the|me|us|table)$/i.test(verb[1].trim())) return { venue: verb[1].trim(), party: party ? Number(party[1]) : undefined };
-  return { party: party ? Number(party[1]) : undefined };
+  const t = squash(text);
+  const partyMatch = /\bfor (\d{1,2})\b/i.exec(t);
+  const party = partyMatch ? Number(partyMatch[1]) : undefined;
+  const venue = nameFrom(after(t, " at ") ?? after(t, "@ ")) ?? nameFrom((after(t, "book ") ?? after(t, "reserve "))?.replace(/^a table at /i, ""));
+  return { venue, party };
 }
 /** "sorry, I meant Harbour Lights" / "actually Harbour Lights" / "change the venue to Mezze House" */
 function parseCorrection(text: string): string | undefined {
-  const m = /\b(?:meant|actually|instead|make it|change (?:the )?venue to|rather)\s+([A-Z][\w&' ]*?)\s*[,.!]?$/i.exec(text.trim());
-  return m ? m[1].trim() : undefined;
+  const t = squash(text);
+  for (const marker of ["meant ", "actually ", "instead ", "make it ", "change the venue to ", "change venue to ", "rather "]) {
+    const name = nameFrom(after(t, marker));
+    if (name) return name;
+  }
+  return undefined;
 }
 
 registerMockModel(async (messages, _tools) => {
