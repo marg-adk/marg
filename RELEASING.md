@@ -12,11 +12,13 @@ fixes only; minor releases (`0.3.0`) may change behaviour and say so in the chan
 1. `main` is green on CI (the gate on Node 22 and 24, the packages job, CodeQL, security).
 2. `CHANGELOG.md`: move the **Unreleased** lines under a new `## <version> — <date>` heading. Each
    line names the package it touches in bold and says what changed for a user, not what moved.
-3. Bump the version everywhere, in one commit named `Release: <version>`:
+3. Bump the version everywhere — the packages pin each other, so the script sets the pins too —
+   in one commit named `Release: <version>`, on a branch (`main` takes pull requests only):
 
    ```bash
-   npm version <version> --no-git-tag-version --workspaces --include-workspace-root
-   git add -A && git commit -m "Release: <version>"
+   node scripts/set-version.mjs <version> && npm install
+   git add package.json package-lock.json packages/*/package.json examples/*/package.json CHANGELOG.md
+   git commit -m "Release: <version>"
    ```
 
    The release workflow refuses a tag whose version differs from any `package.json`.
@@ -26,7 +28,8 @@ fixes only; minor releases (`0.3.0`) may change behaviour and say so in the chan
 ## Tag and publish
 
 ```bash
-git push origin main
+# after the release PR is merged:
+git checkout main && git pull
 git tag -a v<version> -m "Marg <version>" && git push origin v<version>
 ```
 

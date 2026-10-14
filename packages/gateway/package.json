@@ -1,6 +1,6 @@
 {
   "name": "@marg-adk/gateway",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
@@ -47,11 +47,11 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "@marg-adk/core": "0.1.0",
-    "@marg-adk/metering": "0.1.0",
-    "@marg-adk/types": "0.1.0",
-    "@marg-adk/verdict": "0.1.0",
-    "@marg-adk/widget": "0.1.0",
+    "@marg-adk/core": "0.2.0",
+    "@marg-adk/metering": "0.2.0",
+    "@marg-adk/types": "0.2.0",
+    "@marg-adk/verdict": "0.2.0",
+    "@marg-adk/widget": "0.2.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "tsx": "^4.19.0"

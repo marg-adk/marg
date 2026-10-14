@@ -1,6 +1,6 @@
 {
   "name": "marg",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
@@ -41,8 +41,8 @@
     "prepack": "node scripts/sync-payload.js"
   },
   "dependencies": {
-    "@marg-adk/gateway": "0.1.0",
-    "@marg-adk/verdict": "0.1.0",
+    "@marg-adk/gateway": "0.2.0",
+    "@marg-adk/verdict": "0.2.0",
     "tsx": "^4.19.0"
   }
 }
