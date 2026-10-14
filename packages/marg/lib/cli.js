@@ -105,6 +105,13 @@ function newDomain(positionals, flags) {
     return 1;
   }
   const templates = templatesDir();
+  // Before anything is written: the templates must have the server for the chosen language (an older
+  // bundled copy had no Python template, and `--lang python` wrote a domain with no server at all).
+  const serverTemplate = python ? "mcp-server.template.py" : "mcp-server.template.ts";
+  if (!existsSync(join(templates, serverTemplate))) {
+    console.error(`marg new: ${templates} has no ${serverTemplate} — update @marg-adk/cli, or the project's templates/ (create-marg-app copies them)`);
+    return 1;
+  }
   // The manifest names the server the gateway spawns: `npx tsx …/server.ts` or `python3 …/server.py`.
   const serverFile = `${parent}/${name}/mcp/server.${python ? "py" : "ts"}`;
   const mcp = python ? { command: "python3", args: [serverFile] } : { command: "npx", args: ["tsx", serverFile] };
@@ -238,16 +245,29 @@ async function waitFor(url, seconds) {
   return false;
 }
 
+/** The flags each command reads. Anything else is an error, never silently ignored: `marg new x --lang python`
+ *  on a version without `--lang` wrote a TypeScript server and said nothing (seen in the 0.3 review). */
+const FLAGS = { web: ["port", "writes"], new: ["entity", "title", "dir", "lang"], evals: ["gateway", "shard"], check: ["port"] };
+
 export async function run(argv) {
   const { _: positionals, flags } = parse(argv);
   const cmd = positionals.shift();
+  if (flags.version) {
+    console.log(pkg.version);
+    return 0;
+  }
+  if (cmd === "verdict") return verdict(argv.slice(1)); // its own flags and --help (the Verdict CLI)
   if (!cmd || cmd === "help" || flags.help) {
     console.log(HELP);
     return 0;
   }
-  if (cmd === "--version" || flags.version) {
-    console.log(pkg.version);
-    return 0;
+  if (FLAGS[cmd]) {
+    const unknown = Object.keys(flags).filter((k) => !FLAGS[cmd].includes(k));
+    if (unknown.length) {
+      console.error(`marg ${cmd}: unknown flag${unknown.length > 1 ? "s" : ""} ${unknown.map((k) => "--" + k).join(", ")} (this version knows ${FLAGS[cmd].map((k) => "--" + k).join(", ")})\n`);
+      console.log(HELP);
+      return 2;
+    }
   }
   switch (cmd) {
     case "web":
@@ -256,8 +276,6 @@ export async function run(argv) {
       return newDomain(positionals, flags);
     case "evals":
       return evals(positionals, flags);
-    case "verdict":
-      return verdict(argv.slice(1));
     case "check":
       return check(flags);
     default:

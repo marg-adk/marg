@@ -7,6 +7,10 @@
   the stored step only after the draw, so the card came back empty; the playground showed it.
   **evals**: `formRow(key, { value, error })` checks a drawn form's row; the example's
   partial-redraw scenario now asserts the pre-fill and the mark (red on the old engine).
+- **cli**: `marg web | new | evals | check` refuse a flag they do not know (exit 2, the help
+  printed) instead of ignoring it: an older `marg new … --lang python` scaffolded a TypeScript
+  server and said nothing. `marg new` fails when the templates lack the server template for the
+  chosen language; `marg --version` prints the version; `marg verdict --help` reaches Verdict.
 - **templates**: a Python tool server. `npm run new-domain -- <name> --lang python` (and `marg new
   … --lang python`) writes `mcp/server.py` on the official `mcp` SDK (2.x, `MCPServer` over stdio)
   and `mcp/requirements.txt`, with the same tools and contracts as the TypeScript server: the
