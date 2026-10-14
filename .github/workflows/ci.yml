@@ -2,7 +2,8 @@
 # scripted mock model (writes off, no key, no network) — on Node 22 and 24. docs/guides/evals.md
 # explains the report. A second job proves the packages still build, pack and install into a
 # fresh create-marg-app project. A third builds the deploy image and probes its health, so a
-# file missing from the image fails here and not on the host. Branch protection requires all three.
+# file missing from the image fails here and not on the host. A fourth scaffolds a domain with the
+# Python tool server on Python 3.11 and runs the same check. Branch protection requires all four.
 name: ci
 on:
   push:
@@ -59,6 +60,25 @@ jobs:
           name: eval-results-node${{ matrix.node }}
           path: examples/*/evals/results/
           if-no-files-found: ignore
+  scaffold-python:
+    name: scaffold (python 3.11)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - run: npm ci --no-audit --no-fund
+      - name: The scaffold check with the Python tool server
+        run: SCAFFOLD_LANG=python npm run check:scaffold
+      - name: Gateway log (on failure)
+        if: failure()
+        run: tail -n 100 .data/gw-scaffold.log || true
   packages:
     runs-on: ubuntu-latest
     timeout-minutes: 15

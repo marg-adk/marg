@@ -38,8 +38,9 @@ absence cost something.
   shape: *collect → validate → confirm → write*.
 - Your bot only answers (RAG, FAQ, search) and never writes anything.
 - You want a hosted platform. Marg is code you run.
-- Your stack must be Python end to end. Marg is Node ≥ 22 / TypeScript; your backend and tools
-  can be anything that can sit behind an MCP tool server.
+- Your stack must be Python end to end. The runtime is Node ≥ 22 / TypeScript; your tool server
+  can be Python ([the Python template](docs/guides/python-tools.md)) and your backend anything
+  that sits behind MCP.
 
 Models: Anthropic natively, and any OpenAI-compatible endpoint — OpenAI, Gemini, Vertex AI, Azure
 OpenAI, Bedrock, Ollama, vLLM, LiteLLM, Groq, Mistral, DeepSeek, Fireworks, Together, OpenRouter,

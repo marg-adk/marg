@@ -1,0 +1,4 @@
+# mcp/requirements.txt — the __NAME__ tool server (Python ≥ 3.10).
+#   python3 -m venv .venv && .venv/bin/pip install -r domains/__NAME__/mcp/requirements.txt
+mcp>=2,<3                  # the official MCP SDK: MCPServer over stdio
+opentelemetry-api>=1.20    # the API only — the tool spans join the gateway's trace once an SDK + exporter are configured (docs/guides/python-tools.md)

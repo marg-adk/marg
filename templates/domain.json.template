@@ -7,7 +7,7 @@
     "examples": ["<verbatim thing a user would type>", "<another, different register>", "<one per variant>"],
     "keywords": ["<verb>", "<noun>", "<vernacular term>"]
   },
-  "mcp": { "command": "npx", "args": ["tsx", "domains/__NAME__/mcp/server.ts"] },
+  "mcp": { "command": "__MCP_COMMAND__", "args": ["__MCP_ARGS__"] },
   "skills": ["skills/__NAME__"],
   "shared_skills": ["conversation-behaviour", "visual-presentation"],
   "steps": "steps/index.ts",

@@ -29,6 +29,7 @@ const MAP = {
   "docs/guides/new-step.md": "build/new-step",
   "docs/guides/readers.md": "build/readers",
   "docs/guides/evals.md": "build/evals",
+  "docs/guides/python-tools.md": "build/python-tools",
   "examples/support-intake/README.md": "build/example",
   "skills/build-a-domain/SKILL.md": "build/coding-agent",
   "examples/bookings/README.md": "build/example-bookings",
