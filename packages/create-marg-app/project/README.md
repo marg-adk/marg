@@ -38,4 +38,5 @@ Or by hand: `npm run gateway:evals &` (a second gateway on :8788, writes off), t
 | `examples/support-intake/` | the reference domain: manifest, tools, skill, schema, steps, mock, evals |
 | `templates/` | what `npm run new-domain` copies |
 | `shared-skills/` | conversation behaviour and visual presentation, injected into every domain |
+| `skills/build-a-domain/` | the method for a coding agent (Claude Code loads it from `.claude/skills/`; `AGENTS.md` for others) |
 | `.env` | every setting, documented at https://github.com/marg-adk/marg/blob/main/docs/ENVIRONMENT.md |

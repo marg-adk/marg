@@ -8,7 +8,8 @@
  * WHAT COMES IN: a folder name (kebab-case; "." for the current empty folder).
  * WHAT COMES OUT: <name>/ with package.json (depending on the published @marg packages at this
  *   tool's own version), tsconfig.json, .gitignore, .env (from .env.example, the mock model),
- *   README.md, templates/, examples/support-intake/, shared-skills/, scripts/new-domain.ts.
+ *   README.md, templates/, examples/support-intake/, shared-skills/, skills/ (and the build-a-domain
+ *   skill under .claude/skills/ for Claude Code, AGENTS.md for other coding agents), scripts/new-domain.ts.
  *   Refuses a non-empty folder. Nothing is installed or run.
  * WHO TALKS TO IT: a developer, once per project. Then `npm run gateway`, `npm run new-domain`.
  *
@@ -51,6 +52,10 @@ copyFileSync(join(payload, "env.example"), join(dest, ".env.example"));
 copyFileSync(join(payload, "env.example"), join(dest, ".env"));
 copyFileSync(join(projectFiles, "tsconfig.json"), join(dest, "tsconfig.json"));
 copyFileSync(join(projectFiles, "gitignore"), join(dest, ".gitignore"));
+// the build-a-domain skill where Claude Code looks for it (a copy: symlinks survive neither npm pack nor Windows), and AGENTS.md for every other coding agent
+mkdirSync(join(dest, ".claude", "skills"), { recursive: true });
+cpSync(join(payload, "skills", "build-a-domain"), join(dest, ".claude", "skills", "build-a-domain"), { recursive: true });
+copyFileSync(join(projectFiles, "AGENTS.md"), join(dest, "AGENTS.md"));
 writeFileSync(join(dest, "README.md"), readFileSync(join(projectFiles, "README.md"), "utf8").replaceAll("__NAME__", name));
 
 const v = self.version;

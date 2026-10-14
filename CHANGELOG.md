@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **skill**: `skills/build-a-domain/SKILL.md`, the method for building a domain as a skill a coding
+  agent follows (the worksheet, the build order, the gate, the classification rule, the never-rules);
+  Claude Code loads it from `.claude/skills`, `AGENTS.md` points other agents at it, `create-marg-app`
+  installs it in new projects, and the site shows it under Build.
 - **repository**: CI fails when a generated path (the site's mirrored docs or build, a package's
   `dist/` or payload) is tracked; Dependabot ignores major bumps of `@types/node` (the engine is
   Node 22).

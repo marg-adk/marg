@@ -43,6 +43,11 @@ Model endpoints: a preset in `packages/core/src/llm.ts` (base URL, auth style, d
 price-table entry. Decision backends: implement `DecisionBackend` in `packages/verdict`.
 Speech-to-text: a provider branch in `packages/gateway/src/transcribe.ts`.
 
+## With a coding agent
+`skills/build-a-domain/SKILL.md` is the method for a domain; Claude Code loads it from
+`.claude/skills/build-a-domain` (a symlink — on Windows enable `core.symlinks` or read the file
+directly), and `AGENTS.md` points every other agent at it.
+
 ## Pull requests
 Open one from a branch (never push to `main`; it is protected). The template asks for the gate
 output and a classification of every red; CI runs the gate on Node 22 and 24, the packages job,

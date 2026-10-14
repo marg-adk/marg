@@ -3,7 +3,7 @@
  *
  * WHAT COMES IN: ../../templates, ../../examples/support-intake, ../../shared-skills,
  *   ../../scripts/new-domain.ts, ../../.env.example (read from the monorepo, so it only runs there).
- * WHAT COMES OUT: payload/{templates,examples/support-intake,shared-skills,scripts/new-domain.ts,env.example}
+ * WHAT COMES OUT: payload/{templates,examples/support-intake,shared-skills,skills,scripts/new-domain.ts,env.example}
  *   — git-ignored, rebuilt by `npm run build` and on `prepack`, shipped in the tarball.
  * WHO TALKS TO IT: scripts/build.ts, npm (prepack), and nothing at install time.
  *
@@ -30,6 +30,7 @@ mkdirSync(join(payload, "examples"), { recursive: true });
 cpSync(join(repo, "templates"), join(payload, "templates"), { recursive: true, filter });
 cpSync(join(repo, "examples", "support-intake"), join(payload, "examples", "support-intake"), { recursive: true, filter });
 cpSync(join(repo, "shared-skills"), join(payload, "shared-skills"), { recursive: true, filter });
+cpSync(join(repo, "skills"), join(payload, "skills"), { recursive: true, filter });
 copyFileSync(join(repo, "scripts", "new-domain.ts"), join(payload, "scripts", "new-domain.ts"));
 copyFileSync(join(repo, ".env.example"), join(payload, "env.example"));
 console.log("sync-payload: payload/ rebuilt from the monorepo");

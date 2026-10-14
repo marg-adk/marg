@@ -24,6 +24,7 @@ cd "$TMP/demo"
 npm install --no-audit --no-fund --loglevel=error
 npm run -s typecheck
 echo "demo: typecheck clean"
+test -f .claude/skills/build-a-domain/SKILL.md && test -f AGENTS.md && test -f skills/build-a-domain/SKILL.md && echo "demo: the build-a-domain skill is installed (.claude/skills, skills/, AGENTS.md)"
 AGENT_ALLOW_WRITES=false AGENT_REQUIRE_LOGIN=false AGENT_RATE_DISABLED=true GATEWAY_PORT="$PORT" npm run -s gateway > gateway.log 2>&1 &
 GW=$!
 for _ in $(seq 1 60); do
