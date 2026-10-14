@@ -134,7 +134,7 @@ function newDomain(positionals, flags) {
   written.push("README.md");
   console.log(`${name}: ${written.length} files under ${parent}/${name}/\n  ${written.join("\n  ")}`);
   console.log(`\nthe method, step by step: skills/build-a-domain/SKILL.md (a coding agent can follow it)`);
-  console.log(`\nnext:\n  1. ${parent}/${name}/mcp/server.${python ? "py — pip install -r ${parent}/${name}/mcp/requirements.txt, then" : "ts —"} the tools (reads, validate / preview / create)\n  2. probe/probe.ts --yes against your dev backend; fold the findings into schema/${entity}-schema.json\n  3. skills/${name}/SKILL.md, then steps/index.ts\n  4. marg web  (discovered at boot) → walk it in the playground\n  5. marg check`);
+  console.log(`\nnext:\n  1. ${parent}/${name}/mcp/server.${python ? `py — pip install -r ${parent}/${name}/mcp/requirements.txt, then` : "ts —"} the tools (reads, validate / preview / create)\n  2. probe/probe.ts --yes against your dev backend; fold the findings into schema/${entity}-schema.json\n  3. skills/${name}/SKILL.md, then steps/index.ts\n  4. marg web  (discovered at boot) → walk it in the playground\n  5. marg check`);
   return 0;
 }
 
