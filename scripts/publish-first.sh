@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."
 npm whoami > /dev/null 2>&1 || { echo "not logged in to npm — run: npm login"; exit 1; }
 echo "publishing as $(npm whoami) — version $(node -p "require('./package.json').version")"
 npm run -s check:pack
-for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway marg create-marg-app; do
+for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway @marg-adk/cli create-marg-app; do
   if npm view "$w@$(node -p "require('./package.json').version")" version > /dev/null 2>&1; then echo "skip  $w — this version is already on npm"; continue; fi
   echo "▶ npm publish $w (npm will ask for your one-time code)"
   npm publish --access public --provenance=false -w "$w"

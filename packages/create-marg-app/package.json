@@ -29,7 +29,7 @@
     "scaffold"
   ],
   "bin": {
-    "create-marg-app": "./bin/create-marg-app.js"
+    "create-marg-app": "bin/create-marg-app.js"
   },
   "files": [
     "bin",

@@ -1,5 +1,5 @@
 {
-  "name": "marg",
+  "name": "@marg-adk/cli",
   "version": "0.2.0",
   "license": "Apache-2.0",
   "type": "module",
@@ -18,7 +18,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "The marg command: web (the gateway and the playground), new (a domain from the templates), evals (every suite against a writes-off gateway), verdict (a typed decision from the shell), check (the project's gate).",
+  "description": "The marg command (npm i -D @marg-adk/cli): web (the gateway and the playground), new (a domain from the templates), evals (every suite against a writes-off gateway), verdict (a typed decision from the shell), check (the project's gate).",
   "keywords": [
     "agents",
     "agent-framework",
@@ -28,7 +28,7 @@
     "cli"
   ],
   "bin": {
-    "marg": "./bin/marg.js"
+    "marg": "bin/marg.js"
   },
   "files": [
     "bin",

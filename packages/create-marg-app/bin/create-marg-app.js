@@ -82,7 +82,7 @@ const pkg = {
     "@marg-adk/gateway": marg("gateway"),
     "@marg-adk/types": marg("types"),
     "@marg-adk/verdict": marg("verdict"),
-    marg: packs ? `file:${resolve(packs, `marg-${v}.tgz`)}` : `${v}`,
+    "@marg-adk/cli": packs ? `file:${resolve(packs, `marg-adk-cli-${v}.tgz`)}` : `${v}`,
     "@modelcontextprotocol/sdk": "^1.12.0",
     zod: "^3.23.8",
   },
@@ -94,7 +94,7 @@ const pkg = {
 };
 if (packs) {
   // Transitive @marg dependencies must come from the same tarballs, not the registry.
-  pkg.overrides = { "@marg-adk/types": marg("types"), "@marg-adk/core": marg("core"), "@marg-adk/verdict": marg("verdict"), "@marg-adk/metering": marg("metering"), "@marg-adk/widget": marg("widget") };
+  pkg.overrides = { "@marg-adk/types": marg("types"), "@marg-adk/core": marg("core"), "@marg-adk/verdict": marg("verdict"), "@marg-adk/metering": marg("metering"), "@marg-adk/widget": marg("widget"), "@marg-adk/cli": `file:${resolve(packs, `marg-adk-cli-${v}.tgz`)}` };
 }
 writeFileSync(join(dest, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
 

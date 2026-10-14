@@ -1,4 +1,8 @@
-# marg
+# @marg-adk/cli — the `marg` command
+
+```bash
+npm install -D @marg-adk/cli      # a project made by create-marg-app already has it
+```
 
 The one command for a [Marg](https://marg-adk.github.io/marg/) project.
 
