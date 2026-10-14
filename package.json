@@ -1,6 +1,6 @@
 {
   "name": "marg",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "description": "Marg — an open-source Agent Development Kit for conversational agents that complete a job, step by step: runtime-owned steps, typed decisions, evals as the ratchet, and a production ops spine.",
