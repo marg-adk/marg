@@ -54,6 +54,7 @@ jobs:
           echo "workflow ref: ${GITHUB_WORKFLOW_REF}"
       - name: Publish (dependency order, OIDC — provenance is automatic)
         run: |
-          for w in @marg-adk/types @marg-adk/core @marg-adk/verdict @marg-adk/evals @marg-adk/metering @marg-adk/widget @marg-adk/gateway @marg-adk/cli create-marg-app; do
-            npm publish --access public -w "$w"
+          # from each package's own directory: the OIDC exchange is made for the package being published
+          for d in types core verdict evals metering widget gateway marg create-marg-app; do
+            (cd "packages/$d" && echo "▶ $(node -p "require('./package.json').name")" && npm publish --access public)
           done
