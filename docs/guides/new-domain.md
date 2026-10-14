@@ -1,12 +1,13 @@
 # Guide: a new domain
 
 ```bash
-npm run new-domain -- bookings            # scaffolds domains/bookings from templates/
+npm run new-domain -- bookings                  # scaffolds domains/bookings from templates/
+npm run new-domain -- bookings --lang python    # the same, with the tool server in Python (python-tools.md)
 ```
 
 Then, in the build order (docs/PLAYBOOK.md):
 
-1. **Tools** — `domains/bookings/mcp/server.ts`. Implement reads (`search_*`, `get_*`,
+1. **Tools** — `domains/bookings/mcp/server.ts` (or `mcp/server.py`). Implement reads (`search_*`, `get_*`,
    `reference_data`) and the triad: `validate_booking_slots` (write-free; returns `problems`,
    `from_record`, `defaults`), `preview_booking`, `create_booking` (refuses without
    `confirmed:true` and `AGENT_ALLOW_WRITES === "true"`; returns `{created:true, entity_id,

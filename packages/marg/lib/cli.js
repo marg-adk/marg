@@ -18,7 +18,7 @@ const require = createRequire(import.meta.url);
 const HELP = `marg ${pkg.version} — the one command for a Marg project
 
   marg web [--port 8787] [--writes on|off]      the gateway and the playground (http://localhost:8787)
-  marg new <name> [--entity noun] [--title "Title"] [--dir domains]
+  marg new <name> [--entity noun] [--title "Title"] [--dir domains] [--lang ts|python]
                                                a domain scaffolded from the templates
   marg evals [suite.ts …] [--gateway URL] [--shard i/n]
                                                scenario suites against a writes-off gateway
@@ -87,19 +87,29 @@ function templatesDir() {
 function newDomain(positionals, flags) {
   const name = positionals[0];
   if (!name || !/^[a-z][a-z0-9-]*$/.test(name)) {
-    console.error('usage: marg new <kebab-name> [--title "Title"] [--entity noun] [--dir domains]');
+    console.error('usage: marg new <kebab-name> [--title "Title"] [--entity noun] [--dir domains] [--lang ts|python]');
     return 2;
   }
   const title = flags.title ?? name.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
   const entity = String(flags.entity ?? name.split("-").pop() ?? "entry").toLowerCase().replace(/[^a-z0-9_]/g, "_");
   const parent = String(flags.dir ?? "domains");
+  const lang = String(flags.lang ?? "ts").toLowerCase();
+  if (!["ts", "typescript", "python", "py"].includes(lang)) {
+    console.error(`unknown --lang "${lang}": ts (default) or python`);
+    return 2;
+  }
+  const python = lang === "python" || lang === "py";
   const dest = resolve(parent, name);
   if (existsSync(dest)) {
     console.error(`refusing: ${dest} already exists`);
     return 1;
   }
   const templates = templatesDir();
-  const fill = (s) => s.replaceAll("__NAME__", name).replaceAll("__TITLE__", title).replaceAll("__ENTITY__", entity);
+  // The manifest names the server the gateway spawns: `npx tsx …/server.ts` or `python3 …/server.py`.
+  const serverFile = `${parent}/${name}/mcp/server.${python ? "py" : "ts"}`;
+  const mcp = python ? { command: "python3", args: [serverFile] } : { command: "npx", args: ["tsx", serverFile] };
+  const fill = (s) =>
+    s.replaceAll("__NAME__", name).replaceAll("__TITLE__", title).replaceAll("__ENTITY__", entity).replaceAll("__MCP_COMMAND__", mcp.command).replaceAll('["__MCP_ARGS__"]', JSON.stringify(mcp.args));
   const map = {
     "domain.json.template": "domain.json",
     "SKILL.md.template": `skills/${name}/SKILL.md`,
@@ -108,7 +118,7 @@ function newDomain(positionals, flags) {
     "eval-suite.template.ts": "evals/run-evals.ts",
     "mock-policy.template.ts": "mock/policy.ts",
     "probe.template.ts": "probe/probe.ts",
-    "mcp-server.template.ts": "mcp/server.ts",
+    ...(python ? { "mcp-server.template.py": "mcp/server.py", "requirements.template.txt": "mcp/requirements.txt" } : { "mcp-server.template.ts": "mcp/server.ts" }),
   };
   const written = [];
   for (const file of readdirSync(templates)) {
@@ -124,7 +134,7 @@ function newDomain(positionals, flags) {
   written.push("README.md");
   console.log(`${name}: ${written.length} files under ${parent}/${name}/\n  ${written.join("\n  ")}`);
   console.log(`\nthe method, step by step: skills/build-a-domain/SKILL.md (a coding agent can follow it)`);
-  console.log(`\nnext:\n  1. ${parent}/${name}/mcp/server.ts — the tools (reads, validate / preview / create)\n  2. probe/probe.ts --yes against your dev backend; fold the findings into schema/${entity}-schema.json\n  3. skills/${name}/SKILL.md, then steps/index.ts\n  4. marg web  (discovered at boot) → walk it in the playground\n  5. marg check`);
+  console.log(`\nnext:\n  1. ${parent}/${name}/mcp/server.${python ? "py — pip install -r ${parent}/${name}/mcp/requirements.txt, then" : "ts —"} the tools (reads, validate / preview / create)\n  2. probe/probe.ts --yes against your dev backend; fold the findings into schema/${entity}-schema.json\n  3. skills/${name}/SKILL.md, then steps/index.ts\n  4. marg web  (discovered at boot) → walk it in the playground\n  5. marg check`);
   return 0;
 }
 

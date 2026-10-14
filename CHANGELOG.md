@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- **templates**: a Python tool server. `npm run new-domain -- <name> --lang python` (and `marg new
+  … --lang python`) writes `mcp/server.py` on the official `mcp` SDK (2.x, `MCPServer` over stdio)
+  and `mcp/requirements.txt`, with the same tools and contracts as the TypeScript server: the
+  validate / preview / create triad, the bearer in `_meta["agent/auth"]`, the session id and the
+  W3C trace context in `_meta`, the write gate, JSON lines to stderr. The manifest points `python3`
+  at it. `SCAFFOLD_LANG=python npm run check:scaffold` proves it; CI runs that on Python 3.11.
+  Guide: `docs/guides/python-tools.md`.
+- **core**: the readers' vocabulary is English; Hindi and Hinglish are an opt-in lexicon.
+  `reply-words.ts` keeps the English sets and rewrites; every Hindi and Hinglish word, rewrite,
+  question marker and skip phrase lives in `lexicons/hinglish.ts`, loaded with
+  `AGENT_LEXICONS=hinglish` (the gateway logs what it loaded) or `loadLexicons(["hinglish"])`.
+  `extendLexicon` takes rewrites, question openers and leads, cut-offs, unfinished tails,
+  question exceptions and skip phrases as well as words. The readers guide describes registers.
 - **evals**: simulated users — a scenario may set `user` instead of a turn list; the runner asks
   it for each next message from a view of the conversation until it returns null; `everyTurn`
   checks apply to every turn; `cooperativeUser` plays a deterministic persona (an opener, answers

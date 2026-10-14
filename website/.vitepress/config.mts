@@ -64,6 +64,7 @@ export default defineConfig({
         { text: "Guides", items: [
           { text: "A new domain", link: "/build/new-domain" },
           { text: "A new step", link: "/build/new-step" },
+          { text: "Tools in Python", link: "/build/python-tools" },
           { text: "Readers", link: "/build/readers" },
           { text: "Evals", link: "/build/evals" },
         ] },

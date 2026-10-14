@@ -31,13 +31,14 @@ Ship exactly one flow first. Two capabilities sharing most of their tools are on
 
 ```bash
 marg new <name> --entity <noun>          [npm run new-domain -- <name> --entity <noun>]
+marg new <name> --entity <noun> --lang python     # the tool server in Python (docs/guides/python-tools.md)
 ```
 
-That writes `domains/<name>/` with `domain.json`, `skills/<name>/SKILL.md`, `schema/<noun>-schema.json`, `steps/index.ts`, `evals/run-evals.ts`, `mock/policy.ts`, `probe/probe.ts`, `mcp/server.ts`, `fixtures/`. Every file is a working template with `__NAME__`-style placeholders already filled. The reference for each part is the example domain, `examples/support-intake/`: copy from it freely.
+That writes `domains/<name>/` with `domain.json`, `skills/<name>/SKILL.md`, `schema/<noun>-schema.json`, `steps/index.ts`, `evals/run-evals.ts`, `mock/policy.ts`, `probe/probe.ts`, `mcp/server.ts` (with `--lang python`: `mcp/server.py` and `mcp/requirements.txt`), `fixtures/`. Every file is a working template with `__NAME__`-style placeholders already filled. The reference for each part is the example domain, `examples/support-intake/`: copy from it freely.
 
 ## 2. Tools — `mcp/server.ts`
 
-An MCP server over stdio, spawned by the gateway as a child process. Keep the example's shape:
+An MCP server over stdio, spawned by the gateway as a child process. In Python (`--lang python`) it is `mcp/server.py` on the official `mcp` SDK with the same tools, the same `_meta` contract and the same `reg()` wrapper; `docs/guides/python-tools.md` has the venv and the checks. Keep the example's shape:
 
 - **Reads**: `whoami`, `search_<entity>s` / `search_<reference>` (returns matches the skill can offer as a picker), `get_my_<entity>s`, `reference_data(kind)` (option lists the runtime draws as chips).
 - **The triad**, and nothing else writes:
