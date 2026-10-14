@@ -18,6 +18,9 @@ updates:
       # the engine is Node 22 (engines, .nvmrc, the CI matrix): the types follow it, not npm's latest
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # zod 4 is a migration (the MCP SDK and every tool schema), planned in ROADMAP, not a bump
+      - dependency-name: "zod"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "Deps"
   - package-ecosystem: github-actions
