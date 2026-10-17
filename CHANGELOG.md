@@ -27,6 +27,21 @@
   (the route and its confidence, `search_customers` with its query and the two matches, Details asked →
   redrawn → settled, the create refused with writes off, and the same facts after a reload); the bookings
   routing scenarios assert the route both ways. `npm run gateway:evals` sets the flag.
+- **core**: the review no longer draws the summary over an answer the change made stale. After
+  "Change something" → a section → a changed answer, the steps that `dependsOn` it were reset, but
+  the settle called `drawSummary()` directly, so `nextOwed()` was never asked: the card came back at
+  once still showing the old Priority, a typed yes was a go-ahead, and the ticket was written with
+  the tool's default (`medium`) while the user had confirmed `high`. The edit settle now goes through
+  the same chain as every other settle: the reset step is asked again (with one line saying why) and
+  the summary returns after it. Found by walking the example by hand while building a new domain on
+  0.3.0. A reset now counts as `behaviour_events_total{kind="step",type="reset"}`, is a log trace line, and a
+  `reset` event in the dev trace (the Trace pane says it).
+  The create gate is untouched in all three layers.
+  **evals**: `cardRow(key, { value })` checks a drawn summary's field; the example suite gains
+  `review-edit-reasks-dependent` (red on the old engine at the turn the summary returns, and at the
+  typed yes that reached the write tool) and `review-edit-unchanged` (an unchanged edit asks nothing
+  again). `check:e2e` now also drives the review path with writes on and asserts the record on disk
+  is the summary that was confirmed (red on the old engine).
 
 ## 0.3.0 — 2026-10-14
 

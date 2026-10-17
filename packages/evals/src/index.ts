@@ -116,6 +116,11 @@ export const formRow = (key: string, want: { value?: RegExp; error?: RegExp }): 
       (b) => b?.type === "form" && (Array.isArray(b.rows) ? b.rows : []).some((r: any) => r?.key === key && (!want.value || want.value.test(String(r.value ?? ""))) && (!want.error || want.error.test(String(r.error ?? "")))),
     ),
 });
+/** A card block on this turn (the summary) has the field `key` and its value matches — what the user is asked to confirm. */
+export const cardRow = (key: string, want: { value: RegExp }): Check => ({
+  name: `card row ${key} value ~ ${want.value}`,
+  pass: (t) => (t.ui ?? []).some((b) => b?.type === "card" && (Array.isArray(b.fields) ? b.fields : []).some((r: any) => r?.key === key && want.value.test(String(r.value ?? "")))),
+});
 export const noUi = (type: string): Check => ({ name: `ui has no ${type}`, pass: (t) => !(t.ui ?? []).some((b) => b?.type === type) });
 export const toolCalled = (name: string): Check => ({ name: `tool ${name} called (so far)`, pass: (_t, all) => all.some((x) => x.tool_trace?.some((tr) => tr.tool === name)) });
 export const toolCalledThisTurn = (name: string): Check => ({ name: `tool ${name} called this turn`, pass: (t) => t.tool_trace?.some((tr) => tr.tool === name) });
@@ -155,7 +160,7 @@ export const routeIs = (want: { domain?: string; by?: string | string[]; confide
     return (!want.domain || r.domain === want.domain) && (!by || by.includes(r.by)) && (!want.confidence || r.by === "single" || (typeof r.confidence === "number" && r.confidence > 0 && r.confidence <= 1));
   },
 });
-/** The step engine's event for `step` this turn (drawn, late_draw, redrawn, reopened, settled, skipped, summary). */
+/** The step engine's event for `step` this turn (drawn, late_draw, redrawn, reopened, settled, skipped, reset, summary). */
 export const stepEvent = (step: string, event: string): Check => ({ name: `step ${step} ${event} this turn`, pass: (t) => Boolean(t.trace?.steps.some((s) => s.step === step && s.event === event)) });
 /** A call to `tool` this turn whose arguments match (strings exactly, regexes by test) and, optionally, whose result matches. */
 export const toolCall = (tool: string, want: { args?: Record<string, string | RegExp>; result?: RegExp } = {}): Check => ({

@@ -26,6 +26,8 @@ export const yesAtPicker = "Pick the part you'd like to change below, or tap Not
 export const yesIgnored = (label: string, still: string): string => `The ${label.toLowerCase()} step is still open — finish it below first; I'll ask before creating anything. ${still}`.trim();
 export const EDIT_LEAD = (label: string): string => `Edit ${label.toLowerCase()}:`;
 export const updatedLine = (label: string, fact?: string): string => `${label} updated${fact ? ` — ${fact.replace(/\.$/, "")}` : ""}.`;
+/** After a change reset the steps that depend on it: why they are asked again. */
+export const reaskedLine = (labels: readonly string[]): string => `${labels.join(" and ")} depend${labels.length === 1 ? "s" : ""} on that, so ${labels.length === 1 ? "it needs" : "they need"} another answer.`;
 
 /** The picker: one chip per offered section, plus "Something else" and "Nothing to change". */
 export function sectionPickerBlock(offered: readonly SectionDef[], opts: { other?: boolean } = {}): ChipsBlock {

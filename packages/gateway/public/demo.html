@@ -313,7 +313,7 @@
       var TRACE_EMPTY = "One entry per turn: who answered (the runtime or the model), the route and each step's state, every tool call with its arguments and result, the model's timing.";
       var trBody = $("trbody"), trState = $("trstate"), turnCount = 0, seenTurns = {}, lastDomain = null, noteShown = false;
       function clearTrace() { trBody.textContent = ""; trBody.appendChild(el("div", "empty", TRACE_EMPTY)); trState.textContent = ""; turnCount = 0; seenTurns = {}; lastDomain = null; noteShown = false; }
-      var STEP_WORDS = { drawn: "asked", late_draw: "asked (under the model's reply)", redrawn: "redrawn", reopened: "reopened", settled: "settled", skipped: "skipped", summary: "summary shown" };
+      var STEP_WORDS = { drawn: "asked", late_draw: "asked (under the model's reply)", redrawn: "redrawn", reopened: "reopened", settled: "settled", skipped: "skipped", reset: "reset (an edit changed what it depends on)", summary: "summary shown" };
       var ROUTE_WORDS = { sticky: "mid-journey, or the pick was not confident", single: "the only domain installed", fallback: "no decision — the first domain" };
       // arguments and results are the tool's text: shown as text, never as markup; JSON is indented
       function pretty(v) {

@@ -31,7 +31,9 @@ ask, a computed verdict):
 - `settle(ctx, read, via)` — write `slots`, say one line, give the model a fact.
 - `owns` — the slot keys the carry rule restores into every validate/preview/create call.
 - `asksLike` — the model's own sentence that asks this question (cut from its reply).
-- `dependsOn` — steps whose change re-opens this one.
+- `dependsOn` — steps whose change re-opens this one. In the review, a changed answer resets the
+  steps that depend on it and the runtime asks the first of them again before the summary returns,
+  so the summary a user confirms never holds an answer the change made stale.
 - `optional`, `still`, `identityKey`.
 
 ## Rules that keep a step honest

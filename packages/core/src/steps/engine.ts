@@ -12,7 +12,8 @@
  *
  * Plus: the carry rule (settled values ride into every validate/preview/create call), the review
  * ("Change something" → a section picker → the step's own card re-opens pre-filled → the summary
- * returns), dependencies (a change of X re-asks Y), and the open-ask redraw for history replay.
+ * returns), dependencies (a change of X re-asks Y — BEFORE the summary returns, so the card the user
+ * confirms never carries an answer the change made stale), and the open-ask redraw for history replay.
  *
  * Every event is a behaviour() counter + a trace line — a step is not done until it is visible.
  */
@@ -28,7 +29,7 @@ import { rowsFromSlots } from "../ui-blocks.js";
 import { isPlainSkip, isPlainYes } from "../reply-words.js";
 import { readChoice } from "../readers.js";
 import type { Session } from "../session.js";
-import { readEdit, sectionPickerBlock, sectionPickerLead, sectionPickerStill, NOTHING_VALUE, OTHER_VALUE, EDIT_LEAD, yesAtPicker, yesIgnored, updatedLine } from "../sections.js";
+import { readEdit, sectionPickerBlock, sectionPickerLead, sectionPickerStill, NOTHING_VALUE, OTHER_VALUE, EDIT_LEAD, reaskedLine, yesAtPicker, yesIgnored, updatedLine } from "../sections.js";
 import type { RuntimeTurn, StepContext, StepDefinition, StepDraw, StepRead, StepVia } from "./types.js";
 
 // ---------------------------------------------------------------------------
@@ -234,14 +235,14 @@ export function summaryDue(domain: DomainManifest, session: Session): boolean {
 // The chain: settle → next owed → … → summary
 // ---------------------------------------------------------------------------
 
-async function chainAfter(domain: DomainManifest, session: Session, say: string[], ui: UiBlock[], kind: string, event: string): Promise<RuntimeTurn> {
+async function chainAfter(domain: DomainManifest, session: Session, say: string[], ui: UiBlock[], kind: string, event: string, summaryVia: StepVia = "moment"): Promise<RuntimeTurn> {
   const next = nextOwed(domain, session);
   if (next) {
     const { turn } = await drawStep(domain, session, next, "moment");
     return { reply: [...say, turn.reply].filter(Boolean).join(" "), ui: [...ui, ...turn.ui], kind, event };
   }
   if (summaryDue(domain, session)) {
-    const s = drawSummary(domain, session, "moment");
+    const s = drawSummary(domain, session, summaryVia);
     return { reply: [...say, s.reply].filter(Boolean).join(" "), ui: [...ui, ...s.ui], kind, event };
   }
   return { reply: say.join(" "), ui, kind, event };
@@ -262,6 +263,9 @@ export function resetDependents(domain: DomainManifest, session: Session, change
       if (s.dependsOn?.includes(key) && draft.steps?.[s.key] && !reset.includes(s.key)) {
         delete draft.steps[s.key];
         reset.push(s.key);
+        behaviour("step", { domain: domain.name, step: s.key, type: "reset", via: "edit" });
+        log.trace("step", { session: session.id, turn: session.turn, step: s.key, event: "reset", via: "edit", because: changedKey });
+        traceStep(session, s.key, "reset", "edit");
         walk(s.key);
       }
     }
@@ -271,7 +275,7 @@ export function resetDependents(domain: DomainManifest, session: Session, change
   return reset;
 }
 
-async function applySettle(domain: DomainManifest, session: Session, step: StepDefinition, read: Extract<StepRead, { type: "settle" }>, via: StepVia, message: string): Promise<string> {
+async function applySettle(domain: DomainManifest, session: Session, step: StepDefinition, read: Extract<StepRead, { type: "settle" }>, via: StepVia, message: string): Promise<{ say: string; reset: string[] }> {
   const ctx = makeContext(domain, session, step.key);
   const settled = await withSpan(`runtime.step.settle ${step.key}`, { attrs: { "agent.step": step.key, "agent.step.via": via } }, () => step.settle(ctx, read, via));
   const draft = ctx.draft;
@@ -285,11 +289,12 @@ async function applySettle(domain: DomainManifest, session: Session, step: StepD
   behaviour("step", { domain: domain.name, step: step.key, type: "settled", via });
   log.trace("step", { session: session.id, turn: session.turn, step: step.key, event: "settled", via, keys: Object.keys(settled.slots ?? read.values) });
   traceStep(session, step.key, "settled", via);
+  let reset: string[] = [];
   if (via === "edit") {
     const changed = Object.keys(settled.slots ?? read.values).filter((k) => prev?.before?.[k] !== (settled.slots ?? read.values)[k]);
-    if (changed.length) resetDependents(domain, session, step.key);
+    if (changed.length) reset = resetDependents(domain, session, step.key);
   }
-  return settled.say;
+  return { say: settled.say, reset };
 }
 
 async function applySkip(domain: DomainManifest, session: Session, step: StepDefinition): Promise<string> {
@@ -366,11 +371,13 @@ export async function stepTurn(domain: DomainManifest, session: Session, message
     }
     const read = await withSpan(`runtime.step.read ${open.key}`, { attrs: { "agent.step": open.key } }, () => open.read(ctx, message));
     if (read.type === "settle") {
-      const say = await applySettle(domain, session, open, read, editing ? "edit" : "moment", message);
+      const { say, reset } = await applySettle(domain, session, open, read, editing ? "edit" : "moment", message);
       if (editing) {
         draft.edit = undefined;
-        const s = drawSummary(domain, session, "edit");
-        return { turn: { reply: `${updatedLine(open.label, say)} ${s.reply}`, ui: s.ui, kind: "edit", event: "settled" } };
+        // A changed answer may have reset the steps that depend on it: the chain asks the first of them
+        // again, and the summary returns only after the last is answered — never over a stale answer.
+        const labels = stepsFor(domain, session).filter((s) => reset.includes(s.key)).map((s) => s.label);
+        return { turn: await chainAfter(domain, session, [updatedLine(open.label, say), ...(labels.length ? [reaskedLine(labels)] : [])], [], "edit", "settled", "edit") };
       }
       return { turn: await chainAfter(domain, session, [say], [], open.key, "settled") };
     }

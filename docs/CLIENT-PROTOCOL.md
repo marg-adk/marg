@@ -69,7 +69,8 @@ labels (counts and enums); the dev trace is a client payload, never a span attri
   steps: [                                    // the step engine's events this turn, in order
     { step: "details", event: "settled", via: "answer" }
   ],                                          // event: drawn | late_draw | redrawn | reopened | settled
-                                              //        | skipped | summary (the confirmation card, step "confirm")
+                                              //        | skipped | reset (an edit changed what it depends on)
+                                              //        | summary (the confirmation card, step "confirm")
   tools: [                                    // every tool call, in order
     { name: "search_customers", args: {query: "Northwind"}, result: "[{…}]", ms: 41,
       ok: true, carried?: ["customer_id"], refused?: "confirm_gate", runtime?: true }
