@@ -63,7 +63,8 @@ labels (counts and enums); the dev trace is a client payload, never a span attri
     by: "keywords",                           // the deciding link: keywords | systemone | llm, or
                                               // sticky (mid-journey, finished, or a low-confidence pick
                                               // kept the active domain), single (one domain installed),
-                                              // fallback (nothing decided; the first domain)
+                                              // fallback (nothing decided; the first domain — the chat
+                                              // is not locked there, the next turn is classified)
     confidence?: 0.9                          // the router's typed decision, when one was made
   },
   steps: [                                    // the step engine's events this turn, in order
