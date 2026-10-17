@@ -28,7 +28,7 @@ only against a gateway whose health says writes are off.
 
 ## Combinators
 `noError`, `replyMatches`, `replyNotMatches`, `replyOrUiMatches`, `hasUi(type, tags)`,
-`formRow(key, { value, error })`, `noUi`, `toolCalled`, `toolCalledThisTurn`, `neverTool`, `neverToolThisTurn`,
+`formRow(key, { value, error })`, `cardRow(key, { value })`, `noUi`, `toolCalled`, `toolCalledThisTurn`, `neverTool`, `neverToolThisTurn`,
 `runtimeTurn(kind)`, `modelTurn`, `draftHas(slot, re)`, `draftState`, `stepStatus`,
 `completed`, `notCompleted`, `reloadRedraws(type)`, `oneQuestion`, `noLeak(re)`.
 A refused write shows in the trace as `create_x (refused)` — assert on it explicitly.

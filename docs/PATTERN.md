@@ -66,8 +66,8 @@ moments that cost when wrong are the runtime's:
 - **Anything fetched from a record is SHOWN and CONFIRMED**, never asked. Any choice from
   reference data with two or more options is chips or a list, never prose.
 - **The review.** "Change something" is a runtime section picker over the steps that settled;
-  the picked step's own card re-opens pre-filled; dependencies re-ask what the change invalidates;
-  the summary returns in code. Edits after the create write through (GET → merge → PUT on a
+  the picked step's own card re-opens pre-filled; dependencies re-ask what the change invalidates,
+  before the summary returns in code. Edits after the create write through (GET → merge → PUT on a
   whole-document backend) behind their own confirm gate.
 - **Reload redraws the open ask.** The transcript endpoint draws the open step's block again on
   the last assistant entry, so a refreshed page shows what the user must answer.

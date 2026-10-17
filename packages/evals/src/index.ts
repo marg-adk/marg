@@ -99,6 +99,11 @@ export const formRow = (key: string, want: { value?: RegExp; error?: RegExp }): 
       (b) => b?.type === "form" && (Array.isArray(b.rows) ? b.rows : []).some((r: any) => r?.key === key && (!want.value || want.value.test(String(r.value ?? ""))) && (!want.error || want.error.test(String(r.error ?? "")))),
     ),
 });
+/** A card block on this turn (the summary) has the field `key` and its value matches — what the user is asked to confirm. */
+export const cardRow = (key: string, want: { value: RegExp }): Check => ({
+  name: `card row ${key} value ~ ${want.value}`,
+  pass: (t) => (t.ui ?? []).some((b) => b?.type === "card" && (Array.isArray(b.fields) ? b.fields : []).some((r: any) => r?.key === key && want.value.test(String(r.value ?? "")))),
+});
 export const noUi = (type: string): Check => ({ name: `ui has no ${type}`, pass: (t) => !(t.ui ?? []).some((b) => b?.type === type) });
 export const toolCalled = (name: string): Check => ({ name: `tool ${name} called (so far)`, pass: (_t, all) => all.some((x) => x.tool_trace?.some((tr) => tr.tool === name)) });
 export const toolCalledThisTurn = (name: string): Check => ({ name: `tool ${name} called this turn`, pass: (t) => t.tool_trace?.some((tr) => tr.tool === name) });

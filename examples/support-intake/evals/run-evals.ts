@@ -13,7 +13,7 @@
  */
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cooperativeUser, draftHas, draftState, formRow, hasUi, neverTool, noError, noLeak, noUi, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
+import { cardRow, cooperativeUser, draftHas, draftState, formRow, hasUi, neverTool, noError, noLeak, noUi, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
 
 const scenarios: Scenario[] = [
   {
@@ -74,6 +74,39 @@ const scenarios: Scenario[] = [
       { send: tap("Urgent"), checks: [noError, runtimeTurn("edit"), replyMatches(/Priority updated/i), hasUi("card"), draftHas("priority", /^urgent$/)] },
       { send: tap("Change something"), checks: [noError, hasUi("chips", { step: "edit" })] },
       { send: tap("Nothing to change"), checks: [noError, replyMatches(/Nothing changed/i), hasUi("card")] },
+    ],
+  },
+  {
+    id: "review-edit-reasks-dependent",
+    goal: "Change something → Details re-opens → a changed answer resets Priority → Priority is asked again BEFORE the summary returns (a typed yes beside it is no go-ahead) → the summary shows the new answer, and that is what is written",
+    creates: true,
+    turns: [
+      { send: "ticket for Contoso: invoice export broken", checks: [noError, draftHas("customer_name", /Contoso/)] },
+      { send: "Billing", checks: [noError, hasUi("form", { step: "details" })] },
+      { send: submitForm({ environment: "production", affected_users: "12", steps_to_reproduce: "Open Billing, export March, the file is empty" }), checks: [noError, hasUi("chips", { step: "priority" })] },
+      { send: tap("High"), checks: [noError, runtimeTurn("priority"), hasUi("card"), cardRow("priority", { value: /^high$/ })] },
+      { send: tap("Change something"), checks: [noError, hasUi("chips", { step: "edit" })] },
+      { send: tap("Details"), checks: [noError, runtimeTurn("edit"), hasUi("form", { step: "details" }), formRow("environment", { value: /^production$/ })] },
+      // The change resets Priority (it dependsOn Details): the runtime asks it again — no summary yet.
+      { send: submitForm({ environment: "staging" }), checks: [noError, runtimeTurn("edit"), replyMatches(/Details updated/i), stepStatus("details", "settled"), draftHas("environment", /staging/), stepStatus("priority", "asked"), hasUi("chips", { step: "priority" }), noUi("card"), reloadRedraws("chips")] },
+      // A typed yes beside the open ask is not a go-ahead: the write tool is never reached.
+      { send: "yes, create it", checks: [noError, neverTool("create_ticket"), stepStatus("priority", "asked"), hasUi("chips", { step: "priority" }), noUi("card"), replyMatches(/still open|finish it below/i)] },
+      { send: tap("Low"), checks: [noError, runtimeTurn("priority"), stepStatus("priority", "settled"), draftHas("priority", /^low$/), hasUi("card"), cardRow("priority", { value: /^low$/ }), cardRow("environment", { value: /^staging$/ }), replyMatches(/Confirm to create|check it/i)] },
+      { send: tap("Confirm & create ticket"), checks: [noError, toolCalledThisTurn("create_ticket"), notCompleted, replyMatches(/writes are disabled/i)] },
+    ],
+    finalChecks: [draftHas("priority", /^low$/), draftHas("environment", /staging/), neverTool("create_ticket (refused)")],
+  },
+  {
+    id: "review-edit-unchanged",
+    goal: "Change something → Details re-opens → submitted as it was → nothing changed, so Priority is not asked again and the summary returns at once",
+    turns: [
+      { send: "ticket for Contoso: invoice export broken", checks: [noError] },
+      { send: "Billing", checks: [noError, hasUi("form", { step: "details" })] },
+      { send: submitForm({ environment: "production", affected_users: "12", steps_to_reproduce: "Open Billing, export March, the file is empty" }), checks: [noError, hasUi("chips", { step: "priority" })] },
+      { send: tap("High"), checks: [noError, hasUi("card")] },
+      { send: tap("Change something"), checks: [noError, hasUi("chips", { step: "edit" })] },
+      { send: tap("Details"), checks: [noError, hasUi("form", { step: "details" })] },
+      { send: submitForm(), checks: [noError, runtimeTurn("edit"), replyMatches(/Details updated/i), stepStatus("priority", "settled"), noUi("chips"), hasUi("card"), cardRow("priority", { value: /^high$/ })] },
     ],
   },
   {
