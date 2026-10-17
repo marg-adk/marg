@@ -62,11 +62,37 @@ function packageDir(name) {
   }
 }
 
+function parsePort(cmd, val) {
+  if (typeof val === "boolean") {
+    console.error(`marg ${cmd}: --port must be a whole number from 1 to 65535\n`);
+    console.log(HELP);
+    return null;
+  }
+  const n = Number(val);
+  if (!Number.isInteger(n) || n < 1 || n > 65535) {
+    console.error(`marg ${cmd}: --port must be a whole number from 1 to 65535\n`);
+    console.log(HELP);
+    return null;
+  }
+  return n;
+}
+
 // ---- marg web -------------------------------------------------------------------------
 async function web(flags) {
-  if (flags.port) process.env.GATEWAY_PORT = String(flags.port);
-  if (flags.writes === "off") process.env.AGENT_ALLOW_WRITES = "false";
-  if (flags.writes === "on") process.env.AGENT_ALLOW_WRITES = "true";
+  if (flags.port !== undefined) {
+    const port = parsePort("web", flags.port);
+    if (port === null) return 2;
+    process.env.GATEWAY_PORT = String(port);
+  }
+  if (flags.writes !== undefined) {
+    if (flags.writes !== "on" && flags.writes !== "off") {
+      console.error('marg web: --writes must be "on" or "off"\n');
+      console.log(HELP);
+      return 2;
+    }
+    if (flags.writes === "off") process.env.AGENT_ALLOW_WRITES = "false";
+    if (flags.writes === "on") process.env.AGENT_ALLOW_WRITES = "true";
+  }
   const gw = packageDir("@marg-adk/gateway");
   if (!gw) throw new Error("@marg-adk/gateway is not installed — npm install @marg-adk/gateway");
   // domains are TypeScript (steps/index.ts, mock/policy.ts) imported at boot: the tsx loader first
@@ -206,7 +232,13 @@ async function answering(url) {
 }
 
 async function check(flags) {
-  const port = flags.port ? Number(flags.port) : await freePort();
+  let port;
+  if (flags.port !== undefined) {
+    port = parsePort("check", flags.port);
+    if (port === null) return 2;
+  } else {
+    port = await freePort();
+  }
   if (await answering(`http://localhost:${port}/api/health`)) throw new Error(`something already answers on :${port} — the gate must run against its own gateway (pick another --port)`);
   if (existsSync("tsconfig.json")) {
     console.log("▶ typecheck");
