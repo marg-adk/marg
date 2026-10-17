@@ -60,6 +60,12 @@ message, the reply, the system prompt and tool results), `full` (local debugging
 Private user text (notes) must never sit in a label or a step event; search the telemetry for
 a sentinel after building a private path.
 
+The playground's trace pane is a different thing: with `AGENT_DEV_TRACE=true` the gateway hands a
+turn's route, step events, tool arguments and results and model timings to the CLIENT (the `trace`
+on the `done` event, `turns` on `/history`; docs/CLIENT-PROTOCOL.md). That payload is content for the
+developer's own browser, so it is never a span attribute, a metric label or a behaviour event, and it
+is off wherever the gateway is not the dev UI.
+
 ## Setup
 
 ```bash
