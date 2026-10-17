@@ -180,6 +180,14 @@ matches, the route decision and its confidence on the first turn, the Details st
 redrawn → settled, and a reload shows the same panes; `npm test` (the widget under the fake DOM)
 and the example suite stay green.
 
+**Done** (unreleased, 0.4): the gateway, the protocol and the eval checks in
+[#45](https://github.com/marg-adk/marg/pull/45), the playground and the widget in
+[#46](https://github.com/marg-adk/marg/pull/46). The acceptance test is the support-intake
+`dev-trace` scenario (the journey plus one redraw: the route and its confidence, `search_customers`
+with its query and both matches, Details asked → redrawn → settled, the create refused, the same facts
+after a reload) and the widget's `onTurn` / `onHistory` tests. Shape: `docs/CLIENT-PROTOCOL.md`,
+"The dev trace".
+
 ### 2. A model-played user
 
 `UserSim` admits one; none ships. `modelUser({ persona, goal, model })` asks the configured
