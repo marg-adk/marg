@@ -67,7 +67,7 @@ export class World {
   chat: string[] = [];
   /** The chat request bodies (message, display, session_id). */
   turns: Json[] = [];
-  /** What the next chat turn answers: reply text, ui blocks, usage — and, on the streaming endpoint, an optional `preview` payload and `completion`. */
+  /** What the next chat turn answers: reply text, ui blocks, usage — and, on the streaming endpoint, an optional `preview` payload, `completion` and dev `trace`. */
   chatReply: Json = { reply: "ok", ui: [], usage: null };
   handlers: Handler[] = [];
   blobs = { created: [] as string[], revoked: [] as string[] };
@@ -122,7 +122,7 @@ export class World {
       const frames: { event: string; data: unknown }[] = [];
       if (r.reply) frames.push({ event: "delta", data: { text: r.reply } });
       if (r.preview) frames.push({ event: "preview", data: r.preview });
-      frames.push({ event: "done", data: { reply: r.reply ?? "", ui: r.ui ?? [], usage: r.usage ?? null, ...(r.completion ? { completion: r.completion } : {}), ...(r.domain ? { domain: r.domain } : {}), ...(r.kind ? { kind: r.kind } : {}), ...(r.tool_trace ? { tool_trace: r.tool_trace } : {}) } });
+      frames.push({ event: "done", data: { reply: r.reply ?? "", ui: r.ui ?? [], usage: r.usage ?? null, ...(r.completion ? { completion: r.completion } : {}), ...(r.domain ? { domain: r.domain } : {}), ...(r.kind ? { kind: r.kind } : {}), ...(r.tool_trace ? { tool_trace: r.tool_trace } : {}), ...(r.trace ? { trace: r.trace } : {}) } });
       return { sse: frames };
     }
     return { status: 404, body: { error: `no route ${req.method} ${req.path}` } };
