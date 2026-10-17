@@ -184,6 +184,71 @@ test("onTurn: the host receives the finished turn's facts on both transports; he
   }
 });
 
+const devTrace: Json = {
+  turn: 1,
+  route: { domain: "support-intake", by: "keywords", confidence: 0.53 },
+  steps: [{ step: "details", event: "late_draw", via: "late" }],
+  tools: [{ name: "search_customers", args: { query: "Northwind" }, result: '{"customers":[{"name":"Northwind Traders"},{"name":"Northwind Health"}]}', ms: 3, ok: true }],
+  llm: [{ round: 0, endpoint: "mock", model: "mock", ms: 5, input: 100, output: 7, finish: "tool_calls" }],
+};
+
+test("onTurn carries the gateway's dev trace on both transports, and null when the gateway sends none", async () => {
+  for (const stream of [true, false]) {
+    const turns: Json[] = [];
+    const world = await makeWorld({ stream, init: { header: false, onTurn: (t: Json) => turns.push(t) } });
+    world.chatReply = { reply: "Which one?", ui: [], usage: null, domain: "support-intake", trace: devTrace };
+    world.w._send("ticket for Northwind");
+    await world.settle(8);
+    world.chatReply = { reply: "Noted.", ui: [], usage: null, domain: "support-intake" };
+    world.w._send("thanks");
+    await world.settle(8);
+    assert.equal(turns.length, 2, `stream=${stream}`);
+    const t = JSON.parse(JSON.stringify(turns[0].trace));
+    assert.deepEqual(t.route, { domain: "support-intake", by: "keywords", confidence: 0.53 }, `stream=${stream}`);
+    assert.deepEqual(t.steps, [{ step: "details", event: "late_draw", via: "late" }]);
+    assert.equal(t.tools[0].name, "search_customers");
+    assert.deepEqual(t.tools[0].args, { query: "Northwind" });
+    assert.match(t.tools[0].result, /Northwind Traders.*Northwind Health/);
+    assert.equal(t.llm[0].finish, "tool_calls");
+    assert.equal(turns[0].reply, "Which one?", "the existing fields keep their place");
+    assert.equal(turns[1].trace, null, "no dev trace from the gateway: null, never undefined");
+  }
+});
+
+test("onHistory: a resumed or opened chat hands the host the whole history response, before the replay; a host that throws breaks nothing", async () => {
+  const seen: Json[] = [];
+  const world = await makeWorld({ session: false, store: { "marg:sid:http://gw.test": "sess-9" }, init: { onHistory: (j: Json) => seen.push(j) } });
+  await world.settle();
+  const history: Json = {
+    entries: [{ role: "user", text: "ticket for Northwind" }, { role: "assistant", text: "Which one?", ui: [chips] }],
+    completed: false,
+    nudge: { enabled: false },
+    usage: null,
+    preview: { state: "gathering", slots: { customer_name: "Northwind Traders" }, missing: ["category"] },
+    turns: [{ turn: 1, user: "ticket for Northwind", ms: 40, domain: "support-intake", tool_trace: [], trace: devTrace }],
+  };
+  world.history = history;
+  world.w.openSession("sess-2");
+  await world.settle();
+  const got = seen.at(-1)!;
+  assert.equal(got.preview.slots.customer_name, "Northwind Traders", "the draft the host rebuilds its pane from");
+  assert.equal(got.turns[0].trace.route.by, "keywords", "the per-turn facts the host rebuilds its trace pane from");
+  assert.ok(world.texts(".msg.user").includes("ticket for Northwind"), "and the transcript still replays");
+
+  // a completed chat is handed over too (its final draft and its trace are what the host shows)
+  world.history = { ...history, completed: true, completion: { entity_id: "TCK-1", label: "TCK-1" }, preview: { state: "created", slots: {}, missing: [] } };
+  world.w.openSession("sess-3");
+  await world.settle();
+  assert.equal(seen.at(-1)!.completion.entity_id, "TCK-1");
+
+  // a host hook that throws does not stop the replay
+  const bad = await makeWorld({ session: false, store: { "marg:sid:http://gw.test": "sess-9" }, init: { onHistory: () => { throw new Error("host bug"); } } });
+  bad.history = history;
+  bad.w.openSession("sess-4");
+  await bad.settle();
+  assert.ok(bad.texts(".msg.user").includes("ticket for Northwind"));
+});
+
 test("form: a date row is a native date input and its value travels as YYYY-MM-DD", async () => {
   const world = await makeWorld();
   world.draw({ type: "form", title: "Booking details", submit: "Done", rows: [{ key: "date", label: "Date", kind: "date", required: true }, { key: "party_size", label: "Party size", kind: "num", required: true }] });

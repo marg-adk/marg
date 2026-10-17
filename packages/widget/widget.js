@@ -357,7 +357,15 @@
    *                                 host page that has its own chrome (the playground)
    * @param {Function} [opts.onTurn]  called after every completed turn with
    *                                 {user, display, ms, domain, kind, tool_trace, usage,
-   *                                 completion, reply, ui} — what a host's trace pane shows
+   *                                 completion, reply, ui, trace} — what a host's trace pane
+   *                                 shows; `trace` is the gateway's dev trace (route, step
+   *                                 events, tool arguments and results, model calls) and is
+   *                                 null unless the gateway runs with AGENT_DEV_TRACE=true
+   * @param {Function} [opts.onHistory] called with the whole GET /history response when a chat
+   *                                 is resumed or opened ({entries, preview, completion,
+   *                                 completed, turns…}) — a host rebuilds its panes (the live
+   *                                 draft from `preview`, the trace from `turns`) from the
+   *                                 request the widget already made
    */
   function Widget(opts) {
     this.gateway = (opts.gateway || SCRIPT_ORIGIN || "").replace(/\/+$/, "");
@@ -375,6 +383,7 @@
     this.starters = opts.starters || [];
     this.header = opts.header !== false; // the panel's own title bar; a host page with its own chrome turns it off
     this.onTurn = opts.onTurn || null; // host trace hook: the finished turn's facts (#trace)
+    this.onHistory = opts.onHistory || null; // host hook: the resumed chat's whole history response (#trace)
     // URL schemes a `link` block may open besides http(s) (your app's own scheme). The gateway filters too.
     this.linkSchemes = opts.linkSchemes || [];
     this.sessionId = null;
@@ -839,6 +848,8 @@
   Widget.prototype._replayHistory = function (j) {
     var self = this;
     var entries = (j && j.entries) || [];
+    // The host's panes (the playground's draft and trace) rebuild from the same response. A throwing host never breaks the replay.
+    if (this.onHistory && j) { try { this.onHistory(j); } catch (e) {} }
     // Nothing said yet — greet as fresh, but photos may still have been
     // attached before the first message, so restore the strip either way (#15).
     if (!entries.length) { this._fresh(); this._loadMedia(); return; }
@@ -1846,12 +1857,13 @@
   /**
    * The finished turn's facts for the host (#trace): the user's text, the elapsed time, which
    * domain answered, whether the runtime or the model did (kind), every tool call with its
-   * time, usage and the completion. The host's errors never break the chat.
+   * time, usage, the completion and the gateway's dev trace (null when it does not send one).
+   * The host's errors never break the chat.
    */
   Widget.prototype._turnDone = function (ctx, data) {
     if (!this.onTurn || !data) return;
     try {
-      this.onTurn({ user: ctx.text, display: ctx.display || null, ms: Date.now() - (ctx.t0 || Date.now()), domain: data.domain || null, kind: data.kind || null, tool_trace: data.tool_trace || [], usage: data.usage || null, completion: data.completion || null, reply: data.reply || "", ui: data.ui || [] });
+      this.onTurn({ user: ctx.text, display: ctx.display || null, ms: Date.now() - (ctx.t0 || Date.now()), domain: data.domain || null, kind: data.kind || null, tool_trace: data.tool_trace || [], usage: data.usage || null, completion: data.completion || null, reply: data.reply || "", ui: data.ui || [], trace: data.trace || null });
     } catch (e) {}
   };
 
