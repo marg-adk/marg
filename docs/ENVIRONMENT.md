@@ -28,6 +28,7 @@ literal string `"true"`; stores fall back with a warning rather than failing boo
 |---|---|---|
 | `AGENT_ALLOW_WRITES` | unset (off) | Real writes only when literally `true`. |
 | `AGENT_REQUIRE_LOGIN` | on | `false` only for dev/evals/probe. |
+| `AGENT_DEV_TRACE` | unset (off) | The dev UI's trace content: only when literally `true`, a turn's route decision, step events, tool arguments and results and model timings go to the client (`trace` on `done`, `turns` on `/history`; [client protocol](CLIENT-PROTOCOL.md#the-dev-trace)) and the last 30 turns are kept on the session. Never on telemetry. `.env.example` sets it; production leaves it off. |
 | `AGENT_AUTH_VERIFY_URL` | — | Strict identity verification endpoint (GET with the bearer). |
 | `AGENT_TOKEN_SECRET`, `AGENT_TOKEN_TTL_S` (900), `AGENT_APP_KEYS` (`key:tenant,…`) | — | The agent-token exchange. |
 | `AGENT_ENTITLEMENT_URL`, `AGENT_ENTITLEMENT_KEY` | — | Seats and caps at exchange. |
