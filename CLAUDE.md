@@ -46,7 +46,8 @@ Classify every red before fixing it: check brittleness, model flake, pre-existin
   its payload at build). Projects from create-marg-app use it; the repository keeps its npm scripts.
 - Publishing: `scripts/build.ts` (dist per package, in dependency order), `packages/create-marg-app`
   (its `payload/` is synced from templates, the example, shared skills at build), `check:pack`,
-  `check:create`, `.github/workflows/release.yml` (tag `v*` → npm, needs `NPM_TOKEN`). Development
+  `check:create`, `.github/workflows/release.yml` (tag `v*` → npm by trusted publishing: OIDC,
+  provenance, no token or secret anywhere; `RELEASING.md`). Development
   never needs the build: tsx runs the sources through `tsconfig.json` paths.
 
 ## Current focus
