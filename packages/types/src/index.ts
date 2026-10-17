@@ -347,7 +347,7 @@ export interface TurnRoute {
 /** The step engine's event: a step drawn, redrawn, settled… (`summary` is the confirmation card, step `confirm`). */
 export interface TurnStep {
   step: string;
-  event: "drawn" | "late_draw" | "redrawn" | "reopened" | "settled" | "skipped" | "summary";
+  event: "drawn" | "late_draw" | "redrawn" | "reopened" | "settled" | "skipped" | "reset" | "summary";
   via?: string;
 }
 

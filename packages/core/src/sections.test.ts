@@ -1,7 +1,7 @@
 /** sections.test.ts — the review's section picker and its reader, pinned. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { NOTHING_VALUE, OTHER_VALUE, readEdit, sectionPickerBlock, sectionValue } from "./sections.js";
+import { NOTHING_VALUE, OTHER_VALUE, readEdit, reaskedLine, sectionPickerBlock, sectionValue } from "./sections.js";
 
 const sections = [
   { key: "details", label: "Details" },
@@ -28,4 +28,10 @@ test("readEdit reads a pick by its whole content", () => {
   assert.deepEqual(readEdit("change the priority to urgent", sections), { type: "words" }, "a value rides along: the model applies it");
   assert.deepEqual(readEdit("change priority and details", sections), { type: "words" }, "two sections");
   assert.deepEqual(readEdit("is the priority right?", sections), { type: "words" });
+});
+
+test("a change that reset dependent steps says why they are asked again", () => {
+  assert.equal(reaskedLine(["Priority"]), "Priority depends on that, so it needs another answer.");
+  assert.equal(reaskedLine(["Priority", "Time"]), "Priority and Time depend on that, so they need another answer.");
+  assert.ok(!reaskedLine(["Priority"]).includes("?"), "one question per turn: the line asks nothing");
 });
