@@ -26,7 +26,9 @@ domains/<name>/
 **Within a domain, compose skills; across domains, delegate through the super agent** (ADR-0001).
 The super agent is a router, not a doer: it picks ONE domain per turn and delegates to that
 domain's agent, which runs in its own context (its skills + its tools only). Sticky: it stays in
-the current domain until intent clearly shifts; a mid-journey or finished chat never re-routes.
+the current domain until intent clearly shifts; a chat whose domain a link decided, a mid-journey
+or a finished chat never re-routes (one that only fell back to the first domain is classified
+again until one of those holds).
 With a single domain the router costs nothing. A misroute degrades to a clarifying question,
 never a wrong write.
 

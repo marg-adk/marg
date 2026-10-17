@@ -35,6 +35,8 @@ export interface Session {
   usage: TokenUsage & { calls: number; turns: number; cost_usd?: number };
   /** Domain that handled the previous turn — the router prefers to stay here. */
   activeDomain?: string;
+  /** A routing link (a rule, a decision model, the LLM) picked `activeDomain` — as against the fallback to the first domain on a message nothing claimed. A decided domain keeps the chat (ADR-0001). */
+  domainDecided?: boolean;
   /** Entity type in play (typed prompts). */
   activeType?: string;
   /** This user's bearer token, passed through to MCP tool calls. Never persisted. */

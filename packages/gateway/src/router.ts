@@ -3,8 +3,10 @@
  *
  * Each turn it picks ONE domain and delegates to that domain's agent, which runs in its own
  * context (its skills + its tools only). It owns no tools itself. Routing is sticky: it stays in
- * the current domain until intent clearly shifts. With a single installed domain the classifier
- * is skipped entirely (zero cost); a finished chat's turns never re-route.
+ * the current domain until intent clearly shifts, and a chat is held there for good once a link
+ * decided its domain, its journey has begun or it finished (route-lock.ts) — a chat that only
+ * fell back to the first domain on a message nothing claimed is classified again. With a single
+ * installed domain the classifier is skipped entirely (zero cost).
  *
  * The classification is a TYPED DECISION (Verdict): a `choice` over the domain cards, answered by
  * the cascade — manifest keywords as rules first, a decision model (Laya) when configured, the
@@ -18,6 +20,7 @@ import type { DomainManifest, TurnRoute } from "@marg-adk/types";
 import { chatComplete, counter, getSession, log, recordUsage, withSpan, type ChatMessage } from "@marg-adk/core";
 import { deciderFromEnv, regexChoice, rulesBackend, type CompleteFn, type Decider, type TokenLogprobs } from "@marg-adk/verdict";
 import { discoverDomains } from "./domains.js";
+import { holdsTheChat, journeyStarted, wasDecided } from "./route-lock.js";
 
 const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -99,14 +102,20 @@ export async function routeTurn(sessionId: string, userMessage: string): Promise
   if (domains.length === 1) {
     target = domains[0];
     route = { domain: target.name, by: "single" };
-  } else if ((session.completion || session.preview?.steps) && session.activeDomain && domains.some((d) => d.name === session.activeDomain)) {
-    target = domains.find((d) => d.name === session.activeDomain)!; // mid-journey or finished: never re-classify
+  } else if (session.activeDomain && domains.some((d) => d.name === session.activeDomain) && holdsTheChat(session)) {
+    target = domains.find((d) => d.name === session.activeDomain)!; // decided, mid-journey or finished: never re-classify
     route = { domain: target.name, by: "sticky" };
   } else {
     const before = { ...session.usage };
     ({ domain: target, route } = await classify(userMessage, domains, session.activeDomain));
     void before;
     recordUsage(session, undefined);
+    if (wasDecided(route.by)) session.domainDecided = true;
+    // The chat moves off a domain it only fell into: that domain's empty draft is not the new one's.
+    if (session.activeDomain && target.name !== session.activeDomain && !journeyStarted(session.preview)) {
+      session.preview = undefined;
+      session.activeType = undefined;
+    }
   }
   return { session, target, route };
 }

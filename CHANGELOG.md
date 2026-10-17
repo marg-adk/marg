@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **gateway**: a first message no domain claims no longer locks the chat to the first domain. The
+  router held a chat in its domain as soon as the session had a draft, and the step engine creates an
+  empty draft (`steps: {}`) on the first turn of every domain, so `hello there` (no keyword hit, the
+  first domain answered) kept every later message there, a ticket opener included. ADR-0001 says
+  sticky means *never re-route mid-journey or after completion*; now the chat is held when it finished,
+  when a link decided its domain (`session.domainDecided`), or when the journey has begun (something
+  gathered, a step with state, the summary or a review up: `route-lock.ts`). A chat that only fell back
+  is classified again, with the active domain's stickiness bias, and its empty draft is dropped when it
+  moves. **evals**: the bookings suite gains `greeting-then-opener` (red on `main`) and
+  `sticky-mid-journey` (the lock the fix keeps).
 - **gateway, core**: the dev trace. With `AGENT_DEV_TRACE=true` (default off; `.env.example` sets it,
   `render.yaml` and `.env.production.example` leave it off) every turn carries what the gateway already
   logged, as a client payload: the route decision (the domain, the link that decided — `keywords`,

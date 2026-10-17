@@ -92,6 +92,25 @@ const scenarios: Scenario[] = [
     turns: [{ send: "ticket for Northwind: login fails on mobile", checks: [noError, inDomain("support-intake"), toolCalled("search_customers"), hasTrace, routeIs({ domain: "support-intake", by: "keywords", confidence: true })] }],
   },
   {
+    id: "greeting-then-opener",
+    goal: "A first message no domain claims falls to the first domain without locking the chat: the next message that names a job is routed by its words (ADR-0001: sticky means mid-journey, not after the first turn)",
+    turns: [
+      { send: "hello there", checks: [noError, hasTrace, routeIs({ by: "fallback" })] },
+      { send: "ticket for Northwind: login fails on mobile", checks: [noError, inDomain("support-intake"), toolCalled("search_customers"), routeIs({ domain: "support-intake", by: "keywords", confidence: true })] },
+      // the move decided the domain: from here on the chat is held there
+      { send: tap("Northwind Traders"), checks: [noError, inDomain("support-intake"), routeIs({ domain: "support-intake", by: "sticky" }), draftHas("customer_name", /Northwind Traders/), hasUi("chips")] },
+    ],
+  },
+  {
+    id: "sticky-mid-journey",
+    goal: "Once a ticket is in progress, a message with the other domain's words stays in it — a journey is never re-routed (the lock the fix above must keep)",
+    turns: [
+      { send: "ticket for Contoso: invoice export broken", checks: [noError, inDomain("support-intake"), routeIs({ domain: "support-intake", by: "keywords" })] },
+      { send: tap("Billing"), checks: [noError, inDomain("support-intake"), draftHas("category", /billing/), hasUi("form", { step: "details" })] },
+      { send: "book a table at Luna Rooftop for 2", checks: [noError, inDomain("support-intake"), routeIs({ domain: "support-intake", by: "sticky" }), neverTool("search_venues"), hasUi("form", { step: "details" })] },
+    ],
+  },
+  {
     id: "simulated-user",
     goal: "A simulated guest books from one opener: picks the venue from the list, fills the card, asks about walk-ins beside it, picks a time, confirms",
     creates: true,

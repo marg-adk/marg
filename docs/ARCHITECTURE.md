@@ -40,7 +40,9 @@
    it (404 otherwise); a finished chat is 409 unless post-create edits are allowed; rate limits
    (per session, per IP, in-flight); usage caps (plan tokens → a 429 with the reset). All before
    any SSE header is written.
-2. **Route.** One domain, no re-classification mid-journey or after completion.
+2. **Route.** One domain, no re-classification once a link has decided it, mid-journey or after
+   completion. A chat that only fell back to the first domain (a message nothing claimed) is
+   classified again on the next turn.
 3. **Steps first.** If a runtime ask is open, the reply is read in code: settle (the draft is
    written, the next owed step or the summary is drawn in the same reply), skip, redraw, or
    words (the model answers with a runtime fact; the ask is drawn again under its answer). If
