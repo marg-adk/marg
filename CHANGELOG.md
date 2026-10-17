@@ -12,6 +12,16 @@
   kept on the session and `GET /api/session/:id/history` replays them as `turns`, so a reload can rebuild
   the Trace pane. `GET /api/health` reports `dev_trace`. Nothing new reaches telemetry: spans, metrics
   and behaviour events keep their counts and enums. Shape: `docs/CLIENT-PROTOCOL.md`, "The dev trace".
+- **playground**: the Trace pane draws the dev trace per turn: the route with its confidence, the step
+  events as a line (*asked*, *redrawn*, *settled*, *summary shown*), each tool call folded with its
+  arguments and result, the model's calls and timings; a gateway without the flag keeps the old view plus
+  a note saying why. A reload rebuilds both panes from the one `/history` response: the Draft pane from
+  `preview` (a finished chat came back empty before: the widget clears the preview when a chat completes)
+  and the Trace pane from `turns`. The usage pill read `input_tokens`/`plan_tokens` and never showed; it
+  reads `turn_tokens`/`turn_plan`, which the gateway sends. The phone layout is unchanged.
+- **widget**: `onTurn` gains `trace` (null when the gateway sends none) and a new `onHistory(history)` hook
+  hands a host the whole `/history` response when a chat is resumed or opened. Both are additive; the fake-DOM
+  tests cover them.
 - **evals**: `TurnResult` gains `trace` and `turns`; the checks `hasTrace`, `routeIs`, `stepEvent`,
   `toolCall` and `reloadKeepsTrace`. The support-intake `dev-trace` scenario walks the journey with them
   (the route and its confidence, `search_customers` with its query and the two matches, Details asked →
