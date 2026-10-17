@@ -29,7 +29,8 @@ monorepo. Frameworks are adopted through npm.
 - `packages/create-marg-app`: `npx create-marg-app my-agent` copies `templates/` and the example
   into a fresh project whose `package.json` depends on the published versions, then prints the
   next steps.
-- A release workflow: tag `v*` → CI → `npm publish --provenance` with an `NPM_TOKEN` secret.
+- A release workflow: tag `v*` → CI → `npm publish` by trusted publishing (OIDC, provenance
+  automatic, no secret; 0.2.0 went out with a token, 0.2.1 and later this way).
 
 Accept: `npm pack --dry-run` is clean for every package; in an empty folder
 `npx create-marg-app demo && cd demo && npm install && npm run gateway` opens the playground;
