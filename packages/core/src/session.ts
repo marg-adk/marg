@@ -14,7 +14,7 @@
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Completion, HistoryEntry, PreviewState } from "@marg-adk/types";
+import type { Completion, HistoryEntry, PreviewState, TurnRecord } from "@marg-adk/types";
 import { REPO_ROOT, envNum } from "./env.js";
 import { mongoSessions } from "./stores.js";
 import { log } from "./logger.js";
@@ -51,6 +51,8 @@ export interface Session {
   nudge?: { count: number; lastAt?: number };
   /** Turn counter (the trace lines' join key). */
   turn?: number;
+  /** The dev trace's finished turns (AGENT_DEV_TRACE only; the last 30) — GET /history replays them. */
+  turns?: TurnRecord[];
 }
 
 const sessions = new Map<string, Session>();

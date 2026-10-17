@@ -27,3 +27,10 @@ export const DEPLOY_ENV = process.env.AGENT_ENV ?? process.env.DEPLOYMENT_ENV ??
 
 /** Writes to real backends happen only when this is the literal "true". */
 export const WRITES_ALLOWED = process.env.AGENT_ALLOW_WRITES === "true";
+
+/**
+ * The dev UI's trace content (a turn's route, step events, tool arguments and results, model
+ * timings) goes to a client only when this is the literal "true". Read per call so a test can
+ * flip it; it never gates telemetry, which carries no content either way.
+ */
+export const devTraceOn = (): boolean => process.env.AGENT_DEV_TRACE === "true";

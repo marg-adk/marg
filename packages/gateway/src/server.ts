@@ -31,6 +31,7 @@ import {
   closeStores,
   createSession,
   deleteSession,
+  devTraceOn,
   ensureSession,
   envNum,
   flushLogs,
@@ -40,6 +41,7 @@ import {
   initSessions,
   initStores,
   isCompleted,
+  keepTurn,
   listCapabilities,
   loadLexiconsFromEnv,
   listSessions,
@@ -148,6 +150,7 @@ app.get("/api/health", (_req, res) => {
     degraded,
     brand: BRAND,
     writes: WRITES_ALLOWED,
+    dev_trace: devTraceOn(),
     llm,
     verdict: { ...verdictEnvSnapshot(), router: routerSnapshot() },
     auth: { require_login: securityConfig.requireLogin, verify_url_set: Boolean(securityConfig.verifyUrl), exchange: exchangeEnabled(), admin_key_set: Boolean(securityConfig.adminKey), gateway_keys: securityConfig.gatewayKeys.size },
@@ -219,7 +222,7 @@ app.get("/api/session/:id/history", async (req, res) => {
   if (!session) return;
   const domain = discoverDomains().find((d) => d.name === session.activeDomain) ?? discoverDomains()[0];
   const { entries, completion, preview } = sessionHistory(session, domain ? (s) => openAskUi(domain, s) : undefined);
-  res.json({ session_id: session.id, entries, completion, preview, completed: isCompleted(session), usage: { caps: await capStatuses(session) }, media: mediaState(session), nudge: nudgeClientConfig() });
+  res.json({ session_id: session.id, entries, completion, preview, completed: isCompleted(session), usage: { caps: await capStatuses(session) }, media: mediaState(session), nudge: nudgeClientConfig(), ...(devTraceOn() ? { turns: session.turns ?? [] } : {}) });
 });
 
 app.get("/api/session/:id/usage", async (req, res) => {
@@ -357,11 +360,12 @@ app.post("/api/chat", async (req, res) => {
   try {
     if (!(await allowTurn(session, res))) return;
     const before = { ...session.usage };
-    const { target } = await routeTurn(session.id, message);
-    const out = await runDomainAgent(target, session, message, { display, promptTail: mediaPromptNote });
+    const { target, route } = await routeTurn(session.id, message);
+    const out = await runDomainAgent(target, session, message, { display, promptTail: mediaPromptNote, route });
     const ms = Date.now() - t0;
     recordTurn({ domain: out.domain ?? "unknown", ms, tools: out.tool_trace.length, ok: true });
     out.usage = await meterTurn(session, before, { domain: out.domain ?? "unknown", ms, tool_calls: out.tool_trace.length, runtime: Boolean(out.kind) });
+    keepTurn(session, { user: message, display, ms, out });
     if (out.kind) await slot.refund();
     armNudge(session.id, true);
     if (session.completion) void flushPendingMedia(session);
@@ -393,11 +397,12 @@ async function streamTurn(req: express.Request, res: express.Response, session: 
   for (const [event, data] of preEvents) send(event, data);
   const t0 = Date.now();
   try {
-    const { target } = await routeTurn(session.id, message);
+    const { target, route } = await routeTurn(session.id, message);
     let done: (Extract<StreamEvent, { type: "done" }> & { usage?: TurnUsage }) | undefined;
     await runDomainAgent(target, session, message, {
       display,
       promptTail: mediaPromptNote,
+      route,
       onEvent: (e) => {
         if (e.type === "done") {
           done = e;
@@ -411,6 +416,7 @@ async function streamTurn(req: express.Request, res: express.Response, session: 
       const ms = Date.now() - t0;
       recordTurn({ domain: done.domain, ms, tools: done.tool_trace.length, ok: true });
       done.usage = await meterTurn(session, before, { domain: done.domain, ms, tool_calls: done.tool_trace.length, runtime: Boolean(done.kind) });
+      keepTurn(session, { user: message, display, ms, out: done });
       if (done.kind) await slot.refund();
       const { type: _t, ...rest } = done;
       send("done", rest);

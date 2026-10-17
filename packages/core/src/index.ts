@@ -1,6 +1,7 @@
 /** Public surface of the Marg core runtime. */
 export { REPO_ROOT, envList, envNotFalse, envNum, envNum0, envTrue } from "./env.js";
-export { ATTR, BRAND, DEPLOY_ENV, METRIC_PREFIX, SERVICE_NAMESPACE, WRITES_ALLOWED, metricName } from "./config.js";
+export { ATTR, BRAND, DEPLOY_ENV, METRIC_PREFIX, SERVICE_NAMESPACE, WRITES_ALLOWED, devTraceOn, metricName } from "./config.js";
+export { KEEP_TURNS, keepTurn } from "./dev-trace.js";
 export { flushLogs, head, log, logConfig, redact, summarize } from "./logger.js";
 export * from "./otel.js";
 export { metricsSnapshot, primeMetrics, recordCapped, recordRateLimited, recordRequest, recordTurn } from "./metrics.js";

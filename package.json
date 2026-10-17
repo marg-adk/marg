@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "gateway": "tsx packages/gateway/src/server.ts",
-    "gateway:evals": "AGENT_ALLOW_WRITES=false AGENT_REQUIRE_LOGIN=false AGENT_RATE_DISABLED=true GATEWAY_PORT=8788 tsx packages/gateway/src/server.ts",
+    "gateway:evals": "AGENT_ALLOW_WRITES=false AGENT_DEV_TRACE=true AGENT_REQUIRE_LOGIN=false AGENT_RATE_DISABLED=true GATEWAY_PORT=8788 tsx packages/gateway/src/server.ts",
     "evals": "tsx examples/support-intake/evals/run-evals.ts",
     "evals:bookings": "tsx examples/bookings/evals/run-evals.ts",
     "typecheck": "tsc -p . --noEmit",
