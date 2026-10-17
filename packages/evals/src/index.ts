@@ -141,12 +141,18 @@ export const reloadRedraws = (type: string): Check => ({ name: `reload redraws $
 // ---- the dev trace (the gateway must run with AGENT_DEV_TRACE=true — `npm run gateway:evals` does) ----
 const argMatches = (got: unknown, want: string | RegExp): boolean => (want instanceof RegExp ? want.test(String(got ?? "")) : String(got ?? "") === want);
 export const hasTrace: Check = { name: "dev trace present (the eval gateway needs AGENT_DEV_TRACE=true)", pass: (t) => Boolean(t.trace) };
-/** The route decision of this turn: the domain, the deciding link, and (with `confidence: true`) a typed decision's confidence in (0, 1]. */
-export const routeIs = (want: { domain?: string; by?: string; confidence?: boolean }): Check => ({
+/**
+ * The route decision of this turn: the domain, the deciding link (one name, or any of a list: a
+ * project with one domain installed routes `single`, a two-domain gateway `keywords`), and, with
+ * `confidence: true`, a typed decision's confidence in (0, 1] — a `single` route has no decision, so none is asked of it.
+ */
+export const routeIs = (want: { domain?: string; by?: string | string[]; confidence?: boolean }): Check => ({
   name: `route ${JSON.stringify(want)}`,
   pass: (t) => {
     const r = t.trace?.route;
-    return Boolean(r) && (!want.domain || r!.domain === want.domain) && (!want.by || r!.by === want.by) && (!want.confidence || (typeof r!.confidence === "number" && r!.confidence > 0 && r!.confidence <= 1));
+    if (!r) return false;
+    const by = want.by === undefined ? undefined : Array.isArray(want.by) ? want.by : [want.by];
+    return (!want.domain || r.domain === want.domain) && (!by || by.includes(r.by)) && (!want.confidence || r.by === "single" || (typeof r.confidence === "number" && r.confidence > 0 && r.confidence <= 1));
   },
 });
 /** The step engine's event for `step` this turn (drawn, late_draw, redrawn, reopened, settled, skipped, summary). */

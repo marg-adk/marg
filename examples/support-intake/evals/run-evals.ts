@@ -38,7 +38,7 @@ const scenarios: Scenario[] = [
     tags: ["journey", "trace"],
     everyTurn: [noError, hasTrace, reloadKeepsTrace],
     turns: [
-      { send: "ticket for Northwind: login fails on mobile", checks: [modelTurn, routeIs({ domain: "support-intake", by: "keywords", confidence: true }), toolCall("search_customers", { args: { query: /Northwind/ }, result: /Northwind Traders[\s\S]*Northwind Health/ })] },
+      { send: "ticket for Northwind: login fails on mobile", checks: [modelTurn, routeIs({ domain: "support-intake", by: ["keywords", "single"], confidence: true }), toolCall("search_customers", { args: { query: /Northwind/ }, result: /Northwind Traders/ }), toolCall("search_customers", { result: /Northwind Health/ })] },
       { send: tap("Northwind Traders"), checks: [toolCall("validate_ticket_slots", { args: { customer_id: "c-1001" } })] },
       { send: tap("Technical"), checks: [toolCalledThisTurn("validate_ticket_slots"), stepEvent("details", "late_draw")] },
       { send: submitForm({ environment: "production", steps_to_reproduce: null }), checks: [runtimeTurn("details"), stepEvent("details", "redrawn")] },
