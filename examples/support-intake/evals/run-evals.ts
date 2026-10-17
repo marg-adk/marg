@@ -13,7 +13,7 @@
  */
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cooperativeUser, draftHas, draftState, formRow, hasUi, neverTool, noError, noLeak, noUi, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
+import { cooperativeUser, draftHas, draftState, formRow, hasTrace, hasUi, modelTurn, neverTool, noError, noLeak, noUi, notCompleted, oneQuestion, reloadKeepsTrace, reloadRedraws, replyMatches, replyOrUiMatches, routeIs, runSuite, runtimeTurn, stepEvent, stepStatus, submitForm, tap, toolCall, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
 
 const scenarios: Scenario[] = [
   {
@@ -30,6 +30,22 @@ const scenarios: Scenario[] = [
       { send: tap("Confirm & create ticket"), checks: [noError, toolCalledThisTurn("create_ticket"), notCompleted, replyMatches(/writes are disabled/i)] },
     ],
     finalChecks: [neverTool("create_ticket (refused)")],
+  },
+  {
+    id: "dev-trace",
+    goal: "The journey with the dev trace on: the route and its confidence, search_customers with its query and the two matches, the Details step asked → redrawn → settled, the create refused with writes off — and a reload holds the same facts",
+    creates: true,
+    tags: ["journey", "trace"],
+    everyTurn: [noError, hasTrace, reloadKeepsTrace],
+    turns: [
+      { send: "ticket for Northwind: login fails on mobile", checks: [modelTurn, routeIs({ domain: "support-intake", by: "keywords", confidence: true }), toolCall("search_customers", { args: { query: /Northwind/ }, result: /Northwind Traders[\s\S]*Northwind Health/ })] },
+      { send: tap("Northwind Traders"), checks: [toolCall("validate_ticket_slots", { args: { customer_id: "c-1001" } })] },
+      { send: tap("Technical"), checks: [toolCalledThisTurn("validate_ticket_slots"), stepEvent("details", "late_draw")] },
+      { send: submitForm({ environment: "production", steps_to_reproduce: null }), checks: [runtimeTurn("details"), stepEvent("details", "redrawn")] },
+      { send: submitForm({ environment: "production", affected_users: "40", steps_to_reproduce: "Open the app, tap login, see a spinner forever" }), checks: [runtimeTurn("details"), stepEvent("details", "settled"), stepEvent("priority", "drawn")] },
+      { send: tap("High"), checks: [runtimeTurn("priority"), stepEvent("priority", "settled"), stepEvent("confirm", "summary")] },
+      { send: tap("Confirm & create ticket"), checks: [toolCall("create_ticket", { args: { confirmed: "true" }, result: /writes are disabled/i }), notCompleted] },
+    ],
   },
   {
     id: "confirm-gate",

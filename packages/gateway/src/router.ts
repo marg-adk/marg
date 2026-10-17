@@ -10,8 +10,11 @@
  * the cascade — manifest keywords as rules first, a decision model (Laya) when configured, the
  * LLM with logprobs last. A low-confidence pick falls back to the active domain, then the first
  * domain — routing never throws, and a misroute degrades to a clarifying question, never a wrong write.
+ *
+ * Every route also yields a TurnRoute (the domain, the link that decided, the confidence when a
+ * typed decision was made): the dev trace shows it, telemetry only ever gets its enums (spans).
  */
-import type { DomainManifest } from "@marg-adk/types";
+import type { DomainManifest, TurnRoute } from "@marg-adk/types";
 import { chatComplete, counter, getSession, log, recordUsage, withSpan, type ChatMessage } from "@marg-adk/core";
 import { deciderFromEnv, regexChoice, rulesBackend, type CompleteFn, type Decider, type TokenLogprobs } from "@marg-adk/verdict";
 import { discoverDomains } from "./domains.js";
@@ -54,7 +57,7 @@ export function routerSnapshot() {
 
 const CONFIDENT = Number(process.env.AGENT_ROUTER_MIN_CONFIDENCE ?? 0.35) || 0.35;
 
-export async function classify(message: string, domains: DomainManifest[], activeDomain: string | undefined): Promise<DomainManifest> {
+export async function classify(message: string, domains: DomainManifest[], activeDomain: string | undefined): Promise<{ domain: DomainManifest; route: TurnRoute }> {
   if (!decider) initRouter(domains);
   return withSpan("router.classify", { attrs: { "agent.domains": domains.map((d) => d.name).join(","), ...(activeDomain ? { "agent.active_domain": activeDomain } : {}) } }, async (span) => {
     const criteria = Object.fromEntries(domains.map((d) => [d.name, `${d.title}: ${d.description}${d.route_hints?.examples?.length ? ` Examples: ${d.route_hints.examples.slice(0, 6).join("; ")}.` : ""}`]));
@@ -75,26 +78,35 @@ export async function classify(message: string, domains: DomainManifest[], activ
     } catch (e) {
       log.warn("router decision failed — using the sticky fallback", { error: (e as Error).message });
     }
-    const chosen = pick ?? domains.find((d) => d.name === activeDomain) ?? domains[0];
+    const kept = domains.find((d) => d.name === activeDomain);
+    const chosen = pick ?? kept ?? domains[0];
     span.setAttributes({ "agent.router.domain": chosen.name, "agent.router.confidence": +confidence.toFixed(3), "agent.router.by": by, "agent.router.fallback": !pick });
-    return chosen;
+    // an undecided turn stays where the chat was ("sticky", with the confidence of the pick it
+    // declined) or, with no chat yet, falls back to the first domain
+    const route: TurnRoute = { domain: chosen.name, by: pick ? by : kept ? "sticky" : "fallback", ...(confidence > 0 ? { confidence: +confidence.toFixed(3) } : {}) };
+    return { domain: chosen, route };
   });
 }
 
 /** Resolve the session and the target domain for a turn. */
-export async function routeTurn(sessionId: string, userMessage: string): Promise<{ session: NonNullable<ReturnType<typeof getSession>>; target: DomainManifest }> {
+export async function routeTurn(sessionId: string, userMessage: string): Promise<{ session: NonNullable<ReturnType<typeof getSession>>; target: DomainManifest; route: TurnRoute }> {
   const session = getSession(sessionId);
   if (!session) throw new Error("Unknown session — call /api/session first.");
   const domains = discoverDomains();
   if (domains.length === 0) throw new Error("No domain modules installed (domains/*/domain.json).");
   let target: DomainManifest;
-  if (domains.length === 1) target = domains[0];
-  else if ((session.completion || session.preview?.steps) && session.activeDomain && domains.some((d) => d.name === session.activeDomain)) target = domains.find((d) => d.name === session.activeDomain)!; // mid-journey or finished: never re-classify
-  else {
+  let route: TurnRoute;
+  if (domains.length === 1) {
+    target = domains[0];
+    route = { domain: target.name, by: "single" };
+  } else if ((session.completion || session.preview?.steps) && session.activeDomain && domains.some((d) => d.name === session.activeDomain)) {
+    target = domains.find((d) => d.name === session.activeDomain)!; // mid-journey or finished: never re-classify
+    route = { domain: target.name, by: "sticky" };
+  } else {
     const before = { ...session.usage };
-    target = await classify(userMessage, domains, session.activeDomain);
+    ({ domain: target, route } = await classify(userMessage, domains, session.activeDomain));
     void before;
     recordUsage(session, undefined);
   }
-  return { session, target };
+  return { session, target, route };
 }

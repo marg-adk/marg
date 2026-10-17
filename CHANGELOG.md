@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+- **gateway, core**: the dev trace. With `AGENT_DEV_TRACE=true` (default off; `.env.example` sets it,
+  `render.yaml` and `.env.production.example` leave it off) every turn carries what the gateway already
+  logged, as a client payload: the route decision (the domain, the link that decided — `keywords`,
+  `systemone`, `llm`, `sticky`, `single`, `fallback` — and its confidence), the step engine's events
+  (`drawn`, `late_draw`, `redrawn`, `reopened`, `settled`, `skipped`, `summary`), every tool call with the
+  arguments it received (after the carry rule) and its result (masked, clipped), and each model call's
+  time and tokens. It rides the SSE `done` event and the JSON reply as `trace`; the last 30 turns are
+  kept on the session and `GET /api/session/:id/history` replays them as `turns`, so a reload can rebuild
+  the Trace pane. `GET /api/health` reports `dev_trace`. Nothing new reaches telemetry: spans, metrics
+  and behaviour events keep their counts and enums. Shape: `docs/CLIENT-PROTOCOL.md`, "The dev trace".
+- **evals**: `TurnResult` gains `trace` and `turns`; the checks `hasTrace`, `routeIs`, `stepEvent`,
+  `toolCall` and `reloadKeepsTrace`. The support-intake `dev-trace` scenario walks the journey with them
+  (the route and its confidence, `search_customers` with its query and the two matches, Details asked →
+  redrawn → settled, the create refused with writes off, and the same facts after a reload); the bookings
+  routing scenarios assert the route both ways. `npm run gateway:evals` sets the flag.
+
 ## 0.3.0 — 2026-10-14
 
 The release the site already describes: tools in Python, simulated users in the evals, an English

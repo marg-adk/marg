@@ -11,7 +11,7 @@
  */
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cooperativeUser, draftHas, hasUi, inDomain, neverTool, noError, noLeak, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
+import { cooperativeUser, draftHas, hasTrace, hasUi, inDomain, neverTool, noError, noLeak, notCompleted, oneQuestion, reloadRedraws, replyMatches, replyOrUiMatches, routeIs, runSuite, runtimeTurn, stepStatus, submitForm, tap, toolCall, toolCalled, toolCalledThisTurn, type Scenario } from "@marg-adk/evals";
 
 // 2026-11-06 is a Friday; 2026-11-02 a Monday (Harbour House is closed on Mondays).
 const scenarios: Scenario[] = [
@@ -84,12 +84,12 @@ const scenarios: Scenario[] = [
   {
     id: "route-to-bookings",
     goal: "The super agent routes a booking opener to this domain",
-    turns: [{ send: "book a table at Luna Rooftop for 2", checks: [noError, inDomain("bookings"), toolCalled("search_venues")] }],
+    turns: [{ send: "book a table at Luna Rooftop for 2", checks: [noError, inDomain("bookings"), toolCalled("search_venues"), hasTrace, routeIs({ domain: "bookings", by: "keywords", confidence: true }), toolCall("search_venues", { args: { query: /Luna/ } })] }],
   },
   {
     id: "route-to-tickets",
     goal: "The super agent routes a ticket opener to the other example — the same gateway, two domains",
-    turns: [{ send: "ticket for Northwind: login fails on mobile", checks: [noError, inDomain("support-intake"), toolCalled("search_customers")] }],
+    turns: [{ send: "ticket for Northwind: login fails on mobile", checks: [noError, inDomain("support-intake"), toolCalled("search_customers"), hasTrace, routeIs({ domain: "support-intake", by: "keywords", confidence: true })] }],
   },
   {
     id: "simulated-user",

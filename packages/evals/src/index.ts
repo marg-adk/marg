@@ -20,6 +20,19 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+/**
+ * One turn's dev trace, as a gateway started with AGENT_DEV_TRACE=true sends it (docs/CLIENT-PROTOCOL.md,
+ * "The dev trace"): the route decision, the step engine's events, every tool call with its arguments
+ * and result, the model's calls. Only the fields the checks use are typed.
+ */
+export interface DevTrace {
+  turn: number;
+  route?: { domain: string; by: string; confidence?: number };
+  steps: { step: string; event: string; via?: string }[];
+  tools: { name: string; args: any; result: string; ms: number; ok?: boolean; carried?: string[]; refused?: string; runtime?: boolean }[];
+  llm: { round: number; endpoint?: string; model?: string; ms: number; ttft_ms?: number; input: number; output: number; finish: string }[];
+}
+
 export interface TurnResult {
   user: string;
   reply: string;
@@ -35,6 +48,10 @@ export interface TurnResult {
   completion?: any;
   /** The last assistant entry of GET /history after this turn — what a reload would draw. */
   lastEntry?: { text: string; ui: any[] };
+  /** This turn's dev trace (absent when the gateway runs with AGENT_DEV_TRACE off). */
+  trace?: DevTrace;
+  /** GET /history's `turns` after this turn — what a reload would redraw in a trace pane. */
+  turns?: { turn: number; trace: DevTrace; [k: string]: any }[];
 }
 
 export type Check = { name: string; pass: (turn: TurnResult, all: TurnResult[]) => boolean };
@@ -120,6 +137,30 @@ export const stepStatus = (key: string, status: string): Check => ({ name: `step
 export const completed: Check = { name: "completed", pass: (t) => Boolean(t.completion?.entity_id) };
 export const notCompleted: Check = { name: "not completed", pass: (t) => !t.completion };
 export const reloadRedraws = (type: string): Check => ({ name: `reload redraws ${type}`, pass: (t) => (t.lastEntry?.ui ?? []).some((b) => b?.type === type) });
+
+// ---- the dev trace (the gateway must run with AGENT_DEV_TRACE=true — `npm run gateway:evals` does) ----
+const argMatches = (got: unknown, want: string | RegExp): boolean => (want instanceof RegExp ? want.test(String(got ?? "")) : String(got ?? "") === want);
+export const hasTrace: Check = { name: "dev trace present (the eval gateway needs AGENT_DEV_TRACE=true)", pass: (t) => Boolean(t.trace) };
+/** The route decision of this turn: the domain, the deciding link, and (with `confidence: true`) a typed decision's confidence in (0, 1]. */
+export const routeIs = (want: { domain?: string; by?: string; confidence?: boolean }): Check => ({
+  name: `route ${JSON.stringify(want)}`,
+  pass: (t) => {
+    const r = t.trace?.route;
+    return Boolean(r) && (!want.domain || r!.domain === want.domain) && (!want.by || r!.by === want.by) && (!want.confidence || (typeof r!.confidence === "number" && r!.confidence > 0 && r!.confidence <= 1));
+  },
+});
+/** The step engine's event for `step` this turn (drawn, late_draw, redrawn, reopened, settled, skipped, summary). */
+export const stepEvent = (step: string, event: string): Check => ({ name: `step ${step} ${event} this turn`, pass: (t) => Boolean(t.trace?.steps.some((s) => s.step === step && s.event === event)) });
+/** A call to `tool` this turn whose arguments match (strings exactly, regexes by test) and, optionally, whose result matches. */
+export const toolCall = (tool: string, want: { args?: Record<string, string | RegExp>; result?: RegExp } = {}): Check => ({
+  name: `trace: ${tool} called${want.args ? " with " + JSON.stringify(want.args, (_k, v) => (v instanceof RegExp ? String(v) : v)) : ""}${want.result ? ` → ${want.result}` : ""}`,
+  pass: (t) => Boolean(t.trace?.tools.some((c) => c.name === tool && Object.entries(want.args ?? {}).every(([k, v]) => argMatches(c.args?.[k], v)) && (!want.result || want.result.test(c.result)))),
+});
+/** A reload shows what was live: GET /history's `turns` holds this turn's trace unchanged. */
+export const reloadKeepsTrace: Check = {
+  name: "reload keeps this turn's trace (history turns)",
+  pass: (t) => Boolean(t.trace) && (t.turns ?? []).some((x) => x.turn === t.trace!.turn && JSON.stringify(x.trace) === JSON.stringify(t.trace)),
+};
 export const oneQuestion: Check = { name: "at most one question", pass: (t) => (t.reply.match(/\?/g) ?? []).length <= 1 };
 export const noLeak = (re: RegExp): Check => ({ name: `no leak ${re}`, pass: (t) => !re.test(t.reply) && !re.test(JSON.stringify(t.ui ?? [])) });
 
@@ -298,7 +339,7 @@ export async function runScenario(s: Scenario, o: RunOptions): Promise<ScenarioR
           result = { user: message, reply: "", ui: [], tool_trace: [], ms: Date.now() - tt0, error: `${out.status}: ${out.json?.error ?? ""}`, status: out.status };
           if (out.status >= 500 || out.status === 429) transport = true;
         } else {
-          result = { user: message, reply: String(out.json.reply ?? ""), ui: out.json.ui ?? [], tool_trace: out.json.tool_trace ?? [], kind: out.json.kind, domain: out.json.domain, completion: out.json.completion, ms: Date.now() - tt0 };
+          result = { user: message, reply: String(out.json.reply ?? ""), ui: out.json.ui ?? [], tool_trace: out.json.tool_trace ?? [], kind: out.json.kind, domain: out.json.domain, completion: out.json.completion, trace: out.json.trace, ms: Date.now() - tt0 };
           if (/briefly unavailable/i.test(result.reply)) transport = true;
         }
       } catch (e) {
@@ -308,6 +349,7 @@ export async function runScenario(s: Scenario, o: RunOptions): Promise<ScenarioR
       try {
         const h = await api(o.gateway, `/api/session/${encodeURIComponent(session_id)}/history`, undefined, headers, s.id);
         result.preview = h.json?.preview ?? null;
+        if (Array.isArray(h.json?.turns)) result.turns = h.json.turns;
         const entries = h.json?.entries ?? [];
         const lastA = [...entries].reverse().find((e: any) => e.role === "assistant");
         if (lastA) result.lastEntry = { text: lastA.text, ui: lastA.ui ?? [] };
