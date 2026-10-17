@@ -5,8 +5,16 @@
   One centred conversation (the widget from /widget.js mounted inline in #chat — exactly what a
   host app gets), a plain top bar, and two side panes that collapse: the live draft (the widget's
   onPreview hook, "the form filling itself") and the trace (the widget's onTurn hook: which
-  domain answered, runtime or model, every tool call with its time, usage). Past chats live in a
-  drawer. The empty state offers the domains' own example openers (GET /api/health → examples).
+  domain answered, runtime or model, the route decision with its confidence, each step's state,
+  every tool call with its arguments and result folded, the model's timing, usage). Past chats
+  live in a drawer. The empty state offers the domains' own example openers (GET /api/health →
+  examples).
+
+  The trace's content (route, steps, tool arguments and results, model calls) comes from the
+  gateway's dev trace and is there only when it runs with AGENT_DEV_TRACE=true (docs/CLIENT-PROTOCOL.md);
+  without it the pane keeps to who answered, the tools and their time. A reload rebuilds BOTH panes
+  from the one GET /history response the widget makes (its onHistory hook): the draft from
+  `preview`, the trace from `turns`.
 
   Login: when the gateway requires it, paste a token (your app would do the exchange —
   docs/SDK-AUTH.md). The token lives only in this browser's localStorage. No build step, no
@@ -77,6 +85,20 @@
     .pill.create { background: #fef3c7; border-color: #fde68a; color: #92400e; }
     .pill .ms { color: var(--mute); font-family: var(--mono); }
     .t .done { margin-top: 6px; font-size: 12px; color: var(--ok); }
+    .t .r, .t .s { margin-top: 6px; font-size: 11.5px; color: var(--mute); line-height: 1.45; }
+    .t .r b, .t .s b { color: var(--ink-2); font-weight: 600; }
+    .tc { margin-top: 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-2); }
+    .tc > summary { cursor: pointer; padding: 5px 8px; font-size: 11px; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .tc > summary::-webkit-details-marker { display: none; }
+    .tc > summary::before { content: "▸"; color: var(--mute); }
+    .tc[open] > summary::before { content: "▾"; }
+    .tc .nm { font-family: var(--mono); font-size: 10.5px; color: var(--ink); }
+    .tc .ms { color: var(--mute); font-family: var(--mono); font-size: 10.5px; }
+    .tc .tag { font-size: 9.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--warn); }
+    .tc.err .nm { color: #b91c1c; }
+    .tc .lbl { padding: 6px 8px 0; font-size: 9.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--mute); }
+    .tc pre { margin: 0; padding: 3px 8px 8px; font: 11px/1.45 var(--mono); white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; color: var(--ink-2); }
+    .tnote { font-size: 12px; color: var(--mute); background: var(--bg-2); border-radius: 8px; padding: 8px 10px; margin: 8px 0 0; line-height: 1.45; }
 
     /* chats drawer */
     .drawer { position: fixed; inset: 0; display: none; z-index: 40; }
@@ -132,7 +154,7 @@
     </aside>
     <aside class="pane" id="trace">
       <div class="pane-h"><span>Trace</span><span><span class="st" id="trstate"></span> <button class="x" data-close="trace" title="Hide">✕</button></span></div>
-      <div class="pane-b" id="trbody"><div class="empty">One entry per turn: who answered (the runtime or the model), every tool call with its time, usage.</div></div>
+      <div class="pane-b" id="trbody"><div class="empty">One entry per turn: who answered (the runtime or the model), the route and each step's state, every tool call with its arguments and result, the model's timing.</div></div>
     </aside>
   </div>
 
@@ -206,7 +228,8 @@
           token: function () { return token() || undefined; },
           onSession: function (id) { activeSid = id; markActive(); clearTrace(); setTimeout(refresh, 400); },
           onPreview: renderPreview,
-          onTurn: renderTurn
+          onTurn: renderTurn,
+          onHistory: restoreFromHistory
         });
         refresh();
         setInterval(refresh, 15000);
@@ -286,34 +309,123 @@
         pvState.className = "st" + (data.state === "created" || data.state === "validated" ? " ok" : "");
       }
 
-      // ---- the trace pane: one entry per turn, from the widget's onTurn hook
-      var trBody = $("trbody"), trState = $("trstate"), turnCount = 0;
-      function clearTrace() { trBody.textContent = ""; trBody.appendChild(el("div", "empty", "One entry per turn: who answered (the runtime or the model), every tool call with its time, usage.")); trState.textContent = ""; turnCount = 0; }
+      // ---- the trace pane: one entry per turn, from the widget's onTurn hook (live) and onHistory (a reload)
+      var TRACE_EMPTY = "One entry per turn: who answered (the runtime or the model), the route and each step's state, every tool call with its arguments and result, the model's timing.";
+      var trBody = $("trbody"), trState = $("trstate"), turnCount = 0, seenTurns = {}, lastDomain = null, noteShown = false;
+      function clearTrace() { trBody.textContent = ""; trBody.appendChild(el("div", "empty", TRACE_EMPTY)); trState.textContent = ""; turnCount = 0; seenTurns = {}; lastDomain = null; noteShown = false; }
+      var STEP_WORDS = { drawn: "asked", late_draw: "asked (under the model's reply)", redrawn: "redrawn", reopened: "reopened", settled: "settled", skipped: "skipped", reset: "reset (an edit changed what it depends on)", summary: "summary shown" };
+      var ROUTE_WORDS = { sticky: "mid-journey, or the pick was not confident", single: "the only domain installed", fallback: "no decision — the first domain" };
+      // arguments and results are the tool's text: shown as text, never as markup; JSON is indented
+      function pretty(v) {
+        if (typeof v === "string") { try { return JSON.stringify(JSON.parse(v), null, 2); } catch (e) { return v; } }
+        try { return JSON.stringify(v, null, 2); } catch (e) { return String(v); }
+      }
+      function fmt(n) { return n >= 10000 ? Math.round(n / 1000) + "k" : n >= 1000 ? (n / 1000).toFixed(1) + "k" : String(n); }
+      function usageText(u) {
+        if (u.turn_tokens) return fmt(u.turn_tokens) + " tokens" + (u.turn_plan ? " · " + fmt(u.turn_plan) + " plan" : "");
+        if (u.input_tokens || u.output_tokens || u.plan_tokens) return (u.input_tokens != null ? u.input_tokens + " in" : "") + (u.output_tokens != null ? " · " + u.output_tokens + " out" : "") + (u.plan_tokens != null ? " · " + u.plan_tokens + " plan" : "");
+        return "";
+      }
+      function routeLine(r) {
+        var d = el("div", "r");
+        d.appendChild(document.createTextNode(r.by === "sticky" ? "Stayed in " : "Routed to "));
+        d.appendChild(el("b", null, r.domain));
+        var how = ROUTE_WORDS[r.by] || ("by " + r.by);
+        d.appendChild(document.createTextNode(" · " + how + (typeof r.confidence === "number" ? " · confidence " + r.confidence : "")));
+        return d;
+      }
+      function stepsLine(steps) {
+        var d = el("div", "s");
+        d.appendChild(document.createTextNode("Steps: "));
+        steps.forEach(function (st, i) {
+          if (i) d.appendChild(document.createTextNode(" · "));
+          d.appendChild(el("b", null, st.step));
+          d.appendChild(document.createTextNode(" " + (STEP_WORDS[st.event] || st.event)));
+        });
+        return d;
+      }
+      function toolBlock(c) {
+        var d = el("details", "tc" + (c.ok === false || c.refused ? " err" : ""));
+        var sum = el("summary");
+        sum.appendChild(el("span", "nm", c.name));
+        sum.appendChild(el("span", "ms", Math.round(c.ms) + "ms"));
+        if (c.refused) sum.appendChild(el("span", "tag", c.refused === "confirm_gate" ? "refused · create gate" : "refused"));
+        else if (c.ok === false) sum.appendChild(el("span", "tag", "error"));
+        if (c.runtime) sum.appendChild(el("span", "tag", "runtime tool"));
+        d.appendChild(sum);
+        d.appendChild(el("div", "lbl", "arguments" + (c.carried && c.carried.length ? " · carried: " + c.carried.join(", ") : "")));
+        d.appendChild(el("pre", null, pretty(c.args)));
+        d.appendChild(el("div", "lbl", "result"));
+        d.appendChild(el("pre", null, pretty(c.result)));
+        return d;
+      }
+      function modelBlock(calls) {
+        var total = calls.reduce(function (a, c) { return a + (c.ms || 0); }, 0);
+        var d = el("details", "tc");
+        var sum = el("summary");
+        sum.appendChild(el("span", "nm", "model · " + calls.length + (calls.length === 1 ? " call" : " calls")));
+        sum.appendChild(el("span", "ms", Math.round(total) + "ms"));
+        d.appendChild(sum);
+        var lines = calls.map(function (c) {
+          return c.round + " · " + [c.endpoint, c.model].filter(Boolean).join("/") + " · " + Math.round(c.ms) + "ms" + (c.ttft_ms != null ? " · first token " + Math.round(c.ttft_ms) + "ms" : "") + " · " + fmt(c.input) + " in · " + fmt(c.output) + " out · " + c.finish;
+        });
+        d.appendChild(el("pre", null, lines.join("\n")));
+        return d;
+      }
+      // t is what onTurn gives live, or one entry of /history's `turns` after a reload: {user, display, ms, domain, kind, tool_trace, usage, completion, trace}
       function renderTurn(t) {
+        var tr = t.trace || null;
+        if (tr && seenTurns[tr.turn]) return; // a reload rebuilt it already
+        if (tr) seenTurns[tr.turn] = true;
         if (turnCount === 0) trBody.textContent = "";
+        var first = turnCount === 0;
         turnCount++;
         var e = el("div", "t");
-        e.appendChild(el("div", "u", turnCount + ". " + (t.display || t.user || "")));
+        e.appendChild(el("div", "u", (tr ? tr.turn : turnCount) + ". " + (t.display || t.user || "")));
         var m = el("div", "m");
-        var who = t.kind ? el("span", "pill rt", "runtime · " + t.kind) : el("span", "pill model", "model");
+        // a late draw is the model's turn with the runtime's card under it: the trace says so when it shows model calls
+        var withModel = Boolean(tr && tr.llm && tr.llm.length);
+        var who = t.kind ? el("span", "pill rt", (withModel ? "model + runtime · " : "runtime · ") + t.kind) : el("span", "pill model", "model");
         m.appendChild(who);
         if (t.domain) m.appendChild(el("span", "pill", t.domain));
-        (t.tool_trace || []).forEach(function (c) {
-          var p = el("span", "pill tool" + (/^(create|submit)_/.test(c.tool) ? " create" : ""), c.tool + " ");
-          p.appendChild(el("span", "ms", Math.round(c.ms) + "ms"));
-          m.appendChild(p);
-        });
+        if (!tr) {
+          (t.tool_trace || []).forEach(function (c) {
+            var p = el("span", "pill tool" + (/^(create|submit)_/.test(c.tool) ? " create" : ""), c.tool + " ");
+            p.appendChild(el("span", "ms", Math.round(c.ms) + "ms"));
+            m.appendChild(p);
+          });
+        }
         var total = el("span", "pill", ""); total.appendChild(el("span", "ms", Math.round(t.ms) + "ms"));
         m.appendChild(total);
-        if (t.usage && (t.usage.input_tokens || t.usage.output_tokens || t.usage.plan_tokens)) {
-          var u = t.usage;
-          m.appendChild(el("span", "pill", (u.input_tokens != null ? u.input_tokens + " in" : "") + (u.output_tokens != null ? " · " + u.output_tokens + " out" : "") + (u.plan_tokens != null ? " · " + u.plan_tokens + " plan" : "")));
-        }
+        var ut = t.usage ? usageText(t.usage) : "";
+        if (ut) m.appendChild(el("span", "pill", ut));
         e.appendChild(m);
+        if (tr) {
+          // the route: the first turn, and any turn that decided something or moved to another domain
+          if (tr.route && (first || !/^(sticky|single)$/.test(tr.route.by) || tr.route.domain !== lastDomain)) e.appendChild(routeLine(tr.route));
+          if (tr.steps && tr.steps.length) e.appendChild(stepsLine(tr.steps));
+          (tr.tools || []).forEach(function (c) { e.appendChild(toolBlock(c)); });
+          if (tr.llm && tr.llm.length) e.appendChild(modelBlock(tr.llm));
+          lastDomain = tr.route ? tr.route.domain : t.domain || lastDomain;
+        } else {
+          lastDomain = t.domain || lastDomain;
+          if (!noteShown) { noteShown = true; trBody.appendChild(el("div", "tnote", "Arguments, results, the route and each step's state show here when the gateway runs with AGENT_DEV_TRACE=true — this one does not.")); }
+        }
         if (t.completion) { created = t.completion.label || "created"; e.appendChild(el("div", "done", "✓ " + created)); pvState.textContent = "✓ " + created; pvState.className = "st ok"; }
         trBody.appendChild(e);
         trBody.scrollTop = trBody.scrollHeight;
         trState.textContent = turnCount + (turnCount === 1 ? " turn" : " turns");
+      }
+
+      // ---- a chat was resumed or opened: both panes come back from the one /history response the widget made
+      function restoreFromHistory(j) {
+        clearPreview(); clearTrace();
+        if (j.completed && j.completion) created = j.completion.label || "created";
+        if (j.preview) renderPreview(j.preview);
+        if (created) { pvState.textContent = "✓ " + created; pvState.className = "st ok"; }
+        var turns = Array.isArray(j.turns) ? j.turns : null;
+        if (turns && turns.length) turns.forEach(renderTurn);
+        else if (turns && (j.entries || []).length) { trBody.textContent = ""; trBody.appendChild(el("div", "empty", "This chat was not traced: it began before the gateway's dev trace was on.")); }
       }
     })();
   </script>

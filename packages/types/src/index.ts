@@ -331,6 +331,80 @@ export interface PreviewState {
 // Replies and stream events (the client protocol)
 // ---------------------------------------------------------------------------
 
+/** Who got a turn and why (the super agent's decision). */
+export interface TurnRoute {
+  domain: string;
+  /**
+   * The deciding link: `keywords`, `systemone` or `llm` (a typed decision), `sticky` (mid-journey,
+   * finished, or a low-confidence pick kept the active domain), `single` (one domain installed),
+   * `fallback` (nothing decided; the first domain).
+   */
+  by: string;
+  /** The router's typed decision, when one was made. */
+  confidence?: number;
+}
+
+/** The step engine's event: a step drawn, redrawn, settled… (`summary` is the confirmation card, step `confirm`). */
+export interface TurnStep {
+  step: string;
+  event: "drawn" | "late_draw" | "redrawn" | "reopened" | "settled" | "skipped" | "reset" | "summary";
+  via?: string;
+}
+
+/** One tool call: what the tool received (after the carry rule), what it returned, how long it took. */
+export interface TurnTool {
+  name: string;
+  args: unknown;
+  /** The tool's text, masked and clipped. */
+  result: string;
+  ms: number;
+  ok?: boolean;
+  /** Keys the runtime restored from settled steps over the model's own values. */
+  carried?: string[];
+  refused?: "confirm_gate" | "internal";
+  /** The runtime's own tool (the entity-type switch), not an MCP call. */
+  runtime?: boolean;
+}
+
+/** One model call of the turn. */
+export interface TurnLlm {
+  round: number;
+  endpoint?: string;
+  model?: string;
+  ms: number;
+  ttft_ms?: number;
+  input: number;
+  output: number;
+  finish: "stop" | "tool_calls";
+}
+
+/**
+ * One turn's facts for a dev UI — sent only when the gateway runs with `AGENT_DEV_TRACE=true`
+ * (docs/CLIENT-PROTOCOL.md, "The dev trace"). Content: it never reaches telemetry.
+ */
+export interface TurnTrace {
+  /** The session's turn counter — the trace log lines' join key. */
+  turn: number;
+  route?: TurnRoute;
+  steps: TurnStep[];
+  tools: TurnTool[];
+  llm: TurnLlm[];
+}
+
+/** A finished turn as the history endpoint replays it for a dev UI (`turns`). */
+export interface TurnRecord {
+  turn: number;
+  user: string;
+  display?: string;
+  ms: number;
+  domain?: string;
+  kind?: string;
+  tool_trace: { tool: string; ms: number }[];
+  usage?: TurnUsage;
+  completion?: Completion;
+  trace: TurnTrace;
+}
+
 /** The gateway's reply for one user turn. */
 export interface AgentReply {
   reply: string;
@@ -344,6 +418,8 @@ export interface AgentReply {
   usage?: TurnUsage;
   /** Set once, on the turn that created the entity — ends the chat. */
   completion?: Completion;
+  /** The dev trace — only when the gateway runs with AGENT_DEV_TRACE=true. */
+  trace?: TurnTrace;
 }
 
 export type StreamEvent =
@@ -352,7 +428,7 @@ export type StreamEvent =
   | ({ type: "preview" } & PreviewState)
   | { type: "transcript"; text: string; language?: string; confidence?: number; duration_s?: number }
   | { type: "nudge"; text: string; count: number; max: number }
-  | { type: "done"; reply: string; ui: unknown[]; tool_trace: { tool: string; ms: number }[]; domain: string; kind?: string; completion?: Completion; usage?: TurnUsage }
+  | { type: "done"; reply: string; ui: unknown[]; tool_trace: { tool: string; ms: number }[]; domain: string; kind?: string; completion?: Completion; usage?: TurnUsage; trace?: TurnTrace }
   | { type: "error"; error: string; error_id?: string; degraded?: boolean };
 
 export interface HistoryEntry {

@@ -26,6 +26,9 @@ services:
         value: "false"
       - key: AGENT_REQUIRE_LOGIN
         value: "false"
+      # The hosted playground shows who answered and the tools' timing, not their arguments and results.
+      - key: AGENT_DEV_TRACE
+        value: "false"
       - key: AGENT_BRAND
         value: Marg
       - key: AGENT_ENV

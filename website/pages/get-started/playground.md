@@ -2,10 +2,22 @@
 
 The gateway's home page is a playground around the embeddable widget, and the dev UI: one
 conversation in the centre (exactly what a host application gets from one `<script>` tag), the
-**live draft** on the right (every value with where it came from), and the **trace** beside it:
-one entry per turn with who answered (the runtime or the model), every tool call with its time,
-usage, and the create. Both panes collapse; past chats are in a drawer; the empty state offers
-the domains' own example openers.
+**live draft** on the right (every value with where it came from), and the **trace** beside it.
+Both panes collapse; past chats are in a drawer; the empty state offers the domains' own example
+openers.
+
+The trace has one entry per turn: who answered (the runtime, or the model, or both when the model
+answered and the runtime drew the card under it), the **route** — which domain got the turn, the
+link that decided (`keywords`, `llm`…) and its confidence — the **steps** the runtime moved (the
+Details card *asked*, *redrawn*, *settled*; the summary shown), every **tool call** folded (click
+one to read the arguments it received and the result it returned), the **model's** calls with their
+timings, the usage and the create. A refused create shows as `create_ticket` with the refusal in
+its result.
+
+That content — arguments, results, the route — is shown only when the gateway runs with
+`AGENT_DEV_TRACE=true`, which a project's `.env` sets and the hosted copy leaves off (the pane then
+keeps to who answered, the tools and their time, and says why). It goes to your browser, never to
+telemetry. The shape is in the [client protocol](/components/client-protocol).
 
 A hosted copy runs at **https://marg-playground.onrender.com** on the mock model with writes
 off. It sleeps when idle, so the first load takes a moment, and keeps no disk, so a session may
@@ -26,7 +38,11 @@ be lost on a redeploy. Everything else is the real thing.
   the runtime's, with no tool call.
 - **Change something.** On the summary, pick a section; the step's own card re-opens
   pre-filled; the summary returns.
-- **Reload.** Refresh the page mid-journey. The open ask is drawn again from the transcript.
+- **Open a tool call.** After the opener, click `search_customers` in the trace: the query it
+  was given and the two customers it found.
+- **Reload.** Refresh the page mid-journey, or open a finished chat from the drawer. The open ask
+  is drawn again from the transcript, the draft comes back with it, and the trace pane has every
+  turn again, from the one history request the page makes.
 
 ## Embedding the widget
 

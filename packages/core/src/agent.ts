@@ -19,18 +19,23 @@
  *   4. The final text is split into prose + ui blocks, the steps engine finalises (late draws,
  *      the summary card), the ui is sanitised, the turn is persisted and returned.
  *
+ * DEV TRACE (AGENT_DEV_TRACE=true only): the same turn's route, step events, tool arguments and
+ * results and model timings are collected as it runs (dev-trace.ts) and ride the reply and the
+ * `done` event for the playground. Content, so never on a span.
+ *
  * OBSERVABILITY: a turn is one `invoke_agent <domain>` span (GenAI semconv, grouped by
  * gen_ai.conversation.id = session id). Under it: one `chat <model>` span per model call, one
  * `execute_tool <name>` span per tool call, the runtime's step spans, and `behaviour.*` events
  * wherever the runtime corrected the model. Trace log lines carry the same trace id.
  */
-import type { AgentReply, Completion, DomainManifest, StreamEvent, UiBlock } from "@marg-adk/types";
+import type { AgentReply, Completion, DomainManifest, StreamEvent, TurnRoute, UiBlock } from "@marg-adk/types";
 import { chatComplete, chatCompleteStream, type ChatMessage, type ToolCall } from "./llm.js";
 import { buildDomainPrompt } from "./prompt.js";
 import { callDomainTool, getDomainToolDefs, isInternalTool } from "./mcp-client.js";
 import { markCompleted, pushMessage, recordUsage, sanitizeHistory, saveSession, type Session } from "./session.js";
 import { trimHistoryToolResults, trimToolResult } from "./context-trim.js";
 import { head, log, summarize } from "./logger.js";
+import { beginTrace, endTrace, traceLlm, traceTool } from "./dev-trace.js";
 import { MS_BUCKETS, SpanKind, behaviour, counter, evalTag, histogram, setAttrs, withSpan } from "./otel.js";
 import { attestNote, attestedListGuard, guardCreate } from "./guards.js";
 import { handleTypeTool, resolveTypeAtTurnStart, toolsForType, typedEnabled } from "./typed-prompt.js";
@@ -48,6 +53,8 @@ export interface TurnOptions {
   display?: string;
   /** Extra runtime facts for the model this turn (the gateway adds e.g. the media note). */
   promptTail?: (session: Session) => string;
+  /** The super agent's decision for this turn; goes into the dev trace (the core does not route). */
+  route?: TurnRoute;
 }
 
 /** Store an assistant turn so history replay shows exactly what the user saw (prose + the final ui as fences). */
@@ -95,6 +102,7 @@ export async function runDomainAgent(domain: DomainManifest, session: Session, u
       session.activeDomain = domain.name;
       const type = typedEnabled(domain) ? resolveTypeAtTurnStart(domain, session, userMessage) : undefined;
       log.trace("turn.start", { session: session.id, turn: turnNo, domain: domain.name, type, text: head(userMessage, 300), history: session.messages.length });
+      beginTrace(session, turnNo, opts.route);
 
       const tool_trace: { tool: string; ms: number }[] = [];
       const emitPreview = () => {
@@ -120,8 +128,9 @@ export async function runDomainAgent(domain: DomainManifest, session: Session, u
         log.trace("turn.done", { session: session.id, turn: turnNo, kind: pre.turn.kind, event: pre.turn.event, reply: head(reply, 300), ui: ui.map((b) => b.type), ms: Date.now() - t0, runtime: true });
         emitPreview();
         if (onEvent) onEvent({ type: "delta", text: reply });
-        const out: AgentReply = { reply, ui, tool_trace, domain: domain.name, kind: pre.turn.kind };
-        if (onEvent) onEvent({ type: "done", reply, ui, tool_trace, domain: domain.name, kind: pre.turn.kind });
+        const trace = endTrace(session);
+        const out: AgentReply = { reply, ui, tool_trace, domain: domain.name, kind: pre.turn.kind, ...(trace ? { trace } : {}) };
+        if (onEvent) onEvent({ type: "done", reply, ui, tool_trace, domain: domain.name, kind: pre.turn.kind, ...(trace ? { trace } : {}) });
         return out;
       }
 
@@ -164,8 +173,9 @@ export async function runDomainAgent(domain: DomainManifest, session: Session, u
         }
         log.trace("turn.done", { session: session.id, turn: turnNo, rounds, tools: tool_trace.map((t) => t.tool), reply: head(reply, 300), ui: ui.map((b) => b.type), kind, events, ms, completion: completion?.entity_id, usage: session.usage });
         emitPreview();
-        const out: AgentReply = { reply, ui, tool_trace, domain: domain.name, kind, completion };
-        if (onEvent) onEvent({ type: "done", reply, ui, tool_trace, domain: domain.name, kind, completion });
+        const trace = endTrace(session);
+        const out: AgentReply = { reply, ui, tool_trace, domain: domain.name, kind, completion, ...(trace ? { trace } : {}) };
+        if (onEvent) onEvent({ type: "done", reply, ui, tool_trace, domain: domain.name, kind, completion, ...(trace ? { trace } : {}) });
         return out;
       };
 
@@ -173,10 +183,13 @@ export async function runDomainAgent(domain: DomainManifest, session: Session, u
       for (rounds = 0; rounds < MAX_TOOL_ROUNDS; rounds++) {
         let assistant: ChatMessage;
         const spanAttributes = { "agent.turn": turnNo, "agent.round": rounds };
+        const callStart = Date.now();
+        let ttftMs: number | undefined;
         if (onEvent) {
           let full = "";
           let emitted = 0;
           assistant = await chatCompleteStream(messages, tools, (delta) => {
+            ttftMs ??= Date.now() - callStart;
             full += delta;
             const vis = visibleSoFar(full);
             if (vis.length > emitted) {
@@ -188,6 +201,7 @@ export async function runDomainAgent(domain: DomainManifest, session: Session, u
           assistant = await chatComplete(messages, tools, { spanAttributes, domain: domain.name });
         }
         recordUsage(session, assistant.usage);
+        traceLlm(session, { round: rounds, endpoint: assistant.usage?.provider, model: assistant.usage?.model, ms: Date.now() - callStart, ...(ttftMs !== undefined ? { ttft_ms: ttftMs } : {}), input: assistant.usage?.input ?? 0, output: assistant.usage?.output ?? 0, finish: assistant.tool_calls?.length ? "tool_calls" : "stop" });
         log.trace("llm.call", { session: session.id, turn: turnNo, round: rounds, endpoint: assistant.usage?.provider, model: assistant.usage?.model, tokens: assistant.usage, finish: assistant.tool_calls?.length ? "tool_calls" : "stop", text: head(assistant.content, 200), tools: assistant.tool_calls?.map((c) => c.function.name) });
 
         if (!assistant.tool_calls?.length) return finish(assistant.content ?? "", assistant);
@@ -218,12 +232,13 @@ export async function runDomainAgent(domain: DomainManifest, session: Session, u
       pushMessage(session, { role: "assistant", content: BAIL });
       saveSession(session);
       behaviour("tool_rounds_exhausted", { domain: domain.name });
+      const trace = endTrace(session);
       if (onEvent) {
         onEvent({ type: "delta", text: BAIL });
-        onEvent({ type: "done", reply: BAIL, ui: [], tool_trace, domain: domain.name });
+        onEvent({ type: "done", reply: BAIL, ui: [], tool_trace, domain: domain.name, ...(trace ? { trace } : {}) });
       }
       turnSpan.setAttribute("agent.turn.bailed", true);
-      return { reply: BAIL, ui: [], tool_trace, domain: domain.name };
+      return { reply: BAIL, ui: [], tool_trace, domain: domain.name, ...(trace ? { trace } : {}) };
     }
   );
 }
@@ -256,6 +271,7 @@ async function executeToolCall(domain: DomainManifest, session: Session, call: T
     if (sw) {
       span.setAttribute("agent.tool.runtime", true);
       log.trace("tool.call", { session: session.id, turn: o.turnNo, tool: name, args: summarize(args), result: head(sw.result, 200), ms: Date.now() - t0, runtime: true });
+      traceTool(session, { name, args, result: sw.result, ms: Date.now() - t0, runtime: true });
       return { text: sw.result, ms: Date.now() - t0, rebuild: sw.changed, preview: sw.preview };
     }
 
@@ -263,6 +279,7 @@ async function executeToolCall(domain: DomainManifest, session: Session, call: T
     if (name.startsWith("internal_") || isInternalTool(domain.name, name)) {
       const text = `ERROR: ${name} is not available to you.`;
       behaviour("internal_tool_refused", { tool: name });
+      traceTool(session, { name, args, result: text, ms: Date.now() - t0, refused: "internal" });
       return { text, ms: Date.now() - t0, refused: true };
     }
 
@@ -276,6 +293,7 @@ async function executeToolCall(domain: DomainManifest, session: Session, call: T
     if (refusal) {
       span.setAttribute("agent.guard.create_refused", true);
       log.trace("tool.call", { session: session.id, turn: o.turnNo, tool: name, args: summarize(args), result: head(refusal, 200), ms: Date.now() - t0, refused: "confirm_gate" });
+      traceTool(session, { name, args, result: refusal, ms: Date.now() - t0, refused: "confirm_gate", ...(carried.length ? { carried } : {}) });
       return { text: refusal, ms: Date.now() - t0, refused: true };
     }
 
@@ -288,6 +306,7 @@ async function executeToolCall(domain: DomainManifest, session: Session, call: T
     histogram("tool_duration_ms", { unit: "ms", boundaries: MS_BUCKETS }).record(ms, { domain: domain.name, tool: name });
     span.setAttributes({ "agent.tool.ok": ok, "agent.tool.ms": ms, "agent.tool.result_chars": result.length, ...(completion ? { "agent.completion.id": completion.entity_id } : {}) });
     log.trace("tool.call", { session: session.id, turn: o.turnNo, tool: name, args: summarize(args), result: head(result, 400), ms, ok, carried, attested: attested.map((a) => ({ key: a.key, removed: a.removed.length })), completion: completion?.entity_id });
+    traceTool(session, { name, args, result, ms, ok, ...(carried.length ? { carried } : {}) });
     return { text: result + notes.join(""), ms, completion, preview };
   });
 }

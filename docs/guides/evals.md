@@ -33,6 +33,16 @@ only against a gateway whose health says writes are off.
 `completed`, `notCompleted`, `reloadRedraws(type)`, `oneQuestion`, `noLeak(re)`.
 A refused write shows in the trace as `create_x (refused)` — assert on it explicitly.
 
+### The dev trace
+A gateway started with `AGENT_DEV_TRACE=true` (`npm run gateway:evals` does, and a created project's
+`.env` does) hands each turn's facts to the runner: `TurnResult.trace` (the route decision, the step
+engine's events, every tool call with its arguments and result, the model's calls) and `turns`
+(what `GET /history` would let a reload redraw). Checks over them: `hasTrace`,
+`routeIs({ domain, by, confidence })`, `stepEvent(step, event)`, `toolCall(tool, { args, result })`
+and `reloadKeepsTrace`. The example's `dev-trace` scenario walks the journey with all of them. On a
+gateway with the flag off the trace checks go red with the reason in their name: that is the flag
+doing its job, not a regression.
+
 ## Simulated users
 
 A scenario can hand the user's side to a **simulated user** instead of a turn list: `user` is

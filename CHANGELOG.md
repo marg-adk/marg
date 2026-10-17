@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+- **gateway, core**: the dev trace. With `AGENT_DEV_TRACE=true` (default off; `.env.example` sets it,
+  `render.yaml` and `.env.production.example` leave it off) every turn carries what the gateway already
+  logged, as a client payload: the route decision (the domain, the link that decided — `keywords`,
+  `systemone`, `llm`, `sticky`, `single`, `fallback` — and its confidence), the step engine's events
+  (`drawn`, `late_draw`, `redrawn`, `reopened`, `settled`, `skipped`, `summary`), every tool call with the
+  arguments it received (after the carry rule) and its result (masked, clipped), and each model call's
+  time and tokens. It rides the SSE `done` event and the JSON reply as `trace`; the last 30 turns are
+  kept on the session and `GET /api/session/:id/history` replays them as `turns`, so a reload can rebuild
+  the Trace pane. `GET /api/health` reports `dev_trace`. Nothing new reaches telemetry: spans, metrics
+  and behaviour events keep their counts and enums. Shape: `docs/CLIENT-PROTOCOL.md`, "The dev trace".
+- **playground**: the Trace pane draws the dev trace per turn: the route with its confidence, the step
+  events as a line (*asked*, *redrawn*, *settled*, *summary shown*), each tool call folded with its
+  arguments and result, the model's calls and timings; a gateway without the flag keeps the old view plus
+  a note saying why. A reload rebuilds both panes from the one `/history` response: the Draft pane from
+  `preview` (a finished chat came back empty before: the widget clears the preview when a chat completes)
+  and the Trace pane from `turns`. The usage pill read `input_tokens`/`plan_tokens` and never showed; it
+  reads `turn_tokens`/`turn_plan`, which the gateway sends. The phone layout is unchanged.
+- **widget**: `onTurn` gains `trace` (null when the gateway sends none) and a new `onHistory(history)` hook
+  hands a host the whole `/history` response when a chat is resumed or opened. Both are additive; the fake-DOM
+  tests cover them.
+- **evals**: `TurnResult` gains `trace` and `turns`; the checks `hasTrace`, `routeIs`, `stepEvent`,
+  `toolCall` and `reloadKeepsTrace`. The support-intake `dev-trace` scenario walks the journey with them
+  (the route and its confidence, `search_customers` with its query and the two matches, Details asked →
+  redrawn → settled, the create refused with writes off, and the same facts after a reload); the bookings
+  routing scenarios assert the route both ways. `npm run gateway:evals` sets the flag.
 - **core**: the review no longer draws the summary over an answer the change made stale. After
   "Change something" → a section → a changed answer, the steps that `dependsOn` it were reset, but
   the settle called `drawSummary()` directly, so `nextOwed()` was never asked: the card came back at
@@ -9,7 +34,8 @@
   the tool's default (`medium`) while the user had confirmed `high`. The edit settle now goes through
   the same chain as every other settle: the reset step is asked again (with one line saying why) and
   the summary returns after it. Found by walking the example by hand while building a new domain on
-  0.3.0. A reset now counts as `behaviour_events_total{kind="step",type="reset"}` and a trace line.
+  0.3.0. A reset now counts as `behaviour_events_total{kind="step",type="reset"}`, is a log trace line, and a
+  `reset` event in the dev trace (the Trace pane says it).
   The create gate is untouched in all three layers.
   **evals**: `cardRow(key, { value })` checks a drawn summary's field; the example suite gains
   `review-edit-reasks-dependent` (red on the old engine at the turn the summary returns, and at the

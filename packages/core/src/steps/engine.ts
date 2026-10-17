@@ -23,6 +23,7 @@ import type { CardBlock, ChipsBlock, DomainManifest, PreviewState, StepState, Ui
 import { callDomainTool } from "../mcp-client.js";
 import { behaviour, withSpan } from "../otel.js";
 import { log } from "../logger.js";
+import { traceStep } from "../dev-trace.js";
 import { draftFingerprint } from "../preview.js";
 import { rowsFromSlots } from "../ui-blocks.js";
 import { isPlainSkip, isPlainYes } from "../reply-words.js";
@@ -182,6 +183,7 @@ export async function drawStep(domain: DomainManifest, session: Session, step: S
   const event = via === "moment" ? "drawn" : via === "late" ? "late_draw" : via === "edit" ? "reopened" : "redrawn";
   behaviour("step", { domain: domain.name, step: step.key, type: event, via });
   log.trace("step", { session: session.id, turn: session.turn, step: step.key, event, via });
+  traceStep(session, step.key, event, via);
   return { turn: { reply: draw.lead, ui, kind: step.key, event }, draw };
 }
 
@@ -219,6 +221,7 @@ function drawSummary(domain: DomainManifest, session: Session, via: StepVia): Ru
   draft.edit = undefined;
   behaviour("summary_card", { domain: domain.name, via });
   log.trace("step", { session: session.id, turn: session.turn, step: "confirm", event: "summary", via });
+  traceStep(session, "confirm", "summary", via);
   return { reply: SUMMARY_LEAD, ui: [summaryCard(domain, session)], kind: "confirm", event: "summary" };
 }
 
@@ -262,6 +265,7 @@ export function resetDependents(domain: DomainManifest, session: Session, change
         reset.push(s.key);
         behaviour("step", { domain: domain.name, step: s.key, type: "reset", via: "edit" });
         log.trace("step", { session: session.id, turn: session.turn, step: s.key, event: "reset", via: "edit", because: changedKey });
+        traceStep(session, s.key, "reset", "edit");
         walk(s.key);
       }
     }
@@ -284,6 +288,7 @@ async function applySettle(domain: DomainManifest, session: Session, step: StepD
   clearSummary(session);
   behaviour("step", { domain: domain.name, step: step.key, type: "settled", via });
   log.trace("step", { session: session.id, turn: session.turn, step: step.key, event: "settled", via, keys: Object.keys(settled.slots ?? read.values) });
+  traceStep(session, step.key, "settled", via);
   let reset: string[] = [];
   if (via === "edit") {
     const changed = Object.keys(settled.slots ?? read.values).filter((k) => prev?.before?.[k] !== (settled.slots ?? read.values)[k]);
@@ -301,6 +306,7 @@ async function applySkip(domain: DomainManifest, session: Session, step: StepDef
   clearSummary(session);
   behaviour("step", { domain: domain.name, step: step.key, type: "skipped" });
   log.trace("step", { session: session.id, turn: session.turn, step: step.key, event: "skipped" });
+  traceStep(session, step.key, "skipped");
   return out.say;
 }
 
